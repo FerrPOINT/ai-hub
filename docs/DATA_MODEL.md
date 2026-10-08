@@ -64,3 +64,10 @@ post-deploy indexes измеряются на representative data, не доба
 Account balances/aggregate cache не правятся отдельно от ledger transaction.
 Retention удаляет только разрешённые content/projections; financial dedupe identity
 и external receipt ссылки проходят documented archival/restore, не orphan delete.
+
+## Полный typed design
+
+DATA_DICTIONARY и contracts/data-dictionary.v1.json уточняют34 tables/294 fields,
+operation/login ledgers и immutable connection generations. Wire DTO — OpenAPI.
+Operations safe_result не содержит one-time keys/model result; FK/proof/lifecycle
+и stage increments перечислены в MIGRATION_PLAN/STATE_MACHINES.

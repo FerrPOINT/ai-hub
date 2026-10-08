@@ -95,3 +95,11 @@ Known cost overrun фиксируется как fact и блокирует но
 под hard monetary budget; оператор может дать explicit cost-unknown grant с
 token/request/concurrency caps, и UI обязан показать отсутствие денежной гарантии.
 Subscription fee учитывается budget по его scope; не смешивать usage quota и cash.
+
+## Фиксированный сбор
+
+PriceInput.request_fee — известный fixed per-attempt amount38/18 либо null unknown.
+Отсутствие поля не означает zero-fee. Trusted receipt может подтвердить fee даже
+при квалифицированном no-acceptance rejection; tokens при этом не выдумываются.
+Эта fee snapshot включается в upper bound/reservation и per-attempt ledger.
+Допустимость fallback определяется независимой acceptance certainty из ROUTING.

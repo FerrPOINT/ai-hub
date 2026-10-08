@@ -56,3 +56,9 @@ Synthetic fixtures не содержат реальных keys/prompts/account n
 [ui-routes.json](ui-routes.json) — route/operation/test mapping, status planned.
 TC-024 проверяет сценарии, TC-032 — geometry/a11y. Реальные screenshots и served
 source identity собираются после S2/S5, не выдумываются для design baseline.
+
+## Проверенный handoff
+
+Rendered prototype/design contract и QA в design/README. UI_SCREEN_SPEC содержит
+full page composition, UI_FIELD_REFERENCE — fields/derived/constraints.
+Application qa остаётся not_run; design evidence отдельно, current DEVELOP_READY.

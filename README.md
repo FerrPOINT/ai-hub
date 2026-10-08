@@ -92,3 +92,10 @@ transcripts в аналитике. Существующие Octo/PDLC installati
 
 [LICENSE](LICENSE) и [NOTICE](NOTICE) — единый FerrPOINT license;
 [third-party notices](THIRD_PARTY_NOTICES.md) сохраняют границы чужих компонентов.
+
+## Полный дизайн и готовность
+
+[DEVELOP_READY](docs/DEVELOP_READY.md) — полный handoff до разработки.
+[Интерактивный дизайн](docs/design/README.md) / [галерея](docs/design/gallery.html).
+15 screens,3 themes, explicit states/forms/fields; IAB evidence — только prototype.
+Typed DD34 tables/294 fields и execution packets позволяют начать S1.

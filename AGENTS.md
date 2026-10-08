@@ -40,11 +40,12 @@ Credentials только write-only; денежные значения decimal, 
 
 ## Проверки и поставка
 
-Сейчас действует только `python scripts/check_docs.py` и
-`python -m unittest discover -s scripts/tests -v`.
+Действующие gates: `python scripts/check_docs.py`,
+`python scripts/check_design.py` и `python -m unittest discover -s scripts/tests -v`.
 Будущие backend/frontend/runtime gates описаны в [QUALITY_GATE](docs/QUALITY_GATE.md);
 их отсутствие не означает PASS. До разработки не создавать фиктивные package,
-OpenAPI-generated artifacts, migrations, screenshots или зелёные CI badges.
+OpenAPI-generated artifacts, migrations или зелёные CI badges.
+Design screenshots разрешены в docs/design с kind prototype; не actual-app evidence.
 
 Сохранять чужую работу; task-owned документация коммитится и публикуется обычным git.
 Identity: FerrPOINT <ferrpoint@users.noreply.github.com>. Перед push fetch и проверка

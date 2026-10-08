@@ -9,6 +9,7 @@
 
 ```shell
 python scripts/check_docs.py
+python scripts/check_design.py
 python -m unittest discover -s scripts/tests -v
 uv run --no-project --with openapi-spec-validator==0.7.2 python scripts/validate_contract.py
 git diff --check

@@ -1,0 +1,2271 @@
+{
+  "schema_version": 1,
+  "status": "design_only",
+  "store": "PostgreSQL 17",
+  "migration_path": "backend/migrations",
+  "tables": [
+    {
+      "name": "installations",
+      "phase": "S1",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "stable_key",
+          "type": "text",
+          "nullable": false,
+          "rule": "unique"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "rule": "active or blocked"
+        },
+        {
+          "name": "blocked_reason",
+          "type": "text",
+          "nullable": true,
+          "rule": "safe admission reason"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "providers",
+      "phase": "S1",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "installations.id"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "rule": "adapter allowlist"
+        },
+        {
+          "name": "display_name",
+          "type": "varchar(120)",
+          "nullable": false,
+          "rule": "presentation only"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "connections",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "provider_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "providers.id"
+        },
+        {
+          "name": "display_name",
+          "type": "varchar(120)",
+          "nullable": false,
+          "rule": "user label"
+        },
+        {
+          "name": "endpoint_policy_ref",
+          "type": "text",
+          "nullable": false,
+          "rule": "deployment allowlist"
+        },
+        {
+          "name": "billing_mode",
+          "type": "text",
+          "nullable": false,
+          "rule": "metered subscription local unknown"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "monotonic >=1"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "rule": "enabled disabled revoked authorization_unknown"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "CAS >=1"
+        }
+      ]
+    },
+    {
+      "name": "connection_generations",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "composite PK connections.id"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "composite PK >=1"
+        },
+        {
+          "name": "authorization_state",
+          "type": "text",
+          "nullable": false,
+          "rule": "absent prepared active revoked unknown"
+        },
+        {
+          "name": "adapter_revision",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact adapter"
+        },
+        {
+          "name": "endpoint_policy_hash",
+          "type": "text",
+          "nullable": false,
+          "rule": "immutable snapshot"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "credential_versions",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "connection_generations binding"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "same generation composite PK"
+        },
+        {
+          "name": "ciphertext",
+          "type": "bytea",
+          "nullable": false,
+          "rule": "encrypted no raw secret"
+        },
+        {
+          "name": "nonce",
+          "type": "bytea",
+          "nullable": false,
+          "rule": "unique 12-byte AES-GCM nonce"
+        },
+        {
+          "name": "key_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "separate key escrow reference"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "prepared active revoked"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "upstream_models",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "exact connection"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "exact generation"
+        },
+        {
+          "name": "provider_model_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact case-sensitive ID"
+        },
+        {
+          "name": "input_limit",
+          "type": "bigint",
+          "nullable": true,
+          "rule": "unknown not default"
+        },
+        {
+          "name": "output_limit",
+          "type": "bigint",
+          "nullable": true,
+          "rule": "unknown not default"
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "safe allowlisted fields"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "catalog freshness"
+        }
+      ]
+    },
+    {
+      "name": "operations",
+      "phase": "S1",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own installation"
+        },
+        {
+          "name": "principal_kind",
+          "type": "text",
+          "nullable": false,
+          "rule": "human client internal"
+        },
+        {
+          "name": "principal_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "trusted subject"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "caller stable intent"
+        },
+        {
+          "name": "binding_hmac",
+          "type": "bytea",
+          "nullable": false,
+          "rule": "method path payload ETag principal"
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false,
+          "rule": "allowlisted operation"
+        },
+        {
+          "name": "resource_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own target"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "pending succeeded failed unknown cancelled"
+        },
+        {
+          "name": "safe_result",
+          "type": "jsonb",
+          "nullable": true,
+          "rule": "no raw credentials or one-time secret"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "30-day control dedupe"
+        }
+      ]
+    },
+    {
+      "name": "login_attempts",
+      "phase": "S4",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK operation reference"
+        },
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "exact target"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "fenced authorization"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "pending completed expired cancelled failed unknown"
+        },
+        {
+          "name": "encrypted_checkpoint",
+          "type": "bytea",
+          "nullable": true,
+          "rule": "own vault-only projection"
+        },
+        {
+          "name": "key_id",
+          "type": "text",
+          "nullable": true,
+          "rule": "checkpoint key reference"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "provider device login deadline"
+        }
+      ]
+    },
+    {
+      "name": "probe_snapshots",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "operation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own operation"
+        },
+        {
+          "name": "scope",
+          "type": "text",
+          "nullable": false,
+          "rule": "connection_model or profile_draft"
+        },
+        {
+          "name": "config_hash",
+          "type": "text",
+          "nullable": false,
+          "rule": "frozen shape"
+        },
+        {
+          "name": "draft_model_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "only profile scope"
+        },
+        {
+          "name": "draft_version",
+          "type": "bigint",
+          "nullable": true,
+          "rule": "only profile scope"
+        },
+        {
+          "name": "configuration",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "secret-free exact targets bounds capabilities"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "verification_evidence",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "probe_snapshot_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "probe snapshot FK"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "pending verified failed expired"
+        },
+        {
+          "name": "child_evidence",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "ordered exact proof IDs"
+        },
+        {
+          "name": "receipt_digest",
+          "type": "text",
+          "nullable": true,
+          "rule": "trusted terminal witness"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "publication freshness only"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "runtime_qualifications",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "exact account"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "immutable generation"
+        },
+        {
+          "name": "provider_model_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact model"
+        },
+        {
+          "name": "adapter_revision",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact code"
+        },
+        {
+          "name": "endpoint_policy_hash",
+          "type": "text",
+          "nullable": false,
+          "rule": "scope"
+        },
+        {
+          "name": "proof_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "trusted evidence"
+        },
+        {
+          "name": "capabilities",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "qualified set and bounds"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "active invalidated"
+        },
+        {
+          "name": "invalidated_reason",
+          "type": "text",
+          "nullable": true,
+          "rule": "safe reason"
+        }
+      ]
+    },
+    {
+      "name": "virtual_models",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own installation"
+        },
+        {
+          "name": "slug",
+          "type": "varchar(63)",
+          "nullable": false,
+          "rule": "unique immutable API name"
+        },
+        {
+          "name": "display_name",
+          "type": "varchar(120)",
+          "nullable": false,
+          "rule": "presentation"
+        },
+        {
+          "name": "draft",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "validated ProfileInput"
+        },
+        {
+          "name": "draft_version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "CAS >=1"
+        },
+        {
+          "name": "active_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own profile revision only"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "rule": "draft active disabled archived"
+        }
+      ]
+    },
+    {
+      "name": "profile_revisions",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "virtual_model_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "owner FK"
+        },
+        {
+          "name": "sequence",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "unique per model"
+        },
+        {
+          "name": "configuration",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "immutable params bounds policy"
+        },
+        {
+          "name": "config_hash",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact normalized bytes"
+        },
+        {
+          "name": "profile_verification_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "exact draft proof"
+        },
+        {
+          "name": "created_by",
+          "type": "text",
+          "nullable": false,
+          "rule": "trusted actor"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "profile_deployments",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "composite PK profile_revisions.id"
+        },
+        {
+          "name": "ordinal",
+          "type": "integer",
+          "nullable": false,
+          "rule": "ordered composite PK >=1"
+        },
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "exact connection"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "frozen immutable generation"
+        },
+        {
+          "name": "model_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact provider ID"
+        },
+        {
+          "name": "verification_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "child witness"
+        },
+        {
+          "name": "deployment_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "adapter endpoint capabilities bounds no secret"
+        }
+      ]
+    },
+    {
+      "name": "clients",
+      "phase": "S1",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own scope"
+        },
+        {
+          "name": "application_key",
+          "type": "varchar(120)",
+          "nullable": false,
+          "rule": "unique per installation"
+        },
+        {
+          "name": "project_binding",
+          "type": "text",
+          "nullable": false,
+          "rule": "trusted control mapping"
+        },
+        {
+          "name": "allowed_profiles",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "bounded UUID allowlist"
+        },
+        {
+          "name": "scopes",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "infer read_own_usage read_result"
+        },
+        {
+          "name": "cost_policy",
+          "type": "text",
+          "nullable": false,
+          "rule": "budget_guaranteed or explicit cost_unknown_allowed"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        },
+        {
+          "name": "max_concurrency",
+          "type": "integer",
+          "nullable": false,
+          "rule": "1..100 and own global cap"
+        },
+        {
+          "name": "max_rpm",
+          "type": "integer",
+          "nullable": false,
+          "rule": "1..10000"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "rule": "enabled disabled revoked"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "CAS"
+        }
+      ]
+    },
+    {
+      "name": "client_keys",
+      "phase": "S1",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "client_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "clients.id"
+        },
+        {
+          "name": "key_hash",
+          "type": "bytea",
+          "nullable": false,
+          "rule": "unique no plaintext"
+        },
+        {
+          "name": "prefix",
+          "type": "text",
+          "nullable": false,
+          "rule": "safe display identifier"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "revoke effective"
+        }
+      ]
+    },
+    {
+      "name": "grants",
+      "phase": "S1",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "scope"
+        },
+        {
+          "name": "principal_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "trusted identity not body user"
+        },
+        {
+          "name": "client_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "machine binding"
+        },
+        {
+          "name": "project_binding",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact allowed project"
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false,
+          "rule": "allowlisted permission"
+        },
+        {
+          "name": "virtual_model_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "exact model for infer"
+        },
+        {
+          "name": "bounds",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "purpose/caps"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "validity"
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "deny new access"
+        }
+      ]
+    },
+    {
+      "name": "requests",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own scope"
+        },
+        {
+          "name": "client_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own normal/internal client"
+        },
+        {
+          "name": "principal_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "trusted actor"
+        },
+        {
+          "name": "project_binding",
+          "type": "text",
+          "nullable": false,
+          "rule": "frozen grant"
+        },
+        {
+          "name": "request_kind",
+          "type": "text",
+          "nullable": false,
+          "rule": "inference verification evaluation"
+        },
+        {
+          "name": "profile_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "required non-verification"
+        },
+        {
+          "name": "probe_snapshot_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "required verification"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "client key or generated own ID"
+        },
+        {
+          "name": "payload_hmac",
+          "type": "bytea",
+          "nullable": false,
+          "rule": "semantic intent binding"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "admitted dispatching streaming completed failed cancelled unknown"
+        },
+        {
+          "name": "cancel_requested",
+          "type": "boolean",
+          "nullable": false,
+          "rule": "default false separate from terminal"
+        },
+        {
+          "name": "admitted_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "transport terminal"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "CAS fence"
+        }
+      ]
+    },
+    {
+      "name": "replay_payloads",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK own request"
+        },
+        {
+          "name": "encrypted_response",
+          "type": "bytea",
+          "nullable": false,
+          "rule": "own result buffer only"
+        },
+        {
+          "name": "key_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "separate own encryption key"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "<=24h"
+        },
+        {
+          "name": "protocol",
+          "type": "text",
+          "nullable": false,
+          "rule": "chat_completions responses"
+        }
+      ]
+    },
+    {
+      "name": "attempts",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "requests.id"
+        },
+        {
+          "name": "ordinal",
+          "type": "integer",
+          "nullable": false,
+          "rule": "unique request ordinal"
+        },
+        {
+          "name": "deployment_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "frozen exact scope"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "intended dispatched streaming completed failed cancelled unknown"
+        },
+        {
+          "name": "accepted",
+          "type": "text",
+          "nullable": false,
+          "rule": "not_accepted accepted unknown"
+        },
+        {
+          "name": "dispatch_intent_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "durable before I/O"
+        },
+        {
+          "name": "dispatched_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "sent boundary"
+        },
+        {
+          "name": "first_content_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "TTFT"
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "terminal witness"
+        },
+        {
+          "name": "provider_request_id",
+          "type": "text",
+          "nullable": true,
+          "rule": "own readback"
+        },
+        {
+          "name": "actual_model",
+          "type": "text",
+          "nullable": true,
+          "rule": "not guessed"
+        },
+        {
+          "name": "actual_model_verified",
+          "type": "boolean",
+          "nullable": false,
+          "rule": "default false"
+        }
+      ]
+    },
+    {
+      "name": "usage_facts",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "attempt_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "attempts.id"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "rule": "trusted ingestion kind"
+        },
+        {
+          "name": "source_event_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "unique within source installation"
+        },
+        {
+          "name": "categories",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "disjoint known/unknown token categories"
+        },
+        {
+          "name": "provenance",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "adapter receipt/category inclusion"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "price_revisions",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own account"
+        },
+        {
+          "name": "model_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact upstream"
+        },
+        {
+          "name": "tier",
+          "type": "text",
+          "nullable": false,
+          "rule": "billing tier"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "rule": "supported explicit currency"
+        },
+        {
+          "name": "input_uncached",
+          "type": "numeric(30,12)",
+          "nullable": false,
+          "rule": "nonnegative per-million"
+        },
+        {
+          "name": "input_cached",
+          "type": "numeric(30,12)",
+          "nullable": true,
+          "rule": "unknown not zero"
+        },
+        {
+          "name": "output_billable",
+          "type": "numeric(30,12)",
+          "nullable": false,
+          "rule": "nonnegative per-million"
+        },
+        {
+          "name": "request_fee",
+          "type": "numeric(38,18)",
+          "nullable": true,
+          "rule": "known fixed per-attempt or unknown"
+        },
+        {
+          "name": "effective_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "inclusive"
+        },
+        {
+          "name": "effective_to",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "exclusive > from"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "rule": "price provenance"
+        }
+      ]
+    },
+    {
+      "name": "ledger_entries",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own scope"
+        },
+        {
+          "name": "attempt_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "required invocation charge"
+        },
+        {
+          "name": "charge_key",
+          "type": "text",
+          "nullable": false,
+          "rule": "stable logical charge identity"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "rule": "reserve release charge correction subscription_charge"
+        },
+        {
+          "name": "amount",
+          "type": "numeric(38,18)",
+          "nullable": true,
+          "rule": "null only unknown charge"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "rule": "explicit"
+        },
+        {
+          "name": "confidence",
+          "type": "text",
+          "nullable": false,
+          "rule": "confirmed estimated unknown"
+        },
+        {
+          "name": "original_entry_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "correction/settlement reference"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "rule": "trusted origin"
+        },
+        {
+          "name": "source_event_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "dedupe"
+        },
+        {
+          "name": "price_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "estimate provenance"
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "cash basis"
+        }
+      ]
+    },
+    {
+      "name": "budget_policies",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "scope"
+        },
+        {
+          "name": "scope_type",
+          "type": "text",
+          "nullable": false,
+          "rule": "installation project client profile"
+        },
+        {
+          "name": "scope_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact target"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "rule": "no mixed currencies"
+        },
+        {
+          "name": "period",
+          "type": "text",
+          "nullable": false,
+          "rule": "utc_day utc_month"
+        },
+        {
+          "name": "hard_limit",
+          "type": "numeric(38,18)",
+          "nullable": false,
+          "rule": ">=0"
+        },
+        {
+          "name": "thresholds",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "ascending unique 1..99"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "CAS"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "rule": "active disabled"
+        }
+      ]
+    },
+    {
+      "name": "budget_periods",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "policy_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "budget_policies.id"
+        },
+        {
+          "name": "period_start",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC exact boundary"
+        },
+        {
+          "name": "period_end",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "exclusive"
+        },
+        {
+          "name": "charged",
+          "type": "numeric(38,18)",
+          "nullable": false,
+          "rule": "canonical effective charges"
+        },
+        {
+          "name": "reserved",
+          "type": "numeric(38,18)",
+          "nullable": false,
+          "rule": "held >=0"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "row lock/CAS"
+        }
+      ]
+    },
+    {
+      "name": "reservations",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "attempt_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "composite PK"
+        },
+        {
+          "name": "budget_period_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "composite PK"
+        },
+        {
+          "name": "amount",
+          "type": "numeric(38,18)",
+          "nullable": false,
+          "rule": "bounded >=0"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "rule": "same policy"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "held released settled"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "before dispatch"
+        }
+      ]
+    },
+    {
+      "name": "subscriptions",
+      "phase": "S4",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own account"
+        },
+        {
+          "name": "period_start",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "service period inclusive"
+        },
+        {
+          "name": "period_end",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "service period exclusive"
+        },
+        {
+          "name": "amount",
+          "type": "numeric(38,18)",
+          "nullable": false,
+          "rule": ">=0"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "rule": "explicit"
+        },
+        {
+          "name": "payment_status",
+          "type": "text",
+          "nullable": false,
+          "rule": "planned pending paid unknown"
+        },
+        {
+          "name": "receipt_ref",
+          "type": "text",
+          "nullable": true,
+          "rule": "trust importer reference"
+        },
+        {
+          "name": "source_event_id",
+          "type": "text",
+          "nullable": true,
+          "rule": "dedupe trusted payment"
+        },
+        {
+          "name": "cash_occurred_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "known paid charge"
+        },
+        {
+          "name": "confidence",
+          "type": "text",
+          "nullable": false,
+          "rule": "confirmed estimated unknown"
+        }
+      ]
+    },
+    {
+      "name": "quota_observations",
+      "phase": "S4",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "exact account"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "exact scope"
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "nullable": false,
+          "rule": "provider quota unit"
+        },
+        {
+          "name": "limit",
+          "type": "bigint",
+          "nullable": true,
+          "rule": "known nonnegative"
+        },
+        {
+          "name": "remaining",
+          "type": "bigint",
+          "nullable": true,
+          "rule": "known nonnegative"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "rule": "provider witness"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "freshness"
+        },
+        {
+          "name": "reset_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "known reset"
+        }
+      ]
+    },
+    {
+      "name": "dataset_versions",
+      "phase": "S6",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "dataset_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "stable dataset"
+        },
+        {
+          "name": "sequence",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "unique per dataset"
+        },
+        {
+          "name": "project_binding",
+          "type": "text",
+          "nullable": false,
+          "rule": "owner scope"
+        },
+        {
+          "name": "created_by",
+          "type": "text",
+          "nullable": false,
+          "rule": "trusted actor"
+        },
+        {
+          "name": "cases_hash",
+          "type": "text",
+          "nullable": false,
+          "rule": "immutable exact dataset"
+        },
+        {
+          "name": "case_count",
+          "type": "integer",
+          "nullable": false,
+          "rule": "1..1000"
+        },
+        {
+          "name": "content_ref",
+          "type": "text",
+          "nullable": false,
+          "rule": "own encrypted artifact store"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "7d content default"
+        }
+      ]
+    },
+    {
+      "name": "evaluation_runs",
+      "phase": "S6",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "dataset_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "exact version"
+        },
+        {
+          "name": "project_binding",
+          "type": "text",
+          "nullable": false,
+          "rule": "own scope"
+        },
+        {
+          "name": "config_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "profiles scorer params repetitions"
+        },
+        {
+          "name": "budget_policy_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "applicable scope"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "queued running completed failed cancelled"
+        },
+        {
+          "name": "lease_generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "fencing"
+        },
+        {
+          "name": "lease_expires_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "worker lease"
+        },
+        {
+          "name": "cancel_requested",
+          "type": "boolean",
+          "nullable": false,
+          "rule": "default false"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "evaluation_cases",
+      "phase": "S6",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "run_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "composite unique"
+        },
+        {
+          "name": "candidate_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "frozen exact profile"
+        },
+        {
+          "name": "repetition",
+          "type": "integer",
+          "nullable": false,
+          "rule": "1..10"
+        },
+        {
+          "name": "case_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "dataset case"
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "unique dispatch binding"
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "nullable": false,
+          "rule": "pass fail invalid incomparable skipped unknown"
+        },
+        {
+          "name": "score",
+          "type": "jsonb",
+          "nullable": true,
+          "rule": "scorer witness"
+        },
+        {
+          "name": "artifact_ref",
+          "type": "text",
+          "nullable": true,
+          "rule": "scoped TTL content"
+        }
+      ]
+    },
+    {
+      "name": "aggregate_buckets",
+      "phase": "S5",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "filter_hash",
+          "type": "text",
+          "nullable": false,
+          "rule": "authorized grouping identity"
+        },
+        {
+          "name": "time_bucket",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "explicit basis"
+        },
+        {
+          "name": "dimension_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "bounded group"
+        },
+        {
+          "name": "known_counts",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "no fake unknown zeros"
+        },
+        {
+          "name": "totals",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "per currency confidence"
+        },
+        {
+          "name": "watermark",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "rebuild provenance"
+        }
+      ]
+    },
+    {
+      "name": "audit_events",
+      "phase": "S1",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own scope"
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "nullable": false,
+          "rule": "trusted subject"
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false,
+          "rule": "allowlist"
+        },
+        {
+          "name": "object_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "safe identity"
+        },
+        {
+          "name": "revision",
+          "type": "text",
+          "nullable": true,
+          "rule": "exact revision"
+        },
+        {
+          "name": "operation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own operation"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": true,
+          "rule": "safe text no secret"
+        },
+        {
+          "name": "happened_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "alert_outbox",
+      "phase": "S5",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "event_key",
+          "type": "text",
+          "nullable": false,
+          "rule": "unique scope period threshold"
+        },
+        {
+          "name": "scope_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "own target"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "rule": "budget unknown projection provider"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "pending delivered failed"
+        },
+        {
+          "name": "safe_payload",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "no secrets/content"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        },
+        {
+          "name": "delivered_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "in-app ack"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "table": "providers",
+      "column": "installation_id",
+      "target_table": "installations",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "connections",
+      "column": "provider_id",
+      "target_table": "providers",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "connection_generations",
+      "column": "connection_id",
+      "target_table": "connections",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "upstream_models",
+      "column": "connection_id",
+      "target_table": "connections",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "operations",
+      "column": "installation_id",
+      "target_table": "installations",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "login_attempts",
+      "column": "connection_id",
+      "target_table": "connections",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "probe_snapshots",
+      "column": "operation_id",
+      "target_table": "operations",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "verification_evidence",
+      "column": "probe_snapshot_id",
+      "target_table": "probe_snapshots",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "runtime_qualifications",
+      "column": "proof_id",
+      "target_table": "verification_evidence",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "virtual_models",
+      "column": "installation_id",
+      "target_table": "installations",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "profile_revisions",
+      "column": "virtual_model_id",
+      "target_table": "virtual_models",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "profile_deployments",
+      "column": "revision_id",
+      "target_table": "profile_revisions",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "clients",
+      "column": "installation_id",
+      "target_table": "installations",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "client_keys",
+      "column": "client_id",
+      "target_table": "clients",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "grants",
+      "column": "client_id",
+      "target_table": "clients",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "requests",
+      "column": "client_id",
+      "target_table": "clients",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "requests",
+      "column": "profile_revision_id",
+      "target_table": "profile_revisions",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "requests",
+      "column": "probe_snapshot_id",
+      "target_table": "probe_snapshots",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "replay_payloads",
+      "column": "request_id",
+      "target_table": "requests",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "attempts",
+      "column": "request_id",
+      "target_table": "requests",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "usage_facts",
+      "column": "attempt_id",
+      "target_table": "attempts",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "price_revisions",
+      "column": "connection_id",
+      "target_table": "connections",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "ledger_entries",
+      "column": "attempt_id",
+      "target_table": "attempts",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "ledger_entries",
+      "column": "original_entry_id",
+      "target_table": "ledger_entries",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "ledger_entries",
+      "column": "price_revision_id",
+      "target_table": "price_revisions",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "budget_periods",
+      "column": "policy_id",
+      "target_table": "budget_policies",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "reservations",
+      "column": "budget_period_id",
+      "target_table": "budget_periods",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "reservations",
+      "column": "attempt_id",
+      "target_table": "attempts",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "subscriptions",
+      "column": "connection_id",
+      "target_table": "connections",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "quota_observations",
+      "column": "connection_id",
+      "target_table": "connections",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "evaluation_runs",
+      "column": "dataset_version_id",
+      "target_table": "dataset_versions",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "evaluation_runs",
+      "column": "budget_policy_id",
+      "target_table": "budget_policies",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "evaluation_cases",
+      "column": "run_id",
+      "target_table": "evaluation_runs",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "evaluation_cases",
+      "column": "request_id",
+      "target_table": "requests",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "evaluation_cases",
+      "column": "candidate_revision_id",
+      "target_table": "profile_revisions",
+      "target_column": "id",
+      "on_delete": "restrict / archive; content TTL separate"
+    }
+  ],
+  "composite_invariants": [
+    "credential_versions(connection_id,generation) references connection_generations; no absent local auth credential requirement",
+    "runtime qualification binds connection/generation/model/adapter/endpoint and immutable proof",
+    "active_revision_id references revision of same virtual_model, not any existing revision",
+    "request_kind verification iff probe_snapshot_id non-null and profile_revision_id null",
+    "unique installation/client/idempotency intent; control operation separate principal namespace",
+    "unknown charge amount null, confirmed/estimated amount exact; correction linked and append-only",
+    "effective charge confirmed replaces linked estimate; aggregates not financial authority",
+    "price intervals non-overlapping per connection/model/tier/currency",
+    "reservations unique attempt/budget period; sorted multi-scope locks",
+    "evaluation case unique run/candidate/repetition/case; restart no replay unknown I/O",
+    "operation safe_result never stores plaintext client/provider keys or model output",
+    "UTC half-open periods; cash occurred_at distinct subscription service period"
+  ]
+}

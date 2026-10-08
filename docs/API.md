@@ -181,3 +181,11 @@ Post-dispatch ambiguous outcome хранится в request state unknown.
 Upstream credential/body/error content маскируется; raw native failure не passthrough.
 После начала SSE HTTP status не меняется: protocol error event + terminal state,
 никакого fabricated completion. Error cases: TC-005/006/018/026/033.
+
+## Полный design mapping
+
+UI_SCREEN_SPEC/UI_FIELD_REFERENCE и design/design-contract.json перечисляют
+all source/derived fields/actions. PriceInput.request_fee хранит nullable known fee,
+не actual списание; DatasetInput case.tools фиксирует caller schemas для проверки.
+Control one-time key replay при недоступном output:409 one_time_output_unavailable,
+метаданные операции сохраняются; explicit rotation, no new implicit issue.

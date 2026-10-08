@@ -58,3 +58,14 @@ system admin/ops/resilience → DEPLOYMENT+OPERATIONS+BACKUP_RESTORE;
 testing/review/performance → TESTING+QUALITY_GATE+STANDARDS.
 Screenshots/real builds добавляются после actual app, не placeholders.
 Single owner specification каждой нормы указан в TRACEABILITY.
+
+## Полный design/development handoff
+
+- [DEVELOP_READY](DEVELOP_READY.md)
+- [Дизайн и прототип](design/README.md)
+- [Система UI](DESIGN_SYSTEM.md), [экраны](UI_SCREEN_SPEC.md), [поля](UI_FIELD_REFERENCE.md)
+- [Use cases](USE_CASES.md), [доступ](ACCESS_MATRIX.md), [ошибки](ERROR_CATALOG.md)
+- [Состояния](STATE_MACHINES.md), [reconciliation](RECONCILIATION.md)
+- [Typed data dictionary](DATA_DICTIONARY.md), [migration plan](MIGRATION_PLAN.md)
+- [Implementation packets](IMPLEMENTATION_PACKETS.md), [design acceptance](DESIGN_ACCEPTANCE.md)
+- [Rendered QA](design/QA.md), [галерея](design/gallery.html)

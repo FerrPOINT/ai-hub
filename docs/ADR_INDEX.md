@@ -13,3 +13,5 @@ Accepted здесь означает проектное решение для п
 0001 не заменяет действующие Admin ADR без owner-coordinated handoff.
 Переход/выбор технологий не требует отдельного подтверждения каждого routine choice
 по user autonomy; scope расширения, destruction и live deployment — отдельная authority.
+
+- [ADR0007: development-ready design](adr/0007-develop-ready-design.md) — принято.

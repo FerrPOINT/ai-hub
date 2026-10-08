@@ -23,7 +23,7 @@
 
 ## Статус
 
-DOCUMENTATION_READY для начала S1. Offline gate и смысловой audit завершены.
+DEVELOP_READY для начала S1. Offline, semantic и rendered design gates завершены.
 Проверены root matrix, owner boundaries/transition, 34 requirements и их 34
 planned behavioral tests, stage DAG, 15 UI routes и соответствующие API actions.
 Согласованы draft-before-proof, publication TTL/runtime qualification, streaming
@@ -34,3 +34,6 @@ Remote exact-head receipt собирается после публикации �
 указывается в handoff. Он не создаёт release или application acceptance.
 Отдельные будущие acceptance states: application build/DB/runtime/provider/browser
 not_run. Пакет позволяет начать S1 без доступа к платным providers.
+
+Полный design handoff: DESIGN_SYSTEM/UI_SCREEN_SPEC/UI_FIELD_REFERENCE и
+source-bound design evidence. Недостаточно одного source map без rendered checks.
