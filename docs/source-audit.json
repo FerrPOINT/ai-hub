@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-08",
+  "sources": [
+    {
+      "repository": "services-base",
+      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "path": "docs/REPO_STANDARDS.md",
+      "sha256": "551e926d88d3c668ffc59969fe42f6a0c25f4d29d373d14494fa18ad359f5804"
+    },
+    {
+      "repository": "services-base",
+      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "path": "docs/README_SYSTEM.md",
+      "sha256": "47f5ec3cc5f533a4012ed25cb1ec000eaf89876ea0fe5606f4da0691319a12a1"
+    },
+    {
+      "repository": "services-base",
+      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "path": "docs/DOCUMENTATION_HUB.md",
+      "sha256": "eb4e2e241d8b236fd01602af35be1bee9132481d7b03fab688f1811e612edd1f"
+    },
+    {
+      "repository": "services-base",
+      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "path": "docs/BASE_COMPATIBILITY.md",
+      "sha256": "1c5515cbf5058e6adf2178204c3cf300db2a82f187b217ab154cd28268afbed4"
+    },
+    {
+      "repository": "services-base",
+      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "path": "docs/AUTH.md",
+      "sha256": "2fefc4fa84218eed70e6c6e559fbfbc2024c79c72541e9e2bec1232dcfa8bcc1"
+    },
+    {
+      "repository": "services-base",
+      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "path": "docs/platform/UI_UX_STANDARD.md",
+      "sha256": "5e0e577e9d8b0a8439b40e17205f7ae0cc8e9d7d2d2f97eca7ecead487bff395"
+    },
+    {
+      "repository": "services-base",
+      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "path": "docs/platform/UI_SHELL_STANDARD.md",
+      "sha256": "00734febc81f6b0472b7b73965657ad3707b4ca0bea5df62d73171e3faf77062"
+    },
+    {
+      "repository": "fleet-control",
+      "revision": "c8093aace07e54436893c5f7e35df1f968690266",
+      "path": "docs/README.md",
+      "sha256": "95c47f618d96521a627b86105957f9279abd65817feaa5b280d6d8e47e936023"
+    },
+    {
+      "repository": "admin-panel",
+      "revision": "237a697f4e3eef9ff95e8cf6082932e5a182e6ae",
+      "path": "docs/adr/0018-ai-providers-runtime.md",
+      "sha256": "5fc45df0eb0487c1acdd84eb2b1deeeb9f2175f95dda102ae00a24b1d5fdfd4a"
+    },
+    {
+      "repository": "admin-panel",
+      "revision": "237a697f4e3eef9ff95e8cf6082932e5a182e6ae",
+      "path": "docs/contracts/AI_PROFILE_V1.md",
+      "sha256": "29ea903717bbc2ae42976490b9119ae3f4ac99459a513a62d13914d436da6ee7"
+    },
+    {
+      "repository": "admin-panel",
+      "revision": "237a697f4e3eef9ff95e8cf6082932e5a182e6ae",
+      "path": "backend/ai-runtime/README.md",
+      "sha256": "8780d9fbacd8ec8cb8d553fc00c9d9ac8edd46dc93fbb25fd61b1be56f20553c"
+    },
+    {
+      "repository": "task-tracker",
+      "revision": "5a38fd5fada0c79b1d4fb2ea6a3f48cd8949d759",
+      "path": "LICENSE",
+      "sha256": "67f1475a204db7878c1bbda4c02c370ef9390a24f7574333728dcd890c5ecb84"
+    },
+    {
+      "repository": "task-tracker",
+      "revision": "5a38fd5fada0c79b1d4fb2ea6a3f48cd8949d759",
+      "path": "NOTICE",
+      "sha256": "beed28747fe545a8d76928bfaf07866eb9b968a86ab4818880b20ca19301b771"
+    },
+    {
+      "repository": "WARTZ",
+      "revision": "024239938ddb655c5141f1dc86c67c22bec4d560",
+      "path": "koara1/litellm/README.md",
+      "sha256": "f2218b439c9c8edadfe53267a2974c4412aa3b4d4854766fd09718b7d395792e",
+      "sourceStatus": [" M koara1/litellm/README.md"]
+    },
+    {
+      "repository": "WARTZ",
+      "revision": "024239938ddb655c5141f1dc86c67c22bec4d560",
+      "path": "koara1/litellm-ai-gateway-decision.md",
+      "sha256": "6167b5f5c7d793734c2f53feb745683619b07eebf0274bb23df4d706133d82a6",
+      "sourceStatus": [" M koara1/litellm-ai-gateway-decision.md"]
+    },
+    {
+      "repository": "admin-panel",
+      "revision": "237a697f4e3eef9ff95e8cf6082932e5a182e6ae",
+      "path": "backend/domain/src/lib.rs",
+      "sha256": "016e7ed841ac603125bf8dda8fb5d5547e6edd036b0119b17b503de389ce2cac"
+    }
+  ],
+  "live_octo_verified": false,
+  "provider_calls": 0
+}

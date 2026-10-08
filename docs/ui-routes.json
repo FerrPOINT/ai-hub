@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "path": "/",
+      "layout": "wide",
+      "operations": ["readStatisticsSummary"],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/providers",
+      "layout": "wide",
+      "operations": ["listProviders", "createConnection"],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/providers/:id",
+      "layout": "detail-with-aside",
+      "operations": [
+        "readConnection",
+        "readModelCatalog",
+        "writeCredential",
+        "startManagedLogin",
+        "startVerification",
+        "readVerification",
+        "readOperation",
+        "cancelOperation",
+        "disableConnection",
+        "revokeConnectionAuthorization"
+      ],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/models",
+      "layout": "wide",
+      "operations": ["listVirtualModels", "createVirtualModel"],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/models/:id",
+      "layout": "reading",
+      "operations": [
+        "readVirtualModel",
+        "updateVirtualModelDraft",
+        "publishRevision",
+        "listRevisions",
+        "rollbackRevision",
+        "archiveVirtualModel",
+        "disableVirtualModel",
+        "enableVirtualModel",
+        "verifyVirtualModelDraft"
+      ],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/requests",
+      "layout": "wide",
+      "operations": ["listRequests"],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/requests/:id",
+      "layout": "detail-with-aside",
+      "operations": ["readRequest", "cancelRequest", "readRequestResult"],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/statistics",
+      "layout": "wide",
+      "operations": [
+        "readStatisticsSummary",
+        "readStatisticsTimeseries",
+        "readStatisticsBreakdown",
+        "exportStatistics"
+      ],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/expenses",
+      "layout": "wide",
+      "operations": [
+        "readStatisticsExpenses",
+        "listPrices",
+        "createPriceRevision",
+        "listSubscriptions",
+        "recordSubscription",
+        "requestLedgerCorrection"
+      ],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/budgets",
+      "layout": "wide",
+      "operations": ["listBudgets", "createBudget", "updateBudget"],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/clients",
+      "layout": "wide",
+      "operations": [
+        "listClients",
+        "createClient",
+        "updateClient",
+        "issueClientKey",
+        "revokeClientKey",
+        "disableClient",
+        "enableClient"
+      ],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/evaluations",
+      "layout": "wide",
+      "operations": [
+        "listEvaluations",
+        "listDatasetVersions",
+        "createDatasetVersion",
+        "startEvaluation"
+      ],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/evaluations/:id",
+      "layout": "detail-with-aside",
+      "operations": ["readEvaluation", "cancelEvaluation"],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/audit",
+      "layout": "wide",
+      "operations": ["listAudit"],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    },
+    {
+      "path": "/settings",
+      "layout": "reading",
+      "operations": ["readEffectiveSettings"],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run"
+    }
+  ]
+}

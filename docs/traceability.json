@@ -1,0 +1,626 @@
+{
+  "schema_version": 1,
+  "requirements": [
+    {
+      "id": "FR-001",
+      "name": "Подключения провайдеров",
+      "acceptance": "Оператор создаёт/отключает connection; неизвестный provider/неразрешённый endpoint отклоняется; disable не удаляет историю.",
+      "owner": "AI Hub",
+      "tests": ["TC-001"],
+      "phase": "S2",
+      "document": "docs/PROVIDERS.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-002",
+      "name": "Секреты и managed authorization",
+      "acceptance": "Write-only ключ/authorization, own encrypted key, generation; API/log/export/browser storage не раскрывают secrets.",
+      "owner": "AI Hub",
+      "tests": ["TC-002"],
+      "phase": "S2",
+      "document": "docs/SECURITY.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-003",
+      "name": "Проверка возможностей",
+      "acceptance": "Publication требует actual proof точных account/model/generation/adapter/capabilities; catalog alone не sufficient.",
+      "owner": "AI Hub",
+      "tests": ["TC-003"],
+      "phase": "S2",
+      "document": "docs/PROVIDERS.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-004",
+      "name": "Версии виртуальных моделей",
+      "acceptance": "Создание slug/draft, CAS save, immutable revision, publication/rollback/archive; active runs не меняют snapshot.",
+      "owner": "AI Hub",
+      "tests": ["TC-004"],
+      "phase": "S2",
+      "document": "docs/ROUTING.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-005",
+      "name": "Маршрутизация и fallback",
+      "acceptance": "Ordered fallback только explicit policy и known nonacceptance; никаких смешанных streams; pinned_test один deployment.",
+      "owner": "AI Hub",
+      "tests": ["TC-005"],
+      "phase": "S3",
+      "document": "docs/ROUTING.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-006",
+      "name": "Повтор и неопределённый исход",
+      "acceptance": "Одинаковый principal/key/payload даёт readback, changed payload conflict; restart/timeout не повторяет unknown I/O.",
+      "owner": "AI Hub",
+      "tests": ["TC-006"],
+      "phase": "S3",
+      "document": "docs/contracts/INFERENCE_V1.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-007",
+      "name": "Inference API",
+      "acceptance": "Models/chat completions/stateless responses, text/stream/function tools/JSON при qualified capability; неподдержанное явно rejected.",
+      "owner": "AI Hub",
+      "tests": ["TC-007"],
+      "phase": "S3",
+      "document": "docs/API.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-008",
+      "name": "Подписки и квоты",
+      "acceptance": "Own managed login/revoke, отдельная плата за период и quota observations с freshness; недоступная quota null.",
+      "owner": "AI Hub",
+      "tests": ["TC-008"],
+      "phase": "S4",
+      "document": "docs/PROVIDERS.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-009",
+      "name": "Фактическая модель и trace",
+      "acceptance": "Request связывает frozen profile и все attempts; actual model confidence виден; provider alias substitution не hidden.",
+      "owner": "AI Hub",
+      "tests": ["TC-009"],
+      "phase": "S3",
+      "document": "docs/ROUTING.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-010",
+      "name": "Usage и цены",
+      "acceptance": "Trusted category facts × immutable rate snapshot; cached/reasoning не двойной счёт, missing usage/pricing unknown.",
+      "owner": "AI Hub",
+      "tests": ["TC-010"],
+      "phase": "S3",
+      "document": "docs/ACCOUNTING.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-011",
+      "name": "Реальные расходы и подписки",
+      "acceptance": "Confirmed receipt заменяет связанную estimate; duplicate charge/subscription не меняет totals; correction append-only.",
+      "owner": "AI Hub",
+      "tests": ["TC-011"],
+      "phase": "S4",
+      "document": "docs/ACCOUNTING.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-012",
+      "name": "Бюджет и предупреждения",
+      "acceptance": "Atomic reserve по всем scopes до I/O, unknown удерживает reserve; thresholds уведомляют один раз; actual overrun не обрезается.",
+      "owner": "AI Hub",
+      "tests": ["TC-012"],
+      "phase": "S3",
+      "document": "docs/ACCOUNTING.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-013",
+      "name": "Статистика по разрезам",
+      "acceptance": "UTC range + timezone, dimensions/client/project/user/model/provider, known/unknown counts, snapshot freshness и rebuild.",
+      "owner": "AI Hub",
+      "tests": ["TC-013"],
+      "phase": "S5",
+      "document": "docs/ANALYTICS.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-014",
+      "name": "Качество обслуживания",
+      "acceptance": "Success/error/cancel/fallback rates, latency/TTFT, availability/quota с sample sizes и explicit denominators.",
+      "owner": "AI Hub",
+      "tests": ["TC-014"],
+      "phase": "S5",
+      "document": "docs/ANALYTICS.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-015",
+      "name": "Экспорт",
+      "acceptance": "Authorized bounded CSV/JSON соответствует dashboard snapshot; decimal/null semantics и formula safety сохранены.",
+      "owner": "AI Hub",
+      "tests": ["TC-015"],
+      "phase": "S5",
+      "document": "docs/ANALYTICS.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-016",
+      "name": "Диагностика",
+      "acceptance": "Own health, bounded metrics, redacted logs, alerts budget/unknown/lag/provider; telemetry failure не стирает facts.",
+      "owner": "AI Hub",
+      "tests": ["TC-016"],
+      "phase": "S5",
+      "document": "docs/MONITORING.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-017",
+      "name": "Сравнение для dev/test",
+      "acceptance": "Frozen dataset/runner/scorers/pinned revisions без cache/fallback; evidence, actual cost и cancel/restart без дублирования.",
+      "owner": "AI Hub",
+      "tests": ["TC-017"],
+      "phase": "S6",
+      "document": "docs/EVALUATIONS.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-018",
+      "name": "Права и атрибуция",
+      "acceptance": "Central human/service/client principals различаются; server grants защищают direct URLs, requests, stats и artifacts.",
+      "owner": "AI Hub",
+      "tests": ["TC-018"],
+      "phase": "S1",
+      "document": "docs/SECURITY.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-019",
+      "name": "Отзыв",
+      "acceptance": "Revoked/expired central session/PAT/key/generation запрещает новый admission/attempt; никакого credential fallback.",
+      "owner": "AI Hub",
+      "tests": ["TC-019"],
+      "phase": "S1",
+      "document": "docs/SECURITY.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-020",
+      "name": "Endpoint и tools boundary",
+      "acceptance": "SSRF/redirect/private allowlist, payload caps; Hub не исполняет shell/browser/caller function tools.",
+      "owner": "AI Hub",
+      "tests": ["TC-020"],
+      "phase": "S2",
+      "document": "docs/THREAT_MODEL.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-021",
+      "name": "Интеграция Base и Admin",
+      "acceptance": "Один AI config owner; transition contracts/rollback, own auth/catalog/nav; прежний runtime не переключается по docs.",
+      "owner": "AI Hub",
+      "tests": ["TC-021"],
+      "phase": "S7",
+      "document": "docs/contracts/ADMIN_HANDOFF_V1.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-022",
+      "name": "Сохранность и restore",
+      "acceptance": "Own DB/vault/keys/provenance restore в изолированный target; нет external I/O/повторного dispatch; сверяются balances/dedupe.",
+      "owner": "AI Hub",
+      "tests": ["TC-022"],
+      "phase": "S7",
+      "document": "docs/BACKUP_RESTORE.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-023",
+      "name": "Аудит управления",
+      "acceptance": "Mutation + append-only audit атомарны, object/revision/actor/reason; secret bodies и transcripts не попадают в audit.",
+      "owner": "AI Hub",
+      "tests": ["TC-023"],
+      "phase": "S1",
+      "document": "docs/SECURITY.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-024",
+      "name": "UI сценарии",
+      "acceptance": "Provider/models/requests/analytics/expenses/budgets/evaluations со states, CAS, preserved drafts, readable provenance.",
+      "owner": "AI Hub",
+      "tests": ["TC-024"],
+      "phase": "S2",
+      "document": "docs/UI_UX.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-025",
+      "name": "Валюты и отображение",
+      "acceptance": "Per-currency totals, confirmed/estimated/unknown/reserved отдельно; subscription allocation не повторное cash списание.",
+      "owner": "AI Hub",
+      "tests": ["TC-025"],
+      "phase": "S5",
+      "document": "docs/ACCOUNTING.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-026",
+      "name": "Ошибки и ограничения",
+      "acceptance": "Typed errors/retry-after/context/output/capability bounds, deadlined attempts; no silent truncation/downgrade.",
+      "owner": "AI Hub",
+      "tests": ["TC-026"],
+      "phase": "S3",
+      "document": "docs/contracts/INFERENCE_V1.md",
+      "status": "planned"
+    },
+    {
+      "id": "NFR-001",
+      "name": "Consistency",
+      "acceptance": "Facts/settlement/dedupe/revisions атомарны; concurrent admissions/duplicate events не меняют accepted totals.",
+      "owner": "AI Hub",
+      "tests": ["TC-027"],
+      "phase": "S3",
+      "document": "docs/DATA_MODEL.md",
+      "status": "planned"
+    },
+    {
+      "id": "NFR-002",
+      "name": "Recovery",
+      "acceptance": "Restart/cancel/ambiguous outcomes readback сохраняет intent и reserves; нет слепого paid replay.",
+      "owner": "AI Hub",
+      "tests": ["TC-028"],
+      "phase": "S3",
+      "document": "docs/ARCHITECTURE.md",
+      "status": "planned"
+    },
+    {
+      "id": "NFR-003",
+      "name": "Performance bounds",
+      "acceptance": "Controlled load baseline: 20 concurrent requests, own overhead p95≤50ms; 90-day/100k rows stats p95≤2s; receipt включает hardware.",
+      "owner": "AI Hub",
+      "tests": ["TC-029"],
+      "phase": "S7",
+      "document": "docs/QUALITY_GATE.md",
+      "status": "planned"
+    },
+    {
+      "id": "NFR-004",
+      "name": "Reproducible build",
+      "acceptance": "Exact Base SHA, locked manifests, isolated own resources; source/build/image/served identity различаются.",
+      "owner": "AI Hub",
+      "tests": ["TC-030"],
+      "phase": "S1",
+      "document": "docs/BASE_INTEGRATION.md",
+      "status": "planned"
+    },
+    {
+      "id": "NFR-005",
+      "name": "Privacy и retention",
+      "acceptance": "Default no transcripts, encrypted bounded replay buffer, evaluation TTL, own deletion/archival сохраняет billing identity.",
+      "owner": "AI Hub",
+      "tests": ["TC-031"],
+      "phase": "S5",
+      "document": "docs/SECURITY.md",
+      "status": "planned"
+    },
+    {
+      "id": "NFR-006",
+      "name": "Responsive/a11y",
+      "acceptance": "Base shell/themes, keyboard/focus, readable stats/currency и errors; 375/1440/1920/2560, no body overflow.",
+      "owner": "AI Hub",
+      "tests": ["TC-032"],
+      "phase": "S5",
+      "document": "docs/UI_UX.md",
+      "status": "planned"
+    },
+    {
+      "id": "NFR-007",
+      "name": "Contract compatibility",
+      "acceptance": "Versioned contracts, old clients tested; destructive schema/transport change требует version/migration; no unsupported field dropping.",
+      "owner": "AI Hub",
+      "tests": ["TC-033"],
+      "phase": "S7",
+      "document": "docs/API.md",
+      "status": "planned"
+    },
+    {
+      "id": "NFR-008",
+      "name": "Evidence integrity",
+      "acceptance": "Точный source/Base/image/target identity + live consumer/provider сценарии; mock/build/health не substitute user outcome.",
+      "owner": "AI Hub",
+      "tests": ["TC-034"],
+      "phase": "S7",
+      "document": "docs/QUALITY_GATE.md",
+      "status": "planned"
+    }
+  ],
+  "tests": [
+    {
+      "id": "TC-001",
+      "requirements": ["FR-001"],
+      "scenario": "Создать connection с новым display name/ID; permitted endpoint succeeds; неизвестный adapter и private redirect denied; disable сохраняет history.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-002",
+      "requirements": ["FR-002"],
+      "scenario": "Записать/сменить/revoke synthetic credential; искать canary secret в API, logs, traces, browser storage, exports; wrong-key restore denied.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-003",
+      "requirements": ["FR-003"],
+      "scenario": "Catalog metadata без proof publication denied; exact proof succeeds; смена generation/model/draft/adapter или expired proof вновь denied.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-004",
+      "requirements": ["FR-004"],
+      "scenario": "Два concurrent drafts: один CAS succeeds, второй 412 с сохранённым draft; pointer rollback не меняет frozen request; duplicate slug denied.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-005",
+      "requirements": ["FR-005"],
+      "scenario": "Controlled primary 429/no acceptance и reserve secondary дают две attempts; connect-before-send fallback; timeout/5xx-after-send и output fragment не fallback.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-006",
+      "requirements": ["FR-006"],
+      "scenario": "Один key/payload повторить до/после restart; dispatch count=1; different payload/principal conflict/denied; expired payload readback не resend.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-007",
+      "requirements": ["FR-007"],
+      "scenario": "Public chat/Responses normal/stream/tools/continuation/JSON через controlled server; case-sensitive args retained; unsupported field/native tool/stateful request rejected before I/O.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-008",
+      "requirements": ["FR-008"],
+      "scenario": "Own subscription login/cancel/logout generations; invalidated authorization не возобновляется; quota absent null; recurring payment не множится по calls.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-009",
+      "requirements": ["FR-009"],
+      "scenario": "Provider actual model отличается от requested alias: показать both/verification; pinned run incomparable; virtual response slug remains caller name.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-010",
+      "requirements": ["FR-010"],
+      "scenario": "Вычислить synthetic cached/reasoning example exact decimal; unknown category/rate дает unknown; invalid negative counts rejected; stale price snapshot not rewritten.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-011",
+      "requirements": ["FR-011"],
+      "scenario": "Duplicate trusted receipt и subscription payment дают одну charge; late confirmation replaces estimate; refund creates correction; forged amount/status not accepted.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-012",
+      "requirements": ["FR-012"],
+      "scenario": "Два API instances параллельно reserving последний бюджет: ровно один dispatch; multiple scopes/currencies; warning dedupe; unknown holds; overrun visible.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-013",
+      "requirements": ["FR-013"],
+      "scenario": "Same authorized snapshot overview/breakdown/timeseries согласованы; late facts rebuild; timezone/DST/half-open boundary, empty confirmed vs source error различаются.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-014",
+      "requirements": ["FR-014"],
+      "scenario": "Dataset с completed/failed/cancelled/unknown/inprogress и zero traffic: exact denominators/sample counts/percentiles/TTFT, probes separate from user calls.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-015",
+      "requirements": ["FR-015"],
+      "scenario": "Client A пытается export B через прямой query/ID/cursor; deny. Decimal CSV value/null match JSON; formula text escaped; oversized export bounded.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-016",
+      "requirements": ["FR-016"],
+      "scenario": "Down ledger DB отказ до I/O; metrics collector failure не duplicate dispatch; lag/unknown alerts без high-cardinality labels и private bodies.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-017",
+      "requirements": ["FR-017"],
+      "scenario": "Одинаковые frozen cases/config на двух qualified pinned models, no fallback/cache; seed disclaimer; partial cancel/restart no repeated case calls, cost per actual attempt.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-018",
+      "requirements": ["FR-018"],
+      "scenario": "Human session, PAT read/write и inference key матрица; project binding spoofed body ignored/denied; protected direct route/details/cursors enforce backend grants.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-019",
+      "requirements": ["FR-019"],
+      "scenario": "Revoke/expire session/PAT/key/connection перед admission/next attempt и во время UI; no new I/O; no unexpected re-login/global credential fallback.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-020",
+      "requirements": ["FR-020"],
+      "scenario": "Allowlist local Ollama exact target работает; SSRF/DNS rebinding/redirect/proxy env denied; prompt tool call возвращён caller без local side effect.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-021",
+      "requirements": ["FR-021"],
+      "scenario": "Consumer на old endpoint и explicit opt-in Hub key; exact revision/generation mapped; cutover/rollback no duplicate inference or shared DB writes.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-022",
+      "requirements": ["FR-022"],
+      "scenario": "Backup synthetic DB+vault отделён от key; own isolated restore external_calls off; dedupe/unknown reserves/audit links equal; existing data target rejected.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-023",
+      "requirements": ["FR-023"],
+      "scenario": "Mutation и audit fail атомарно при DB failure; repeated idempotent operation не audit duplicates; no secret body/raw provider error in record.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-024",
+      "requirements": ["FR-024"],
+      "scenario": "Все routes loading/empty/error/403/404/partial и dirty/pending/412; screenshot + real API scenario; unavailable provider не empty success.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-025",
+      "requirements": ["FR-025"],
+      "scenario": "USD/EUR/zero/unknown + estimate then confirmation + fixed subscription: per-currency totals exact; no combined mixed currency or double allocation.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-026",
+      "requirements": ["FR-026"],
+      "scenario": "Context/output/schema deadline mismatch до I/O; 429 safe Retry-After; provider error redacted and distinct from invalid input; stream terminal not false success.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-027",
+      "requirements": ["NFR-001"],
+      "scenario": "DB concurrency/dedupe/correction unique constraints и compare canonical amounts до/после aggregate rebuild; transaction rollback on partial write.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-028",
+      "requirements": ["NFR-002"],
+      "scenario": "Crash before intent, after intent, after dispatch, before terminal commit; stable request IDs/reserves; reconcile without redispatch; cancellation not free unknown.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-029",
+      "requirements": ["NFR-003"],
+      "scenario": "Exact-source isolated load fixture/hardware receipt, 20 concurrency, 100k rows: measure own overhead/statistics limits; slow provider separated; memory bounded.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-030",
+      "requirements": ["NFR-004"],
+      "scenario": "Materialize pinned Base, verify clean revision; frozen dependency build/readback hashes; CI/local images use same toolchain, changes to lock fail frozen gate.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-031",
+      "requirements": ["NFR-005"],
+      "scenario": "Advance TTL clock: replay payload/artifacts removed, dedupe/ledger keys retained; content denied after expiry, billing readback remains; no provider calls by TTL worker.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-032",
+      "requirements": ["NFR-006"],
+      "scenario": "375/1440/1920/2560 across supported themes: keyboard tab/Escape/return focus, no horizontal body overflow; unknown expense accessible label and readable table.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-033",
+      "requirements": ["NFR-007"],
+      "scenario": "Old supported client payloads retained, contract draft→generated parity, reject unsupported semantic fields; OpenAPI/schema compatibility and migration previous schema.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-034",
+      "requirements": ["NFR-008"],
+      "scenario": "Final merged source/Base/image artifact hashes match served target; authenticate UI + actual provider/consumer checks; old screenshot/probe receipt rejected as current.",
+      "status": "not_run"
+    }
+  ],
+  "phases": [
+    {
+      "id": "S1",
+      "name": "Own foundation и trusted access",
+      "depends_on": [],
+      "components": [
+        "backend/crates/{api,application,domain,infrastructure}",
+        "frontend/src/{app,shared/api}",
+        "backend/migrations"
+      ],
+      "outcome": "Изолированное приложение принимает trusted principal, имеет own schema/audit и живые readiness/SSO проверки."
+    },
+    {
+      "id": "S2",
+      "name": "Connection и virtual model lifecycle",
+      "depends_on": ["S1"],
+      "components": [
+        "backend/crates/application/{connections,profiles}",
+        "frontend/src/pages/{providers,models}"
+      ],
+      "outcome": "Synthetic provider подключён, capabilities проверены; draft публикует immutable revision через UI/API."
+    },
+    {
+      "id": "S3",
+      "name": "Inference с financial ledger",
+      "depends_on": ["S2"],
+      "components": [
+        "backend/crates/application/{admission,routing,accounting}",
+        "backend/crates/infrastructure/adapters",
+        "frontend/src/pages/requests"
+      ],
+      "outcome": "Реальный controlled upstream отвечает full/stream/tools через scoped Hub key, retries/fallback/budget/restart доказаны."
+    },
+    {
+      "id": "S4",
+      "name": "Нужные внешние providers и subscriptions",
+      "depends_on": ["S3"],
+      "components": [
+        "backend/crates/infrastructure/adapters/{ollama,zai,chatgpt_managed}",
+        "frontend/src/pages/{providers,expenses}"
+      ],
+      "outcome": "Каждый выбранный account/adapter qualified live; own auth и subscription/quota receipts проверены."
+    },
+    {
+      "id": "S5",
+      "name": "Статистика, расходы и operational UI",
+      "depends_on": ["S3", "S4"],
+      "components": [
+        "backend/crates/application/{analytics,exports}",
+        "frontend/src/pages/{dashboard,statistics,expenses,budgets}"
+      ],
+      "outcome": "Сводки/разрезы/export совпадают с ledger; late facts, partial failures, multi-currency и thresholds проверены."
+    },
+    {
+      "id": "S6",
+      "name": "Воспроизводимые model evaluations",
+      "depends_on": ["S4", "S5"],
+      "components": [
+        "backend/crates/application/evaluations",
+        "frontend/src/pages/evaluations"
+      ],
+      "outcome": "Одинаковый dataset на pinned profiles даёт проверяемые результаты, реальные расходы и cancel/recovery."
+    },
+    {
+      "id": "S7",
+      "name": "Integration, restore и полный release gate",
+      "depends_on": ["S6"],
+      "components": [
+        "deploy",
+        "docs/contracts",
+        "backend/crates/application/recovery"
+      ],
+      "outcome": "Выбранный consumer проходит exact-target полный путь; own restore, rollout/rollback и итоговая приёмка доказаны."
+    }
+  ]
+}

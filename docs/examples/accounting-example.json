@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "currency": "USD",
+  "rates_per_million": {
+    "input_uncached": "2",
+    "input_cached": "0.5",
+    "output_billable": "8"
+  },
+  "usage": {
+    "input_tokens": 2000,
+    "cached_input_tokens": 800,
+    "output_tokens": 1000,
+    "reasoning_tokens": 200
+  },
+  "failed_attempt_uncached_tokens": 100,
+  "expected": {
+    "main_attempt_estimated": "0.010800000000",
+    "request_estimated": "0.011000000000",
+    "request_count": 1,
+    "attempt_count": 2,
+    "fallback_count": 1
+  },
+  "subscription": {
+    "period_charge": "30.000000000000",
+    "calls": 25,
+    "expected_cash_total": "30.000000000000"
+  },
+  "late_receipt": {
+    "confirmed_charge": "0.030000000000",
+    "replaces_estimate": "0.011000000000",
+    "expected_effective_charge": "0.030000000000"
+  },
+  "unknown": {
+    "amount": null,
+    "confidence": "unknown",
+    "held_reserve": "0.020000000000"
+  },
+  "precision_case": {
+    "tokens": 1,
+    "rate_per_million": "0.000000000001",
+    "expected_amount": "0.000000000000000001"
+  }
+}
