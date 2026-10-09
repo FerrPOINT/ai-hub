@@ -53,3 +53,10 @@ Base reference `81decf7d9edd2c4218d8625a96e2e25c0617e9f1`, Admin reference `7c42
 ## OpenRouter pricing — 2026-10-09
 
 Официальные [usage accounting](https://openrouter.ai/docs/cookbook/administration/usage-accounting) и [models pricing](https://openrouter.ai/docs/api/api-reference/models/list-all-models-and-their-properties) подтверждают response usage/cost, terminal SSE accounting и catalog rates. [PROJECT_TARIFFS](PROJECT_TARIFFS.md) фиксирует adapter qualification и unknown/BYOK ограничения. Проверка документации не runtime provider receipt.
+
+## Повторная проверка publication cohorts 2026-10-09
+
+- services-base: remote main `ae8af2342b61090094292e75a7c23bf464757468`; Hub docs branch `docs/ai-hub-onboarding`. Main integration not_run.
+- admin-panel: remote main `902245d59ecf45467536e4d789733dfc4414c5cc`; Hub docs branch `docs/ai-hub-extraction`. Main integration not_run.
+
+SDK 875cac2, Namespace 81decf7 и operator tooling не перепинены. Signed Hub adapter — отдельный target contract; legacy runtime audience не принят автоматически.

@@ -68,3 +68,12 @@ multi-currency и concurrency across processes.
 ## TC-038 — Тарифы
 
 [PROJECT_TARIFFS](PROJECT_TARIFFS.md): input/output conversion ×1M; receipt 10 → default charge 12; custom 3/10 rates; decimal tiny values; same names/different UUID pair; manual pricing not confirmed cash; missing cost/usage not zero; 412 draft retained; tariff change leaves old request and late receipt on old revision; unknown reserve held; receipt replay produces one correction. Actual API/DB acceptance planned.
+
+## Дополнительный adversarial gate
+
+| Test   | Requirements                    | Сценарий                                                                                                                                                                                     |
+| ------ | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-039 | FR-004/017/021/027/030, NFR-007 | Same-name different Namespace, native history dirty/proof, endpoint/generation invalidation, model/currency tariffs/activation CAS, canonical exports and signed service/revoke body binding |
+
+Все TC остаются actual-app not_run до реализации. Prototype runner и offline
+signature vectors отдельно подтверждают design behavior; их PASS не runtime qualification.

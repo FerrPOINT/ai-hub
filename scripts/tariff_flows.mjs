@@ -26,7 +26,12 @@ export async function verifyTariffs(tab, sourceScriptHash) {
     await observe();
   };
   const priceRow = (label) =>
-    tab.playwright.locator("#main tbody tr").filter({ hasText: label });
+    tab.playwright.locator("#main tbody tr").filter({
+      hasText:
+        label === "ChatGPT"
+          ? "ChatGPT · собственная подписка · model-a"
+          : label + " · model-a",
+    });
   await tab.goto(
     "http://127.0.0.1:53061/design/prototype.html?theme=dark&state=ready#/tariffs",
   );
@@ -36,7 +41,10 @@ export async function verifyTariffs(tab, sourceScriptHash) {
   expect((await tab.url()).includes("tariff_tab=sources"), "tariff-tab-url");
   await tab.reload();
   await observe();
-  expect((await text()).includes("ChatGPT · подписка"), "tariff-tab-reload");
+  expect(
+    (await text()).includes("ChatGPT · собственная подписка"),
+    "tariff-tab-reload",
+  );
   await tab.back();
   await observe();
   expect((await text()).includes("Тарифы проектов"), "tariff-tab-back");
@@ -62,7 +70,7 @@ export async function verifyTariffs(tab, sourceScriptHash) {
   await fill("#source-price-output", "8");
   await click("Сохранить новую версию");
   expect(
-    (await priceRow("ChatGPT").innerText()).includes("r2"),
+    (await priceRow("ChatGPT").innerText()).includes("r1"),
     "subscription-manual-revision",
   );
   await priceRow("OpenRouter")
@@ -83,8 +91,8 @@ export async function verifyTariffs(tab, sourceScriptHash) {
   );
   await switchTab("Проекты");
   expect(
-    (await text()).includes("15.6 USD") && (await text()).includes("2.6 USD"),
-    "manual-source-updates-cost-charge-margin",
+    (await text()).includes("12 USD") && !(await text()).includes("15.6 USD"),
+    "source-model-price-isolation",
   );
   await switchTab("Себестоимость подключений");
   await priceRow("OpenRouter")
@@ -92,6 +100,7 @@ export async function verifyTariffs(tab, sourceScriptHash) {
     .click();
   await observe();
   await select("#source-price-mode", "provider_auto");
+  await fill("#source-price-from", "2026-10-09T13:31");
   await click("Сохранить новую версию");
   expect(
     (await priceRow("OpenRouter").innerText()).includes("Автоматически"),
@@ -103,7 +112,7 @@ export async function verifyTariffs(tab, sourceScriptHash) {
   await select("#project-price-mode", "custom_rates");
   await fill("#project-price-input", "0.0000000000001");
   await fill("#project-price-output", "10");
-  await click("Сохранить новую версию");
+  await click("Сохранить черновик тарифа");
   expect(
     (await tab.playwright.locator("#dialog-error").innerText()).length > 0,
     "tariff-rate-scale-rejected",
@@ -113,7 +122,10 @@ export async function verifyTariffs(tab, sourceScriptHash) {
     "tariff-invalid-keeps-draft",
   );
   await fill("#project-price-input", "3");
-  await click("Сохранить новую версию");
+  await click("Сохранить черновик тарифа");
+  expect((await text()).includes("12 USD"), "tariff-draft-not-active");
+  await click("Активировать");
+  await click("Подтвердить активацию");
   expect((await text()).includes("13 USD"), "tariff-custom-per-million");
   expect(
     (await text()).includes("default-20-v1") &&
@@ -131,7 +143,15 @@ export async function verifyTariffs(tab, sourceScriptHash) {
   await click("Настроить тариф");
   await select("#project-price-mode", "default_markup");
   await fill("#project-price-bps", "25.01");
-  await click("Сохранить новую версию");
+  await fill("#project-price-from", "2026-10-09T13:31");
+  await click("Сохранить черновик тарифа");
+  await tab.playwright
+    .locator('[data-action="activate-tariff"]:enabled')
+    .click();
+  await observe();
+  await click("Подтвердить активацию");
+  expect((await text()).includes("13 USD"), "tariff-scheduled-not-early");
+  await fill("#tariff-at", "2026-10-09T13:31");
   expect((await text()).includes("12.501 USD"), "tariff-decimal-percent-exact");
   await tab.playwright
     .getByRole("tab", { name: "Проекты", exact: true })
@@ -145,7 +165,7 @@ export async function verifyTariffs(tab, sourceScriptHash) {
   await select("#scene-select", "conflict");
   await click("Настроить тариф");
   await fill("#project-price-bps", "30");
-  await click("Сохранить новую версию");
+  await click("Сохранить черновик тарифа");
   expect(
     (await tab.playwright.locator("#dialog-error").innerText()).includes("412"),
     "tariff-cas-conflict",

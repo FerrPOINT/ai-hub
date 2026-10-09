@@ -555,3 +555,9 @@
 ## Тарифы и начисления — S2/S3
 
 Канонические поля pricing_source_revisions, project_tariff_revisions и project_charge_events описаны в [typed dictionary](contracts/data-dictionary.v1.json). Request получает immutable project_tariff_snapshot. Project amount/margin — NUMERIC(50,24); provider expense сохраняет прежний тип. [Правила](PROJECT_TARIFFS.md).
+
+## Semantic review schema increments
+
+Канонические поля новых policy/activation/score/delegation таблиц — [typed dictionary](contracts/data-dictionary.v1.json). Activation interval derived, revision window immutable. UUID project scope связан с exact registry/Namespace; label не FK. Cryptographic envelope и v2 refs — [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md).
+
+pricing_source_revisions: currency CHAR(3) NOT NULL, effective_from TIMESTAMPTZ NOT NULL, effective_to TIMESTAMPTZ nullable; CAS key connection_id/model_id/currency и unique effective_from. Manual referenced PriceRevision должен иметь тот же tuple/window; latest expired source означает unknown, не older fallback.

@@ -2338,7 +2338,7 @@
           "name": "version",
           "type": "bigint",
           "nullable": false,
-          "rule": "logical key CAS"
+          "rule": "CAS per connection_id/model_id/currency; immutable increasing revision"
         },
         {
           "name": "actor_subject",
@@ -2351,6 +2351,24 @@
           "type": "timestamptz",
           "nullable": false,
           "rule": "UTC"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "rule": "ISO uppercase; part of exact connection/model/currency policy key"
+        },
+        {
+          "name": "effective_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC; unique started interval per policy key; cannot backdate changed receipts"
+        },
+        {
+          "name": "effective_to",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "half-open UTC interval; later than from; expiry preserves unknown, not older source fallback"
         }
       ]
     },
@@ -2430,6 +2448,12 @@
           "type": "timestamptz",
           "nullable": false,
           "rule": "UTC"
+        },
+        {
+          "name": "policy_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own stable policy FK; draft revision window, not mutable active pointer"
         }
       ]
     },
@@ -2527,6 +2551,226 @@
           "type": "timestamptz",
           "nullable": false,
           "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "project_tariff_policies",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "namespace_binding_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own binding FK"
+        },
+        {
+          "name": "virtual_model_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own model; null project default"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "rule": "logical key part"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "CAS stable policy row; unique Namespace/profile/currency"
+        }
+      ]
+    },
+    {
+      "name": "project_tariff_activations",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "policy_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own policy FK"
+        },
+        {
+          "name": "tariff_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "immutable own revision FK"
+        },
+        {
+          "name": "activate_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "unique policy/time; inclusive"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "rule": "scheduled active superseded cancelled"
+        },
+        {
+          "name": "policy_version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "monotonic policy CAS"
+        },
+        {
+          "name": "actor_subject",
+          "type": "text",
+          "nullable": false,
+          "rule": "verified actor"
+        }
+      ]
+    },
+    {
+      "name": "evaluation_manual_scores",
+      "phase": "S6",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "evaluation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own evaluation FK"
+        },
+        {
+          "name": "case_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "existing case"
+        },
+        {
+          "name": "profile_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "frozen candidate"
+        },
+        {
+          "name": "repetition",
+          "type": "integer",
+          "nullable": false,
+          "rule": "1..10"
+        },
+        {
+          "name": "score",
+          "type": "numeric(4,3)",
+          "nullable": false,
+          "rule": "0..1"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "rule": "bounded 500"
+        },
+        {
+          "name": "actor_subject",
+          "type": "text",
+          "nullable": false,
+          "rule": "verified scorer"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "CAS per run/candidate/case/repetition"
+        }
+      ]
+    },
+    {
+      "name": "service_delegations",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "grant_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK; tombstones may precede inference"
+        },
+        {
+          "name": "issuer_instance_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "trusted configured signer"
+        },
+        {
+          "name": "client_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own client FK; absent tombstone only"
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "original request; absent tombstone only"
+        },
+        {
+          "name": "execution_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "Fleet execution; no ownership transfer"
+        },
+        {
+          "name": "fencing_token",
+          "type": "numeric(20,0)",
+          "nullable": true,
+          "rule": "u64 checked; monotonic per issuer/execution"
+        },
+        {
+          "name": "body_digest",
+          "type": "text",
+          "nullable": true,
+          "rule": "SHA256 raw request bytes"
+        },
+        {
+          "name": "valid_until",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "minimum grant and lease expiry"
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "trusted issuer event"
+        },
+        {
+          "name": "context_snapshot",
+          "type": "jsonb",
+          "nullable": true,
+          "rule": "verified Base v2 context; no prompt/secret"
         }
       ]
     }
@@ -2878,6 +3122,42 @@
       "column": "cost_source_revision_id",
       "target_table": "pricing_source_revisions",
       "target_column": "id"
+    },
+    {
+      "table": "project_tariff_policies",
+      "column": "namespace_binding_id",
+      "target_table": "namespace_bindings",
+      "target_column": "id"
+    },
+    {
+      "table": "project_tariff_revisions",
+      "column": "policy_id",
+      "target_table": "project_tariff_policies",
+      "target_column": "id"
+    },
+    {
+      "table": "project_tariff_activations",
+      "column": "policy_id",
+      "target_table": "project_tariff_policies",
+      "target_column": "id"
+    },
+    {
+      "table": "project_tariff_activations",
+      "column": "tariff_revision_id",
+      "target_table": "project_tariff_revisions",
+      "target_column": "id"
+    },
+    {
+      "table": "evaluation_manual_scores",
+      "column": "evaluation_id",
+      "target_table": "evaluation_runs",
+      "target_column": "id"
+    },
+    {
+      "table": "project_charge_events",
+      "column": "supersedes_id",
+      "target_table": "project_charge_events",
+      "target_column": "id"
     }
   ],
   "composite_invariants": [
@@ -2899,6 +3179,9 @@
     "unique source_instance_id/source_kind/source_record_id import identity with digest conflict protection",
     "project tariff precedence exact namespace/profile then namespace default then installation 2000 bps; currency-qualified nonoverlapping intervals",
     "project charge events append-only and deduped by attempt/source event; unknown amount null; old snapshot used for late receipt",
-    "manual subscription allocation never counted as a second provider cash charge; budget policy remains provider cost"
+    "manual subscription allocation never counted as a second provider cash charge; budget policy remains provider cost",
+    "tariff draft windows may overlap; activation timeline CAS derives nonoverlapping intervals, supersession never changes revision bytes",
+    "service delegation raw body SHA256 and exact issuer/client/Namespace/context/profile binding required; revocation tombstone and fence checked before each attempt",
+    "manual score unique run/candidate/case/repetition version and verified actor; no financial mutation"
   ]
 }

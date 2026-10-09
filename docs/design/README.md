@@ -1,6 +1,6 @@
 # Дизайн AI Hub
 
-[Интерактивный прототип](prototype.html) — 15 operational routes и auth /login с синтетическими
+[Интерактивный прототип](prototype.html) — 16 operational routes и auth /login с синтетическими
 данными; это design artifact, не приложение с provider/DB/SSO.
 [design-contract.json](design-contract.json) фиксирует pages/forms/states/API mapping.
 Token snapshot взят из exact Base SHA в .base-revision; production потребляет @sdlc/ui,

@@ -26,3 +26,7 @@ Fleet/Forge adapters применяют [Namespace contract](NAMESPACE_V1.md), �
 identity и owner grants. Hub не владеет Task lifecycle, agent roles или исполнением tools.
 После cutover old endpoint не выбирается автоматически при ошибке Hub: сохранённый
 rollback candidate включается оператором после cancel/reconcile и financial readback.
+
+## SDLC wire
+
+[Подписанный service-adapter](SERVICE_ADAPTER_V1.md) определяет отдельный endpoint, Header envelope, trusted issuer, Base V2 body, raw-byte digest, revocation и recovery. Public /v1 не требует Task/run. Не использовать ordinal r12 вместо UUID profile revision. Runtime consumer qualification остаётся S7.

@@ -1,18 +1,15 @@
-# Проверка актуализированного прототипа
+# Проверка окончательного прототипа
 
 Дата: 2026-10-09. Kind: prototype. Surface: Codex in-app browser.
-Canonical [evidence](evidence.json) относится к финальному HTML/script текущих тарифов.
+[Evidence](evidence.json) привязан к окончательным HTML/script hashes.
 
-- 230 geometry / 179 states / 94 flow assertions: 17 маршрутов, 375/1440/1920/2560 во всех трёх темах; дополнительные тарифные границы 320/374/376/767/768/1279/1280.
-- 71 native PNG конкретной IAB вкладки; размер изображения проверен. Четыре тарифных снимка просмотрены непосредственно; остальные — захват, не отдельная ручная визуальная приёмка.
-- 15 token contrast checks; это не formal full WCAG acceptance.
-- Unexpected JavaScript errors: 0; provider calls: 0.
-- Viewport применяется через scoped IAB CDP. Общий browser viewport не подтверждает размер новой фоновой вкладки; screenshot clip учитывает origin прокрученного viewport.
-- 24 тарифных сценария: default 20%, custom per-million, auto/manual, subscription missing rate, exact percentage, Namespace isolation, history, 412 и URL reload/Back/Forward. [Scoped evidence](tariffs-evidence.json).
+- 230 geometry / 179 states / 123 flow assertions: 17 маршрутов; 375/1440/1920/2560 во всех трёх темах, 26 дополнительных тарифных размеров/границ.
+- 74 native PNG; размеры проверены. Пять снимков просмотрены напрямую: desktop tariffs, light source catalog, mobile model и две mobile price forms. Остальные снимки — захват с geometry checks, не отдельная ручная визуальная приёмка.
+- 15 контрастных проверок text tokens ≥4.5; полный WCAG/accessibility audit не выполнялся.
+- 70 основных, 25 тарифных и 28 adversarial сценариев. Back/draft, generation/proof, stable-ID isolation, manual scoring, archive, exact export, currency/time/model pricing проверены.
+- Unexpected JavaScript errors: 0; provider calls: 0. Complete IAB script прочитан частями по 100000 символов и совпал с локальным.
+- Scoped IAB CDP viewport и native PNG; размеры новой вкладки не выводились из browser-wide override.
 
-## Границы приёмки
-
-Structural/rendered gates не закрывают открытый semantic audit proof/Namespace budgets/datasets/exports/consumer transport. Полный статус DEVELOP_READY остаётся на актуализации.
-Backend/API/SQL/SSO/live adapters не реализованы. Цены синтетические; автоматический режим в макете не читает OpenRouter и не выполняет платежи.
-Prototype показывает представительные USD/main-dev examples; multi-profile/currency/effective interval application forms реализуются по полному [контракту тарифов](../PROJECT_TARIFFS.md).
-Provider cash, manual subscription allocation и project charge различаются; неизвестная сумма не бесплатный вызов.
+Разбор всех замечаний: [REVIEW_RESOLUTION](../REVIEW_RESOLUTION.md).
+Цены и авторизация синтетические. Backend/API/DB/SSO/providers и actual application acceptance not_run.
+Макет не хранит данные через полный reload: URL context/tabs восстанавливаются, in-memory demo records сбрасываются. Production persistence описана в API/DD.

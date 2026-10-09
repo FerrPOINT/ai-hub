@@ -59,3 +59,7 @@ Namespace UUID pair и binding=unbound входят в filter echo и cursor ide
 ## Начисления проектам
 
 В /tariffs отдельно показаны cost basis/confidence, project charge, margin и tariff revision. Суммы из project_charge_events не прибавляются к provider cash expenses. Currency/Namespace/range/snapshot identity общие для списка и экспорта; pending/provisional не confirmed expense. [Тарифы](PROJECT_TARIFFS.md).
+
+## Canonical export и echo
+
+Statistics.filter_echo включает all/unbound/namespace, exact UUID pair, range/currency/group_by и все фильтры dimensions/status. CSV/JSON сериализуют canonical statistics snapshot; display strings, валютные glyph и локальные даты не источник данных. Sample request/receipt таблицы явно неполные; агрегаты не превращаются в выдуманную историю. Разрезы profile/client используют одну synthetic matrix.

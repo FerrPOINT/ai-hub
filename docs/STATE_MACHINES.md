@@ -61,3 +61,16 @@ queued → running → completed/failed/cancelled. Each candidate/case/repetitio
 request key and worker fence. Unknown attempt yields unknown/incomparable result,
 no automatic rerun. Cancel prevents new cases; spent/held values retained.
 New run has new config/ID, old results immutable.
+
+## Сохранённый draft и тариф
+
+Local edit сохраняет private UI fields отдельно от server saved version; native
+Back/Forward не превращает ввод в committed draft. Оператор может stay/discard.
+Proof связывает saved version/config hash и ordered connection/model/generation/
+endpoint/adapter snapshots; новый credential/endpoint инвалидирует его. Повторная
+connection qualification не восстанавливает profile proof. TTL publication не
+заменяет runtime qualification. Rollback требует current qualification старого snapshot.
+
+Tariff draft → scheduled activation → active → superseded; revision неизменна.
+Policy CAS и unique activation time сериализуют конкурентов. Новые запросы фиксируют
+active tuple; старые и reconciliation не читают сегодняшнюю цену.

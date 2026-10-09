@@ -38,3 +38,5 @@ States queued/running/completed/failed/cancelled; worker leases + fencing,
 Cancel закрывает новые admissions, текущие attempts сверяет adapter; partial cost
 сохраняется. Export и content artifacts только владельцу/granted project.
 TTL artifacts=7 дней default; run metadata/financial facts имеют независимый retention.
+
+Manual scores: case_id/profile_revision_id/repetition из frozen config; `expected_version=0` создаёт absent score, update сравнивает CAS, 412 сохраняет ввод. Score 0..1 с шагом .001, reason, authenticated actor/time, append-only version history; ACK/score не меняет financial facts. [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md) описывает отдельный service inference.

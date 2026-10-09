@@ -24,7 +24,7 @@
   },
   "response_headers": {
     "X-AIHub-Request-Id": "40000000-0000-4000-8000-000000000001",
-    "X-AIHub-Profile-Revision": "12"
+    "X-AIHub-Profile-Revision": "80000000-0000-4000-8000-000000000012"
   },
   "unknown": {
     "state": "unknown",

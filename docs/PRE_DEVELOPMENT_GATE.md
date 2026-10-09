@@ -1,6 +1,6 @@
 # Готовность к разработке
 
-> Текущий статус: DESIGN_ALIGNMENT. Ниже исторический gate до semantic audit и добавления проектных тарифов; повторная полная приёмка pending. См. [CURRENT_STATE](CURRENT_STATE.md).
+> Текущий статус: DEVELOP_READY для документов и дизайна. Actual application/runtime acceptance not_run; main/Namespace integration остаётся отдельной вехой. См. [CURRENT_STATE](CURRENT_STATE.md).
 
 Этот gate проверяет достаточность документационного baseline для старта S1.
 Работающий UI/API, provider access и runtime release здесь не требуются и не
@@ -26,8 +26,8 @@
 ## Статус
 
 DEVELOP_READY для начала S1. Offline, semantic и rendered design gates завершены.
-Проверены root matrix, owner boundaries/transition, 37 requirements и их 37
-planned behavioral tests, stage DAG, 15 operational + 1 auth UI routes и соответствующие API actions.
+Проверены root matrix, owner boundaries/transition, 38 requirements и их 39
+planned behavioral tests, stage DAG, 16 operational + 1 auth UI routes и соответствующие API actions.
 Согласованы draft-before-proof, publication TTL/runtime qualification, streaming
 readback/own result grants, financial precision и static platform capability paths.
 Рабочие команды проверки в QUALITY_GATE воспроизводимы; independent OpenAPI
@@ -42,4 +42,4 @@ source-bound design evidence. Недостаточно одного source map �
 
 ## Актуализация 2026-10-09
 
-Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 219 geometry / 168 states / 73 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.
+Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 230 geometry / 179 states / 123 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.

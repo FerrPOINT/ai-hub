@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AI Hub — проектный контракт v1",
-    "version": "0.3.0-design",
+    "version": "0.4.0-design",
     "description": "Design-only: API/handlers отсутствуют. Не generated runtime OpenAPI. Unknown/unsupported semantics fail closed."
   },
   "x-readiness": "design-only",
@@ -5946,6 +5946,33 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "model_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
           }
         ],
         "responses": {
@@ -5970,10 +5997,20 @@
                   "required": ["items", "next_cursor"]
                 }
               }
+            },
+            "headers": {
+              "ETag": {
+                "description": "Exact model query returns quoted preference version, or \"0\" when absent. The unfiltered collection ETag is not a preference precondition.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"[0-9]+\"$"
+                }
+              }
             }
           }
         },
-        "x-requirements": ["FR-004", "FR-028"]
+        "x-requirements": ["FR-004", "FR-028"],
+        "description": "Bounded projection, stable identity ordering; cursor binds actor, filters and snapshot. Labels are metadata, never identities."
       },
       "put": {
         "operationId": "saveModelContextPreference",
@@ -6001,6 +6038,18 @@
               "type": "string",
               "pattern": "^\"[^\"]+\"$"
             }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
           }
         ],
         "requestBody": {
@@ -6022,13 +6071,22 @@
                   "$ref": "#/components/schemas/ModelContextPreference"
                 }
               }
+            },
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"[0-9]+\"$"
+                }
+              }
             }
           },
           "412": {
             "$ref": "#/components/responses/PreconditionFailed"
           }
         },
-        "x-requirements": ["FR-004", "FR-028"]
+        "x-requirements": ["FR-004", "FR-028"],
+        "description": "If-Match \"0\" creates only when this exact connection/model preference is absent. Updates use the model-query ETag. Idempotent replay returns original saved preference and does not invalidate proof twice; stale CAS is 412."
       }
     },
     "/api/v1/namespaces": {
@@ -6050,6 +6108,14 @@
               "minimum": 1,
               "maximum": 100,
               "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
             }
           }
         ],
@@ -6078,7 +6144,8 @@
             }
           }
         },
-        "x-requirements": ["FR-027"]
+        "x-requirements": ["FR-027"],
+        "description": "Bounded projection, stable identity ordering; cursor binds actor, filters and snapshot. Labels are metadata, never identities."
       }
     },
     "/api/v1/notifications": {
@@ -6259,6 +6326,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            }
           }
         ],
         "responses": {
@@ -6321,7 +6397,7 @@
           }
         ],
         "x-requirements": ["FR-030"],
-        "description": "Design-only. PROJECT_TARIFFS.md defines authorization, exact decimal arithmetic, snapshots and unknown handling. Namespace query pair validates identity/grants; conflicting or incomplete selectors are rejected.",
+        "description": "Append source revision with CAS on the exact connection/model/currency policy. expected_version 0 creates absent policy; stale 412 retains draft. Idempotency-Key returns original revision. effective_from must be unique on this key, effective_to > effective_from. Read latest started interval at admitted_at; expired latest is unknown and does not fall back to an older source. Future revisions leave present policy effective. Manual revision is created first via createPriceRevision; its exact tuple/interval must match. A failed binding leaves unbound draft PriceRevision and never changes active cost or receipts.",
         "parameters": [
           {
             "name": "Idempotency-Key",
@@ -6688,6 +6764,551 @@
           }
         }
       }
+    },
+    "/api/v1/evaluations/{evaluation_id}/scores": {
+      "get": {
+        "operationId": "listManualScores",
+        "summary": "listManualScores",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-017", "FR-023"],
+        "parameters": [
+          {
+            "name": "evaluation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ],
+        "description": "Design-only. Typed owner semantics, grants, idempotency/CAS and recovery are specified in the linked product contracts.",
+        "responses": {
+          "200": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/ManualScore"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "next_cursor"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      },
+      "post": {
+        "operationId": "recordManualScore",
+        "summary": "recordManualScore",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-017", "FR-023"],
+        "parameters": [
+          {
+            "name": "evaluation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          }
+        ],
+        "description": "Append a version attributed to authenticated actor for the exact frozen case/profile revision/repetition. expected_version 0 creates absent score, otherwise CAS compares current score version; mismatch 412 retains draft. Idempotency-Key replays original outcome. Repetition must be within the immutable run configuration. Score cannot change financial facts.",
+        "responses": {
+          "201": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManualScore"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualScoreInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project-tariff-activations": {
+      "get": {
+        "operationId": "listTariffActivations",
+        "summary": "listTariffActivations",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-030"],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          }
+        ],
+        "description": "Design-only. Typed owner semantics, grants, idempotency/CAS and recovery are specified in the linked product contracts.",
+        "responses": {
+          "200": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/TariffActivation"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "next_cursor"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      },
+      "post": {
+        "operationId": "activateProjectTariff",
+        "summary": "activateProjectTariff",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-030"],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          }
+        ],
+        "description": "Design-only. Typed owner semantics, grants, idempotency/CAS and recovery are specified in the linked product contracts.",
+        "responses": {
+          "201": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TariffActivation"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TariffActivationInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/service-inference": {
+      "post": {
+        "operationId": "serviceInference",
+        "summary": "serviceInference",
+        "security": [
+          {
+            "HubClientKey": [],
+            "FleetDelegation": []
+          }
+        ],
+        "x-requirements": ["FR-018", "FR-021", "FR-027"],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          }
+        ],
+        "description": "Target signed service adapter. HubClientKey and FleetDelegation are both required. Raw body digest, issuer/audience, exact Namespace/context operation, immutable profile UUID, active delegation/lease/fence and trusted caps are checked before the shared admission path. Ordinary /v1 calls require no Task/run.",
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          },
+          "200": {
+            "description": "Target successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Completion"
+                }
+              },
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "Typed SSE frames, protocol-specific shapes in INFERENCE_V1.md; not persisted transcript."
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "X-AIHub-Profile-Revision": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "X-AIHub-Request-Id": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceInferenceInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/delegations/revoke": {
+      "post": {
+        "operationId": "revokeServiceDelegation",
+        "summary": "revokeServiceDelegation",
+        "security": [
+          {
+            "FleetDelegation": []
+          }
+        ],
+        "x-requirements": ["FR-019", "FR-021"],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          }
+        ],
+        "description": "Signed issuer-only idempotent revocation; unknown grant creates a durable tombstone. It blocks new admission/attempts, requests cancellation and retains uncertain reserves. No new inference.",
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          },
+          "200": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceRevocationInput"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceRevocationInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6701,6 +7322,12 @@
         "type": "http",
         "scheme": "bearer",
         "description": "Own scoped random key; never provider secret."
+      },
+      "FleetDelegation": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-AIHub-Delegation",
+        "description": "base64url UTF-8 ServiceGrantEnvelope; Ed25519 signature over AIHUB-SERVICE-INFERENCE-V1 NUL + original payload bytes. Trusted issuer keys are deployment-owned; not a human PAT."
       }
     },
     "schemas": {
@@ -8096,7 +8723,11 @@
             "enum": ["installation", "project", "client", "profile"]
           },
           "scope_id": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
           },
           "currency": {
             "type": "string",
@@ -8120,6 +8751,16 @@
             "minItems": 1,
             "maxItems": 5,
             "default": [80, 95]
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -8128,8 +8769,35 @@
           "currency",
           "period",
           "hard_limit",
-          "warning_thresholds"
-        ]
+          "warning_thresholds",
+          "namespace"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "scope_type": {
+                  "const": "project"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "namespace": {
+                  "$ref": "#/components/schemas/NamespaceRef"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "namespace": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ],
+        "description": "scope_id is own installation/client/profile UUID; for project it equals namespace.namespace_id. Server resolves the exact registry/Namespace pair to its verified Tracker binding; mismatch is 422. Client scope derives its Namespace from the referenced client."
       },
       "Budget": {
         "type": "object",
@@ -8292,9 +8960,89 @@
               },
               "group_by": {
                 "type": ["string", "null"]
+              },
+              "binding": {
+                "type": "string",
+                "enum": ["all", "unbound", "namespace"]
+              },
+              "client_id": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "not": {
+                      "const": "00000000-0000-0000-0000-000000000000"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "connection_id": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "not": {
+                      "const": "00000000-0000-0000-0000-000000000000"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "virtual_model_id": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "not": {
+                      "const": "00000000-0000-0000-0000-000000000000"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "profile_revision_id": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "not": {
+                      "const": "00000000-0000-0000-0000-000000000000"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "user_subject": {
+                "type": ["string", "null"],
+                "maxLength": 120
+              },
+              "status": {
+                "type": ["string", "null"]
               }
             },
-            "required": ["namespace", "from", "to", "currency", "group_by"]
+            "required": [
+              "namespace",
+              "from",
+              "to",
+              "currency",
+              "group_by",
+              "binding",
+              "client_id",
+              "connection_id",
+              "virtual_model_id",
+              "profile_revision_id",
+              "user_subject",
+              "status"
+            ]
           },
           "source_basis": {
             "type": "object",
@@ -8436,7 +9184,9 @@
               "additionalProperties": false,
               "properties": {
                 "case_id": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
                 },
                 "input": {
                   "type": "string",
@@ -8444,7 +9194,13 @@
                 },
                 "assertion_kind": {
                   "type": "string",
-                  "enum": ["exact_match", "json_schema", "tool_args", "manual"]
+                  "enum": [
+                    "exact_match",
+                    "normalized_text",
+                    "json_schema",
+                    "tool_args",
+                    "manual"
+                  ]
                 },
                 "expected": {
                   "type": "string",
@@ -8623,6 +9379,18 @@
                   "items": {
                     "$ref": "#/components/schemas/ExpenseTotals"
                   }
+                },
+                "profile_revision_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "not": {
+                    "const": "00000000-0000-0000-0000-000000000000"
+                  }
+                },
+                "repetition": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10
                 }
               },
               "required": [
@@ -8630,7 +9398,9 @@
                 "request_id",
                 "outcome",
                 "score",
-                "expenses"
+                "expenses",
+                "profile_revision_id",
+                "repetition"
               ]
             }
           },
@@ -9739,6 +10509,15 @@
           "generation": {
             "type": "integer",
             "minimum": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "tracker_project_key": {
+            "type": "string",
+            "maxLength": 120
           }
         },
         "required": [
@@ -9747,7 +10526,9 @@
           "tracker_project_id",
           "state",
           "observed_at",
-          "generation"
+          "generation",
+          "label",
+          "tracker_project_key"
         ]
       },
       "ModelContextPreferenceInput": {
@@ -9918,6 +10699,18 @@
           "expected_version": {
             "type": "integer",
             "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effective_to": {
+            "type": ["string", "null"],
+            "format": "date-time"
           }
         },
         "required": [
@@ -9925,7 +10718,10 @@
           "model_id",
           "mode",
           "manual_price_revision_id",
-          "expected_version"
+          "expected_version",
+          "currency",
+          "effective_from",
+          "effective_to"
         ],
         "allOf": [
           {
@@ -9952,7 +10748,8 @@
               }
             }
           }
-        ]
+        ],
+        "description": "Logical policy key is exact connection_id/model_id/currency. Immutable source revisions have effective UTC intervals. Manual price revision must match the same connection/model/currency and interval; mismatch 422. Auto native currency requires qualified catalog evidence, with no FX fallback."
       },
       "PricingSourceRevision": {
         "type": "object",
@@ -10155,7 +10952,8 @@
               }
             }
           }
-        ]
+        ],
+        "description": "Creates an immutable draft revision. effective_from/to are its allowed activation window; multiple draft revisions may overlap. Only the CAS-protected activation timeline determines effective nonoverlapping intervals. Saving is not activation."
       },
       "ProjectTariffRevision": {
         "type": "object",
@@ -10178,9 +10976,28 @@
           },
           "actor_subject": {
             "type": "string"
+          },
+          "policy_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "publication_status": {
+            "type": "string",
+            "enum": ["draft", "published"]
           }
         },
-        "required": ["id", "config", "version", "created_at", "actor_subject"]
+        "required": [
+          "id",
+          "config",
+          "version",
+          "created_at",
+          "actor_subject",
+          "policy_id",
+          "publication_status"
+        ]
       },
       "ProjectCharge": {
         "type": "object",
@@ -10303,6 +11120,498 @@
           "occurred_at",
           "source_event_id",
           "supersedes_id"
+        ]
+      },
+      "ManualScoreInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "profile_revision_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "repetition": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "multipleOf": 0.001
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "case_id",
+          "profile_revision_id",
+          "repetition",
+          "score",
+          "reason",
+          "expected_version"
+        ]
+      },
+      "ManualScore": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "evaluation_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "input": {
+            "$ref": "#/components/schemas/ManualScoreInput"
+          },
+          "actor_subject": {
+            "type": "string"
+          },
+          "reviewed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id",
+          "evaluation_id",
+          "input",
+          "actor_subject",
+          "reviewed_at",
+          "version"
+        ]
+      },
+      "TariffActivationInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tariff_revision_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "activate_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expected_policy_version": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "tariff_revision_id",
+          "activate_at",
+          "expected_policy_version"
+        ]
+      },
+      "TariffActivation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "policy_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "tariff_revision_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "activate_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["scheduled", "active", "superseded", "cancelled"]
+          },
+          "policy_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "actor_subject": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "policy_id",
+          "tariff_revision_id",
+          "activate_at",
+          "status",
+          "policy_version",
+          "actor_subject"
+        ]
+      },
+      "TaskRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tracker_instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          }
+        },
+        "required": ["tracker_instance_id", "task_id"]
+      },
+      "RepositoryRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "forge_instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "repository_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          }
+        },
+        "required": ["forge_instance_id", "repository_id"]
+      },
+      "ExecutionContextV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "type": "integer",
+            "const": 2
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "namespace": {
+            "$ref": "#/components/schemas/NamespaceRef"
+          },
+          "task": {
+            "$ref": "#/components/schemas/TaskRef"
+          },
+          "repositories": {
+            "type": "array",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/RepositoryRef"
+            }
+          }
+        },
+        "required": [
+          "schema_version",
+          "operation_id",
+          "namespace",
+          "task",
+          "repositories"
+        ]
+      },
+      "ServiceInferenceInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "enum": ["chat", "responses"]
+          },
+          "execution_context": {
+            "$ref": "#/components/schemas/ExecutionContextV2"
+          },
+          "invocation": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ChatInput"
+              },
+              {
+                "$ref": "#/components/schemas/ResponsesInput"
+              }
+            ]
+          }
+        },
+        "required": ["protocol", "execution_context", "invocation"]
+      },
+      "ServiceGrantEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "type": "integer",
+            "const": 1
+          },
+          "key_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "payload": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768
+          },
+          "signature_hex": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{128}$"
+          }
+        },
+        "required": ["schema_version", "key_id", "payload", "signature_hex"]
+      },
+      "ServiceInferenceClaims": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "type": "integer",
+            "const": 1
+          },
+          "action": {
+            "type": "string",
+            "const": "infer"
+          },
+          "issuer_instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "audience_installation_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "machine_subject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "grant_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "context_operation_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "execution_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "profile_revision_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "namespace": {
+            "$ref": "#/components/schemas/NamespaceRef"
+          },
+          "fencing_token": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,19}$"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lease_expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "request_body_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "max_provider_cost": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          }
+        },
+        "required": [
+          "schema_version",
+          "action",
+          "issuer_instance_id",
+          "audience_installation_id",
+          "machine_subject",
+          "grant_id",
+          "client_id",
+          "request_id",
+          "context_operation_id",
+          "execution_id",
+          "profile_revision_id",
+          "namespace",
+          "fencing_token",
+          "issued_at",
+          "expires_at",
+          "lease_expires_at",
+          "request_body_sha256",
+          "max_provider_cost",
+          "currency"
+        ]
+      },
+      "ServiceRevocationInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "grant_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          }
+        },
+        "required": ["grant_id"]
+      },
+      "ServiceRevocationClaims": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "type": "integer",
+            "const": 1
+          },
+          "action": {
+            "type": "string",
+            "const": "revoke"
+          },
+          "issuer_instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "audience_installation_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "machine_subject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "request_body_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "schema_version",
+          "action",
+          "issuer_instance_id",
+          "audience_installation_id",
+          "machine_subject",
+          "issued_at",
+          "request_body_sha256"
         ]
       }
     },

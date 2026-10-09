@@ -53,3 +53,5 @@ Hosted CI optional mirror; локальные обязательные gates н�
 ## Актуализация 2026-10-09
 
 Дополнительный действующий gate: `python scripts/check_alignment.py`. Он проверяет source mapping, namespaces, filters и exact legacy decimal conversion. IAB regression runner `scripts/design_flows.mjs` принимает существующий IAB tab; отдельный браузер не запускает.
+
+Additional semantic gates: `python scripts/check_alignment.py`, `python scripts/check_semantics.py`, `node scripts/check_service_contract.mjs`. Service vectors и Statistics export проверяются independent schema validator; actual transport not_run.

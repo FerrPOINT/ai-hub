@@ -146,36 +146,117 @@ def main():
     )
     source_price = {
         "connection_id": "10000000-0000-4000-8000-000000000001",
-        "model_id": "model-a", "mode": "provider_auto",
-        "manual_price_revision_id": None, "expected_version": 0,
+        "model_id": "model-a",
+        "mode": "provider_auto",
+        "manual_price_revision_id": None,
+        "expected_version": 0,
+        "currency": "USD",
+        "effective_from": "2026-10-09T13:30:00Z",
+        "effective_to": None,
     }
     assert accepts("PricingSourceInput", source_price)
     assert not accepts("PricingSourceInput", {**source_price, "mode": "manual"})
-    assert accepts("PricingSourceInput", {
-        **source_price, "mode": "manual",
-        "manual_price_revision_id": "20000000-0000-4000-8000-000000000001",
-    })
+    assert not accepts(
+        "PricingSourceInput", {k: v for k, v in source_price.items() if k != "currency"}
+    )
+    assert accepts("PricingSourceInput", {**source_price, "currency": "EUR"})
+    assert accepts(
+        "PricingSourceInput",
+        {
+            **source_price,
+            "mode": "manual",
+            "manual_price_revision_id": "20000000-0000-4000-8000-000000000001",
+        },
+    )
     tariff = {
-        "namespace": {"registry_instance_id": source_price["connection_id"],
-                      "namespace_id": "20000000-0000-4000-8000-000000000001"},
-        "virtual_model_id": None, "currency": "USD", "mode": "default_markup",
-        "markup_bps": 2000, "input_uncached": None, "input_cached": None,
-        "output_billable": None, "unit": "per_million_tokens",
-        "effective_from": "2026-10-09T00:00:00Z", "effective_to": None,
+        "namespace": {
+            "registry_instance_id": source_price["connection_id"],
+            "namespace_id": "20000000-0000-4000-8000-000000000001",
+        },
+        "virtual_model_id": None,
+        "currency": "USD",
+        "mode": "default_markup",
+        "markup_bps": 2000,
+        "input_uncached": None,
+        "input_cached": None,
+        "output_billable": None,
+        "unit": "per_million_tokens",
+        "effective_from": "2026-10-09T00:00:00Z",
+        "effective_to": None,
         "expected_version": 0,
     }
     assert accepts("ProjectTariffInput", tariff)
     assert not accepts("ProjectTariffInput", {**tariff, "namespace": None})
     assert not accepts("ProjectTariffInput", {**tariff, "mode": "custom_rates"})
-    custom = {**tariff, "mode": "custom_rates", "markup_bps": None,
-              "input_uncached": "3", "output_billable": "10"}
+    custom = {
+        **tariff,
+        "mode": "custom_rates",
+        "markup_bps": None,
+        "input_uncached": "3",
+        "output_billable": "10",
+    }
     assert accepts("ProjectTariffInput", custom)
-    assert not accepts("ProjectTariffInput", {**custom, "input_uncached": "0.0000000000001"})
+    assert not accepts(
+        "ProjectTariffInput", {**custom, "input_uncached": "0.0000000000001"}
+    )
     assert not accepts("ProjectTariffInput", {**custom, "input_uncached": 3})
     assert not accepts("ProjectTariffInput", {**tariff, "unit": "per_token"})
     assert not accepts("ProjectTariffInput", {**tariff, "markup_bps": 2000.5})
-    assert not accepts("ProjectTariffInput", {**tariff, "namespace": {
-        **tariff["namespace"], "namespace_id": "00000000-0000-0000-0000-000000000000"}})
+    assert not accepts(
+        "ProjectTariffInput",
+        {
+            **tariff,
+            "namespace": {
+                **tariff["namespace"],
+                "namespace_id": "00000000-0000-0000-0000-000000000000",
+            },
+        },
+    )
+    vector = json.loads(
+        (root / "docs/examples/service-adapter-vector.json").read_text(encoding="utf-8")
+    )
+    body = json.loads(vector["raw_body_utf8"])
+    assert accepts("ServiceInferenceInput", body)
+    assert accepts("ServiceInferenceClaims", vector["claims"])
+    assert accepts("ExecutionContextV2", body["execution_context"])
+    assert not accepts("ServiceInferenceInput", {**body, "task_id": "legacy"})
+    assert not accepts(
+        "ServiceInferenceClaims", {**vector["claims"], "fencing_token": 1}
+    )
+    assert not accepts(
+        "ServiceInferenceClaims", {**vector["claims"], "profile_revision_id": "12"}
+    )
+    budget = {
+        "scope_type": "project",
+        "scope_id": tariff["namespace"]["namespace_id"],
+        "namespace": tariff["namespace"],
+        "currency": "USD",
+        "period": "utc_day",
+        "hard_limit": "0.000001",
+        "warning_thresholds": [80],
+    }
+    assert accepts("BudgetInput", budget)
+    assert not accepts("BudgetInput", {**budget, "namespace": None})
+    assert not accepts("BudgetInput", {**budget, "scope_id": "Платформа"})
+    score = {
+        "case_id": "a1",
+        "profile_revision_id": vector["claims"]["profile_revision_id"],
+        "repetition": 1,
+        "score": 0.125,
+        "reason": "Synthetic",
+        "expected_version": 0,
+    }
+    assert accepts("ManualScoreInput", score)
+    assert not accepts("ManualScoreInput", {**score, "score": 0.1255})
+    assert not accepts("ManualScoreInput", {**score, "repetition": 0})
+    exported = json.loads(
+        (root / "docs/examples/statistics-export.json").read_text(encoding="utf-8")
+    )
+    assert accepts("Statistics", exported["payload"])
+    assert not accepts(
+        "Statistics", {**exported["payload"], "filter_echo": {"binding": "all"}}
+    )
+    print("Service vector / Namespace budget / manual score schema examples: PASS")
     print("Project tariff/source positive and negative schema examples: PASS")
     print("Independent OpenAPI 3.1 and schema validation: PASS")
     print("Money/draft/tools/stateless/pinned-mode examples: PASS")

@@ -41,3 +41,5 @@ docs/products и не изменением соседних repo в рамках
 ## Актуализация 2026-10-09
 
 AI Hub добавляется в documentation mirror явным onboarding; это не runtime service registration и не разрешение installation cutover. Admin transition сохраняет /ai до accepted S7, затем status/link и Namespace-aware UI redirect.
+
+Target service transport: [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md). Base UI и штатный public SDK отделены от signed Fleet adapter. Target approved в документационном каталоге не означает main/runtime adoption.

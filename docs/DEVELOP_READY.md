@@ -1,6 +1,6 @@
 # Готовность полного пакета к разработке
 
-> Текущий статус: DESIGN_ALIGNMENT. Ниже исторический gate до semantic audit и добавления проектных тарифов; повторная полная приёмка pending. См. [CURRENT_STATE](CURRENT_STATE.md).
+> Текущий статус: DEVELOP_READY для документов и дизайна. Actual application/runtime acceptance not_run; main/Namespace integration остаётся отдельной вехой. См. [CURRENT_STATE](CURRENT_STATE.md).
 
 Цель: передать достаточные product/architecture/API/data/UI/quality inputs, чтобы
 инженер мог начать S1 без повторного проектирования и без fake runtime PASS.
@@ -13,7 +13,7 @@
 | Inference и funds      | API/INFERENCE/ACCOUNTING/RECONCILIATION                      | Exact intents/attempts/knownness/fixed fees/unknown reserve     |
 | Typed data             | DD + DATA_MODEL/MIGRATION_PLAN                               | Required/null/default/FK/unique/lifecycle and stage mapping     |
 | Access и failure       | ACCESS_MATRIX/ERROR_CATALOG/STATE_MACHINES                   | Actor/scopes/revocation/404/412/replay/content TTL              |
-| Full UI                | DESIGN_SYSTEM/UI_SCREEN_SPEC/Field reference/design contract | 15 routes, forms/actions/states, no undocumented empty pieces   |
+| Full UI                | DESIGN_SYSTEM/UI_SCREEN_SPEC/Field reference/design contract | 17 routes, forms/actions/states, no undocumented empty pieces   |
 | Visual quality         | Prototype + design evidence manifest                         | IAB route/width/theme/state/keyboard results and fresh images   |
 | Delivery packets       | IMPLEMENTATION_PACKETS/roadmap/tests                         | Dependencies/target components/oracles and first ready frontier |
 | Source delivery        | Clean exact git head/main + source inventory                 | Task documents published, pins/runtime untouched                |
@@ -21,7 +21,7 @@
 ## Статус
 
 DEVELOP_READY. Полный product/design handoff проверен: typed contracts/data/forms,
-rendered prototype и source-bound IAB evidence согласованы.Execution gates
+rendered prototype и source-bound IAB evidence согласованы. Execution gates
 приложения остаются planned; числа geometry/state/flow подтверждены design/QA.
 Application/backend/DB migrations/live SSO/provider/deployment not implemented;
 those are execution checkpoints and do not become prerequisites for documentation delivery.
@@ -29,4 +29,4 @@ those are execution checkpoints and do not become prerequisites for documentatio
 
 ## Актуализация 2026-10-09
 
-Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 219 geometry / 168 states / 73 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.
+Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 230 geometry / 179 states / 123 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.

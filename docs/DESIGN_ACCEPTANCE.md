@@ -5,7 +5,7 @@ Scope: rendered static prototype through Codex in-app browser, not real auth/bil
 
 | Case | Steps                                                   | Expected                                                                   |
 | ---- | ------------------------------------------------------- | -------------------------------------------------------------------------- |
-| D-01 | Open all15 routes at375/1440/2560                       | Correct source pattern/h1/layout, no body overflow; every action reachable |
+| D-01 | Open all17 routes at375/1440/2560                       | Correct source pattern/h1/layout, no body overflow; every action reachable |
 | D-02 | Dark/gray/light at all routes                           | Same geometry, readable semantic text/status/focus                         |
 | D-03 | Mobile drawer open/nav/Escape                           | Named links, modal focus, return to trigger, same product actions          |
 | D-04 | Unknown entity ID / permitted existing ID               | 404 vs actual data; no default first-record masking                        |

@@ -1,0 +1,172 @@
+{
+  "kind": "prototype",
+  "synthetic": true,
+  "as_of": "2026-10-08T13:30:00Z",
+  "route": "#/statistics",
+  "filters": {
+    "binding": "all",
+    "namespace": null,
+    "from": "2026-10-02T00:00:00Z",
+    "to": "2026-10-09T00:00:00Z",
+    "currency": "USD",
+    "group_by": null,
+    "client_id": null,
+    "connection_id": null,
+    "virtual_model_id": null,
+    "profile_revision_id": null,
+    "user_subject": null,
+    "status": null
+  },
+  "namespace": null,
+  "payload": {
+    "as_of": "2026-10-08T13:30:00Z",
+    "projection_watermark": "2026-10-08T13:30:00Z",
+    "lag_seconds": 0,
+    "data_status": "complete",
+    "request_count": 1384,
+    "attempt_count": 1427,
+    "sample_count": 1376,
+    "unknown_usage_attempts": 3,
+    "usage": {
+      "input_tokens": 7800000,
+      "cached_input_tokens": null,
+      "output_tokens": 1700000,
+      "reasoning_tokens": null,
+      "provenance": "synthetic canonical aggregate",
+      "knownness": "partial"
+    },
+    "expenses": [
+      {
+        "currency": "USD",
+        "confirmed_amount": "12.40",
+        "estimated_amount": "4.85",
+        "held_reserve": "0.72",
+        "unknown_charge_count": 3,
+        "as_of": "2026-10-08T13:30:00Z"
+      },
+      {
+        "currency": "EUR",
+        "confirmed_amount": "2.10",
+        "estimated_amount": "0.35",
+        "held_reserve": "0",
+        "unknown_charge_count": 0,
+        "as_of": "2026-10-08T13:30:00Z"
+      }
+    ],
+    "latency_p95_ms": 2840,
+    "ttft_p95_ms": 740,
+    "buckets": [
+      {
+        "key": "Fleet Control",
+        "count": 870,
+        "expenses": [
+          {
+            "currency": "USD",
+            "confirmed_amount": "5.55",
+            "estimated_amount": "2.3",
+            "held_reserve": "0",
+            "unknown_charge_count": 1,
+            "as_of": "2026-10-08T13:30:00Z"
+          }
+        ]
+      },
+      {
+        "key": "Forge CI/CD",
+        "count": 360,
+        "expenses": [
+          {
+            "currency": "USD",
+            "confirmed_amount": "4.2",
+            "estimated_amount": "1.25",
+            "held_reserve": "0",
+            "unknown_charge_count": 1,
+            "as_of": "2026-10-08T13:30:00Z"
+          }
+        ]
+      },
+      {
+        "key": "CI тесты",
+        "count": 144,
+        "expenses": [
+          {
+            "currency": "USD",
+            "confirmed_amount": "2.55",
+            "estimated_amount": "1.25",
+            "held_reserve": "0",
+            "unknown_charge_count": 1,
+            "as_of": "2026-10-08T13:30:00Z"
+          }
+        ]
+      },
+      {
+        "key": "Локальный тест",
+        "count": 10,
+        "expenses": [
+          {
+            "currency": "USD",
+            "confirmed_amount": "0.1",
+            "estimated_amount": "0.05",
+            "held_reserve": "0",
+            "unknown_charge_count": 0,
+            "as_of": "2026-10-08T13:30:00Z"
+          }
+        ]
+      }
+    ],
+    "filter_echo": {
+      "binding": "all",
+      "namespace": null,
+      "from": "2026-10-02T00:00:00Z",
+      "to": "2026-10-09T00:00:00Z",
+      "currency": "USD",
+      "group_by": null,
+      "client_id": null,
+      "connection_id": null,
+      "virtual_model_id": null,
+      "profile_revision_id": null,
+      "user_subject": null,
+      "status": null
+    },
+    "source_basis": {
+      "requests": "admitted_at",
+      "attempts": "dispatched_at",
+      "expenses": "occurred_at",
+      "subscriptions": "service_period"
+    },
+    "completed_count": 1300,
+    "failed_count": 62,
+    "cancelled_count": 14,
+    "unknown_count": 8,
+    "in_progress_count": 0,
+    "admission_denied_count": 0,
+    "fallback_request_count": 43,
+    "probe_count": 0,
+    "success_rate": {
+      "numerator": 1300,
+      "denominator": 1376,
+      "value": 0.9447674418604651,
+      "basis": "terminal_requests"
+    },
+    "error_rate": {
+      "numerator": 62,
+      "denominator": 1376,
+      "value": 0.04505813953488372,
+      "basis": "terminal_requests"
+    },
+    "fallback_rate": {
+      "numerator": 43,
+      "denominator": 1384,
+      "value": 0.03106936416184971,
+      "basis": "admitted_requests"
+    },
+    "availability_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "value": null,
+      "basis": "explicit_probes"
+    },
+    "latency_p50_ms": 1120,
+    "throughput_per_second": 0.0022883597883597883,
+    "namespace": null
+  }
+}

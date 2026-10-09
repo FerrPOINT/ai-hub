@@ -174,6 +174,21 @@ def validate(root=ROOT, require_evidence=True):
         "client-binding-requires-revocation",
         "profile-rollback",
         "profile-archive-readonly",
+        "native-back-draft-guard",
+        "unsaved-proof-cannot-bypass-history",
+        "endpoint-requalification-not-profile-proof",
+        "dataset-project-derived-from-namespace",
+        "same-name-cannot-cross-namespace",
+        "manual-score-attributed-and-visible",
+        "archive-history-readable",
+        "export-canonical-decimal",
+        "export-full-scope-utc-echo",
+        "tariff-save-not-activation",
+        "tariff-profile-key-independent",
+        "future-source-not-applied-early",
+        "effective-source-rate-at-boundary",
+        "expired-source-not-old-rate-fallback",
+        "currency-rate-exact-tuple-no-fx",
     }
     if not required_flows <= {item.get("name") for item in evidence["flows"]}:
         errors.append("Missing behavioral UX regression evidence")

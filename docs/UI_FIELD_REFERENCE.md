@@ -204,3 +204,9 @@ Namespace/project binding сверяется с owner projection. Client Namespa
 ## pricingSource / projectTariff
 
 OpenAPI PricingSourceInput и ProjectTariffInput — canonical fields. Auto требует qualified provider pricing; manual требует immutable price revision. NamespaceRef обязателен для project override; custom input/output decimal per_million_tokens; markup_bps=2000 default. expected_version передаёт CAS. [Контракт](PROJECT_TARIFFS.md).
+
+## Обновление 0.4.0-design
+
+BudgetInput.namespace и UUID scope_id, NamespaceBinding.label/project_key, TariffActivationInput и ManualScoreInput присутствуют в OpenAPI и form manifest. Context PUT использует per-model ETag/Idempotency-Key. Dataset assertion enum: exact_match/normalized_text/json_schema/tool_args/manual; expected — bounded string. Цена, её источники и активация — разные операции.
+
+Source price form: currency/effective_from/effective_to входят в PricingSourceInput. Manual rates/source создают PriceInput → bind PricingSourceInput с exact CAS; failure сохраняет ввод и unbound immutable revision, не подменяет старый effective source.

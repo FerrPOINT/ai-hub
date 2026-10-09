@@ -302,7 +302,12 @@
     {
       "path": "/evaluations/:id",
       "layout": "detail-with-aside",
-      "operations": ["readEvaluation", "cancelEvaluation"],
+      "operations": [
+        "readEvaluation",
+        "cancelEvaluation",
+        "recordManualScore",
+        "listManualScores"
+      ],
       "auth": "central_verified_with_product_grants",
       "states": [
         "loading",
@@ -385,7 +390,9 @@
         "createProjectTariffRevision",
         "listPrices",
         "createPriceRevision",
-        "listProjectCharges"
+        "listProjectCharges",
+        "activateProjectTariff",
+        "listTariffActivations"
       ],
       "auth": "central_verified_with_product_grants",
       "states": [

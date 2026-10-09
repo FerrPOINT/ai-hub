@@ -104,5 +104,17 @@
   "live_octo_verified": false,
   "provider_calls": 0,
   "sdk_baseline_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
-  "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
+  "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",
+  "publication_cohorts": {
+    "services-base": {
+      "remote_main": "ae8af2342b61090094292e75a7c23bf464757468",
+      "target_docs_branch": "docs/ai-hub-onboarding",
+      "main_integration": "not_run"
+    },
+    "admin-panel": {
+      "remote_main": "902245d59ecf45467536e4d789733dfc4414c5cc",
+      "target_docs_branch": "docs/ai-hub-extraction",
+      "main_integration": "not_run"
+    }
+  }
 }

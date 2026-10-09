@@ -157,3 +157,7 @@
 ## Тарифы — /tariffs
 
 Operational, wide. Tabs «Проекты» / «Себестоимость подключений» в URL. NamespacePicker общий; all показывает сравнение, exact active Namespace разрешает scoped edit. Default 20%; формы переключают markup/custom rates и auto/manual source, input/output/cached за 1M, currency/version/effective interval. Таблица показывает cost basis, начисление и margin отдельно. Operations: listPricingSources/createPricingSourceRevision/listProjectTariffs/createProjectTariffRevision/listPrices/createPriceRevision/listProjectCharges. Состояния pending/412/unknown сохраняют ввод и резерв.
+
+## Полный pricing и scoring flow
+
+/tariffs показывает все текущие connections/model/currency, shared PriceRevision history, profile/currency/UTC selectors и отдельную draft/activate timeline. /expenses ссылается на тот же справочник ставок; второго editor/store нет. Dataset/run читает frozen IDs/scorer/budget; readEvaluation и manual score показывают actor/time/case/candidate. Archive history сохраняет immutable records и не предлагает новые admissions.

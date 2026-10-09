@@ -29,3 +29,7 @@ DB-01/S1: namespace_bindings и nullable bindings клиентов. DB-02/S2: mo
 ## Дополнение тарифов
 
 S2: pricing_source_revisions. S3: project_tariff_revisions, requests.project_tariff_snapshot и project_charge_events. S5: projection/control UI. Own FK, nonoverlap, CAS/dedupe и decimal scale требуют настоящих SQL migrations при реализации; ручного переноса legacy aggregate в выдуманные project charges нет.
+
+## Semantic review increments
+
+S3: stable project tariff policies/activation timelines и service delegations/tombstones. S6: evaluation_manual_scores. DB constraints: unique policy/time, policy-version CAS, run/candidate/case/repetition score version, issuer/grant tombstone, same-owner FK. Source SDK pins не меняются; legacy grants/ordinal IDs не конвертируются автоматически.

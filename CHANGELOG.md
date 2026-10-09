@@ -30,3 +30,11 @@ Runtime-реализации и выпущенной версии пока не�
 - OpenRouter automatic catalog/usage cost и manual Ollama Online/ChatGPT subscription cost allocation.
 - Immutable pricing-source/tariff/charge DTO и dataflow; runtime не реализован.
 - Полный design handoff остаётся на актуализации после semantic audit; прошлый evidence исторический.
+
+## 2026-10-09 — Semantic review closure
+
+- Stable-ID Namespace binding, saved draft/proof/history and generation invalidation.
+- Typed budget/context pagination/CAS, immutable price activation timeline, full profile/currency pricing.
+- Dataset/run/manual score parity, canonical exports and full filter echo.
+- Signed service adapter with exact v2 context/body binding and revoke tombstones; public SDK unchanged.
+- Final evidence and current status refreshed after the coordinated gate; actual runtime not implemented.

@@ -34,8 +34,7 @@ Namespace, expiry/concurrency/cost policy. Human PAT не становится p
 Обычный совместимый SDK не требует Task/run. SDLC adapter использует существующий Base
 `ExecutionContextV2`, сверяет его Namespace с client binding и сохраняет provenance.
 TaskRef/RepositoryRef не становятся grants; source owner/instance и подпись/lease проверяются
-до dispatch. Strict SDLC v1 не расширяется. Транспорт SDLC adapter остаётся отдельным
-owner compatibility gate, не заявленной возможностью public OpenAI-compatible metadata.
+до dispatch. Strict SDLC v1 не расширяется. Target transport задан в [SERVICE_ADAPTER_V1](SERVICE_ADAPTER_V1.md): отдельный signed service endpoint, raw-body digest и expiry/revocation/fence. Public OpenAI-compatible metadata не заменяет этот envelope.
 Original request ID/idempotency/revision сохраняются; uncertain response → readback,
 не новый provider вызов. Legacy Fleet grant не преобразуется автоматически в Hub key.
 

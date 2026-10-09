@@ -50,7 +50,7 @@ reconciliation; повторный inference не является способ�
 наценку либо custom_rates: свои input/output/cached ставки за миллион токенов.
 Тариф задаётся по Namespace/profile/currency; profile=null — общий тариф проекта.
 Приоритет: exact Namespace/profile → общий Namespace → установка, default 20%.
-Перекрывающиеся активные интервалы одного ключа отвергаются; currency не конвертируется.
+Сохранение создаёт immutable draft, оно не активирует цену. Draft окна могут перекрываться; активные интервалы определяет отдельный timeline policy. Currency не конвертируется.
 
 - Default: project charge = cost basis × (10000 + markup_bps) / 10000.
 - Custom: project charge = Σ(disjoint billable tokens × project rate / 1000000).
@@ -91,3 +91,33 @@ Default 20% — продуктовая policy, реальные ставки н�
 UI формы показывают source, currency, unit, effective interval и revision.
 TC-038 проверяет decimal precision, automatic/manual, отсутствующий usage/cost,
 exact Namespace identity, custom rates, immutable historical snapshot и dedupe.
+
+## Активация и интервалы
+
+Stable policy имеет ключ Namespace/profile-or-null/currency и monotonic version.
+createProjectTariffRevision создаёт immutable draft с allowed effective window.
+activateProjectTariff содержит revision UUID, activate_at и expected_policy_version.
+Транзакция блокирует policy, проверяет current version, Namespace grants, принадлежность
+revision тому же policy и from<=activate_at<to. Duplicate key replay возвращает тот же
+activation; другой intent на занятое policy/time →409, stale version →412.
+Успех создаёт append-only activation и увеличивает policy version. Revision bytes
+не меняются. Timeline отсортирован по activate_at; interval заканчивается у следующей
+активации либо в immutable effective_to текущей revision — что раньше.
+Scheduled activation до своего времени не заменяет активную. После конца окна без
+следующего exact-profile тарифа применяется project-wide policy, затем default 20%.
+Публикации в прошлое запрещены; первоначальный backup import — отдельная S7 операция.
+Cancellation scheduled activation append-only; активные snapshots не редактируются.
+Admission читает timeline один раз под canonical watermark; поздний receipt использует
+tariff_snapshot запроса, а не сегодняшнюю policy. Цена не перемещается между валютами.
+Тариф lookup выполняется по валюте cost basis; для custom rates несовпадающая валюта
+не преобразуется. Такое сочетание закрыто до matching price/budget qualification.
+UI выбирает профиль, валюту и UTC время; показывает draft, schedule и историю.
+
+Price-source настройки также имеют stable connection/model/currency key и CAS.
+Новая manual PriceRevision выбирается ссылкой, сохраняет свои allowed window и provenance;
+source revision определяет supersession timeline, не переписывая старую цену.
+Catalog quotes, provider cash и manually allocated subscription cost остаются разными.
+Подтверждённый OpenRouter account receipt имеет приоритет над manual estimate,
+даже если каталог/quotes настроены вручную. JSON decimal lexeme читается без f64.
+
+PricingSourceInput и pricing_source_revisions имеют currency/effective_from/effective_to. CAS policy key = connection/model/currency, unique start и half-open interval. Manual PriceRevision сначала создаётся отдельно, затем exact tuple/interval связывается с source; при 412/422 новая несвязанная revision остаётся draft и не меняет действующие расходы. Native auto currency проверяется qualification, FX отсутствует.

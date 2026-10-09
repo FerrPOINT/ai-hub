@@ -1,15 +1,14 @@
 # Текущее состояние
 
-Дата: 2026-10-09. Stage: DESIGN_ALIGNMENT — актуализация по semantic audit и новым тарифам.
+Дата: 2026-10-09. Stage: DEVELOP_READY для пакета документов и дизайна.
 
-- Документы и prototype; backend/API/SQL/provider runtime отсутствуют.
-- OpenAPI 0.3.0-design; FR-030/TC-038 добавляют per-million tariffs, default 20%, project prices и automatic/manual sources.
-- /tariffs отдельный operational route; Namespace остаётся Base identity.
-- Свежий IAB evidence финального прототипа: 230 geometry / 179 states / 94 flow assertions; 71 native PNG, 4 просмотрены. Цена, Namespace и предыдущие UX регрессии проверены; runtime acceptance not_run.
-- Semantic audit выявил несогласованность proof/Namespace budgets/dataset/URL/exports и незамкнутый consumer transport; эти границы требуют дальнейшей доработки.
-- Полный DEVELOP_READY/design gate повторно не принят. Реальное приложение и provider acceptance not_run.
-- SDK/skills/operator pins, данные, Admin /ai, установленный runtime и соседние checkout не меняются.
+- Замечания R01–R15 обработаны в [реестре](REVIEW_RESOLUTION.md); ограничения main/runtime cohorts описаны отдельно.
+- OpenAPI 0.4.0-design; 46 typed таблиц/408 полей; 16 operational routes и /login.
+- Final IAB: 230 geometry / 179 states / 123 flow assertions; 74 native PNG, 5 просмотрены; 0 JS errors/реальных provider calls.
+- Тарифы: за 1M, default 20%, custom Namespace/profile/currency, automatic OpenRouter и manual Ollama Online/ChatGPT; separate activation, effective intervals и immutable history.
+- Fleet/Forge target adapter замкнут по identity, signed grant, exact V2/body, revision/request/idempotency, fencing/revocation/recovery. Offline vectors не runtime qualification.
+- SDK baseline, Namespace target и operator tooling независимы. Base/Admin docs публикуются на документационных branches; main integration и Namespace acceptance — отдельные gates.
+- Backend/API/SQL migrations/SSO/live adapter/финансовый runtime/cutover не реализованы; actual app acceptance not_run.
 
-## Следующая веха
-
-Закрыть semantic audit и собрать один полный source-bound documentation/design gate, затем S1 настоящего изолированного приложения. Тарифы проектов не являются runtime billing acceptance.
+Следующая веха: S1 настоящего изолированного приложения. Действующий Admin /ai,
+данные, pins и установленный runtime не меняются этой поставкой.

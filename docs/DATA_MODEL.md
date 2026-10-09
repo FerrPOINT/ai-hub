@@ -67,7 +67,7 @@ Retention удаляет только разрешённые content/projections
 
 ## Полный typed design
 
-DATA_DICTIONARY и contracts/data-dictionary.v1.json уточняют34 tables/294 fields,
+DATA_DICTIONARY и contracts/data-dictionary.v1.json задают актуальные таблицы и поля (счётчики проверяются по JSON),
 operation/login ledgers и immutable connection generations. Wire DTO — OpenAPI.
 Operations safe_result не содержит one-time keys/model result; FK/proof/lifecycle
 и stage increments перечислены в MIGRATION_PLAN/STATE_MACHINES.
@@ -79,3 +79,7 @@ Namespace projection, model context preferences, notifications/actor acknowledge
 ## Цены проектов
 
 Pricing source revisions и project tariff revisions отдельны от provider price revisions. Admission сохраняет project_tariff_snapshot; project_charge_events не заменяют provider ledger. [Контракт](PROJECT_TARIFFS.md); typed dictionary содержит поля, собственные FK и ключи dedupe.
+
+## Новые owner records
+
+project_tariff_policies и project_tariff_activations задают стабильный CAS timeline отдельно от immutable revisions. evaluation_manual_scores содержит own score witness/actor/version. service_delegations хранит verified context, fence и revoke tombstones без prompt/provider secrets. Все отношения own DB; wire в OpenAPI 0.4.0-design.

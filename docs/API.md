@@ -3,7 +3,7 @@
 [openapi.v1.json](contracts/openapi.v1.json) — проектный OpenAPI 3.1 контракт.
 Handlers/runtime отсутствуют. `openapi/openapi.json` после реализации генерируется
 из Rust DTO/handlers; draft сохраняется как исходная design revision, parity migration
-не расширяет capabilities автоматически. Версия 0.1.0-design — не release приложения.
+не расширяет capabilities автоматически. Версия 0.4.0-design — не release приложения.
 
 ## Поверхности
 
@@ -210,4 +210,26 @@ Control one-time key replay при недоступном output:409 one_time_ou
 | POST  | /api/v1/project-tariffs | createProjectTariffRevision |
 | GET   | /api/v1/project-charges | listProjectCharges          |
 
-[PROJECT_TARIFFS](PROJECT_TARIFFS.md) определяет режимы, Namespace/CAS и decimal scale. Новые DTO входят в 0.3.0-design. Actual runtime not_run.
+[PROJECT_TARIFFS](PROJECT_TARIFFS.md) определяет режимы, Namespace/CAS и decimal scale. Новые DTO входят в 0.4.0-design. Actual runtime not_run.
+
+## Закрытие semantic review — 0.4.0-design
+
+| Метод | Путь                                       | Operation               |
+| ----- | ------------------------------------------ | ----------------------- |
+| GET   | /api/v1/project-tariff-activations         | listTariffActivations   |
+| POST  | /api/v1/project-tariff-activations         | activateProjectTariff   |
+| GET   | /api/v1/evaluations/{evaluation_id}/scores | listManualScores        |
+| POST  | /api/v1/evaluations/{evaluation_id}/scores | recordManualScore       |
+| POST  | /internal/v1/service-inference             | serviceInference        |
+| POST  | /internal/v1/delegations/revoke            | revokeServiceDelegation |
+
+BudgetInput.scope_id — UUID; project scope обязательно имеет NamespaceRef, scope_id
+равен namespace_id, Tracker target выводится из verified binding. Installation/profile
+scope не принимает чужой Namespace; client scope выводится из exact client record.
+NamespaceBinding содержит safe label/project_key; cursor обязателен в следующем page.
+Exact GET model-contexts?model_id даёт ETag version или "0" при отсутствии; PUT
+If-Match "0" создаёт только отсутствующий tuple, updates используют ETag; UUID
+Idempotency-Key дедуплицирует side effect/proof invalidation. Cursor коллекции не ETag модели.
+Manual scores проверяют существующий frozen candidate/case/repetition, own scope,
+CAS и actor/time; финансы не изменяются. Новые typed errors входят в общий envelope.
+Signed service wire: [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md).

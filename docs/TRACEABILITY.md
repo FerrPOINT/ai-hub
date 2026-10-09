@@ -42,7 +42,7 @@ Status planned/not_run, code coverage не заявлен.
 | NFR-007     | [Contract compatibility](API.md)                           | S7    | TC-033            |
 | NFR-008     | [Evidence integrity](QUALITY_GATE.md)                      | S7    | TC-034            |
 
-[UI map](ui-routes.json) связывает 15 operational routes и auth /login с target operation IDs,
+[UI map](ui-routes.json) связывает 16 operational routes и auth /login с target operation IDs,
 TC-024 и TC-032; draft OpenAPI покрывает весь перечисленный API.
 No missing test автоматически не означает implementation acceptance:
 код/DB/target evidence собирается по TESTING/QUALITY_GATE после разработки.
@@ -57,3 +57,5 @@ No missing test автоматически не означает implementation 
 ## Дополнение FR-030
 
 FR-030 → TC-038 → S5: [тарифы](PROJECT_TARIFFS.md), OpenAPI PricingSourceInput/ProjectTariffInput/ProjectCharge, own typed dictionary и /tariffs prototype. Admission/ledger snapshots S3, provider qualification S4, UI S5. [Machine traceability](traceability.json).
+
+TC-039 дополняет FR-004/017/021/027/030/NFR-007: [machine traceability](traceability.json), [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md), pricing/prototype adversarial checks. Старые критерии сохранены; проверки усиливают varied-ID/name и recovery coverage.

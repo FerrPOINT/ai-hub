@@ -40,3 +40,7 @@ FR-027/TC-035: S1 namespace projection + S3 frozen admission context. FR-028/TC-
 ## FR-030 / TC-038
 
 S2 cost-source settings и manual price snapshots; S3 immutable tariff admission/charge journal; S4 OpenRouter official usage/catalog qualification; S5 Namespace тарифы, basis/charge/margin и exports. [PROJECT_TARIFFS](PROJECT_TARIFFS.md) — обязательный input; S7 сверяет финансовые источники и consumer readback.
+
+## TC-039
+
+Пакеты S2/S3/S5/S6 используют сохранённый draft/config proof, typed Namespace budget, price policy timeline и schema-derived dataset/run/score DTO. S7 потребляет [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md), packed SDK и cross-owner negative/recovery fixtures. Prototype/crypto vectors — design evidence; actual consumer/runtime acceptance отдельна.

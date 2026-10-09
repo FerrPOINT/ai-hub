@@ -499,7 +499,7 @@ export async function verifyDesign(tab, sourceScriptHash) {
   );
   await click("Сохранить версию");
   assert(
-    (await mainText()).includes("v1 · 1 случаев"),
+    (await mainText()).includes("v1 · 1 демонстрационных случаев"),
     "dataset-visible",
     "version saved",
   );
@@ -535,13 +535,32 @@ export async function verifyDesign(tab, sourceScriptHash) {
     .getByRole("tab", { name: "Себестоимость", exact: true })
     .click();
   await observe();
-  await click("Новый тариф");
-  await click("Сохранить");
+  await tab.playwright
+    .getByRole("link", { name: "Открыть тарифы", exact: true })
+    .click();
+  await observe();
+  await tab.playwright
+    .getByRole("tab", { name: "Себестоимость подключений", exact: true })
+    .click();
+  await observe();
+  await tab.playwright
+    .locator("#main tbody tr")
+    .filter({ hasText: "OpenAI-compatible · model-a" })
+    .getByRole("button", { name: "Настроить цену", exact: true })
+    .click();
+  await observe();
+  await fill("source-price-input", "3");
+  await click("Сохранить новую версию");
   assert(
-    (await mainText()).includes("Добавлено в этой сессии"),
+    (await mainText()).includes("r2"),
     "financial-save-visible",
-    "no fake receipt",
+    "new PriceRevision, no fake receipt",
   );
+  await reset("/expenses");
+  await tab.playwright
+    .getByRole("tab", { name: "Себестоимость", exact: true })
+    .click();
+  await observe();
   await tab.playwright
     .getByRole("tab", { name: "Себестоимость", exact: true })
     .press("ArrowRight");
@@ -563,9 +582,9 @@ export async function verifyDesign(tab, sourceScriptHash) {
   const file = await download.path({ timeoutMs: 10000 });
   const snapshot = JSON.parse(await fs.readFile(file, "utf8"));
   assert(
-    snapshot.synthetic === true && snapshot.rows.length > 0,
+    snapshot.synthetic === true && snapshot.payload.expenses.length > 0,
     "export-downloaded-snapshot",
-    { file, rows: snapshot.rows.length },
+    { file, expenses: snapshot.payload.expenses.length },
   );
 
   await reset("/models/main-dev");

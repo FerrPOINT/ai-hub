@@ -36,7 +36,7 @@
       "name": "Версии виртуальных моделей",
       "acceptance": "Создание slug/draft, CAS save, immutable revision, publication/rollback/archive; active runs не меняют snapshot.",
       "owner": "AI Hub",
-      "tests": ["TC-004"],
+      "tests": ["TC-004", "TC-039"],
       "phase": "S2",
       "document": "docs/ROUTING.md",
       "status": "planned"
@@ -166,7 +166,7 @@
       "name": "Сравнение для dev/test",
       "acceptance": "Frozen dataset/runner/scorers/pinned revisions без cache/fallback; evidence, actual cost и cancel/restart без дублирования.",
       "owner": "AI Hub",
-      "tests": ["TC-017"],
+      "tests": ["TC-017", "TC-039"],
       "phase": "S6",
       "document": "docs/EVALUATIONS.md",
       "status": "planned"
@@ -206,7 +206,7 @@
       "name": "Интеграция Base и Admin",
       "acceptance": "Один AI config owner; transition contracts/rollback, own auth/catalog/nav; прежний runtime не переключается по docs.",
       "owner": "AI Hub",
-      "tests": ["TC-021"],
+      "tests": ["TC-021", "TC-039"],
       "phase": "S7",
       "document": "docs/contracts/ADMIN_HANDOFF_V1.md",
       "status": "planned"
@@ -326,7 +326,7 @@
       "name": "Contract compatibility",
       "acceptance": "Versioned contracts, old clients tested; destructive schema/transport change требует version/migration; no unsupported field dropping.",
       "owner": "AI Hub",
-      "tests": ["TC-033"],
+      "tests": ["TC-033", "TC-039"],
       "phase": "S7",
       "document": "docs/API.md",
       "status": "planned"
@@ -346,7 +346,7 @@
       "name": "Сквозной Namespace",
       "acceptance": "Проверенная UUID-пара NamespaceRef связывает клиента, запрос, dataset и проектный бюджет; повреждённый контекст denied, непривязанные записи не присваиваются по имени.",
       "owner": "AI Hub",
-      "tests": ["TC-035"],
+      "tests": ["TC-035", "TC-039"],
       "phase": "S1",
       "document": "docs/contracts/NAMESPACE_V1.md",
       "status": "planned"
@@ -376,7 +376,7 @@
       "name": "Тарифы проектов и источники себестоимости",
       "acceptance": "Per-million input/output rates; default cost markup 20%; exact Namespace overrides; OpenRouter automatic costs and manual subscription/Ollama rates remain separate from provider cash; frozen snapshots, decimal arithmetic and unknown are preserved.",
       "owner": "AI Hub",
-      "tests": ["TC-038"],
+      "tests": ["TC-038", "TC-039"],
       "phase": "S5",
       "document": "docs/PROJECT_TARIFFS.md",
       "status": "planned"
@@ -609,6 +609,19 @@
       "id": "TC-038",
       "requirements": ["FR-030"],
       "scenario": "Automatic/manual sources, 1M conversion, 20% markup/custom rates, subscription allocation, same-name Namespace separation, historical revisions and unknown receipt recovery.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-039",
+      "requirements": [
+        "FR-004",
+        "FR-017",
+        "FR-021",
+        "FR-027",
+        "FR-030",
+        "NFR-007"
+      ],
+      "scenario": "Adversarial stable-ID Namespace rows, saved-draft/history/proof fences, schema parity, tariff activation timelines and signed service envelope/revocation recovery.",
       "status": "not_run"
     }
   ],

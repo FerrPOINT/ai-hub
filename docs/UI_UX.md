@@ -31,3 +31,7 @@ Picker содержит all/active/unbound и unavailable/archived/invalid. Вы
 ## Раздел тарифов
 
 /tariffs — operational wide page. Pricing tab хранится в allowlisted URL tariff_tab. При selected Namespace нет второго project selector. Currency/rates/source/version и input/output units видимы. Auto без qualified источника закрыт; manual empty не бесплатный тариф. Unknown и subscription allocation имеют самостоятельные подписи.
+
+## Состояние и контекст
+
+Все tab families provider/expense/tariff используют allowlisted URL и native history. Несохранённые model fields/version живут отдельно от saved snapshot; native Back/Forward получает stay/discard guard. Namespace disabled state запрещает writes/admissions, сохраняет authorised history. Dataset project выводится из Namespace readback; второго editable selector нет. Rows/cursors/queries используют resource ID, никогда display text.

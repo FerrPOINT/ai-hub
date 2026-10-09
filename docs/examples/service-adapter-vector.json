@@ -1,0 +1,38 @@
+{
+  "kind": "offline-design-vector",
+  "algorithm": "Ed25519",
+  "domain": "AIHUB-SERVICE-INFERENCE-V1 NUL",
+  "public_key_spki_hex": "302a300506032b6570032100d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+  "raw_body_utf8": "{\"protocol\":\"chat\",\"execution_context\":{\"schema_version\":2,\"operation_id\":\"00000003-0000-4000-8000-000000000001\",\"namespace\":{\"registry_instance_id\":\"00000001-0000-4000-8000-000000000001\",\"namespace_id\":\"00000002-0000-4000-8000-000000000001\"},\"task\":{\"tracker_instance_id\":\"00000004-0000-4000-8000-000000000001\",\"task_id\":\"00000005-0000-4000-8000-000000000001\"},\"repositories\":[{\"forge_instance_id\":\"00000006-0000-4000-8000-000000000001\",\"repository_id\":\"00000007-0000-4000-8000-000000000001\"}]},\"invocation\":{\"model\":\"main-dev\",\"messages\":[{\"role\":\"user\",\"content\":\"Синтетическая проверка\"}],\"stream\":false}}",
+  "claims": {
+    "schema_version": 1,
+    "action": "infer",
+    "issuer_instance_id": "00000008-0000-4000-8000-000000000001",
+    "audience_installation_id": "00000009-0000-4000-8000-000000000001",
+    "machine_subject": "fleet:fixture",
+    "grant_id": "0000000a-0000-4000-8000-000000000001",
+    "client_id": "0000000b-0000-4000-8000-000000000001",
+    "request_id": "0000000c-0000-4000-8000-000000000001",
+    "context_operation_id": "00000003-0000-4000-8000-000000000001",
+    "execution_id": "0000000d-0000-4000-8000-000000000001",
+    "profile_revision_id": "80000000-0000-4000-8000-000000000012",
+    "namespace": {
+      "registry_instance_id": "00000001-0000-4000-8000-000000000001",
+      "namespace_id": "00000002-0000-4000-8000-000000000001"
+    },
+    "fencing_token": "5",
+    "issued_at": "2026-10-09T13:29:00Z",
+    "expires_at": "2026-10-09T13:35:00Z",
+    "lease_expires_at": "2026-10-09T13:34:00Z",
+    "request_body_sha256": "47ae32c415e9f41c1b7852d7755cb0e03e8e40df2549aa2a0b818c2976cf2c2c",
+    "max_provider_cost": "0.05",
+    "currency": "USD"
+  },
+  "envelope": {
+    "schema_version": 1,
+    "key_id": "rfc8032-design-only",
+    "payload": "{\"schema_version\":1,\"action\":\"infer\",\"issuer_instance_id\":\"00000008-0000-4000-8000-000000000001\",\"audience_installation_id\":\"00000009-0000-4000-8000-000000000001\",\"machine_subject\":\"fleet:fixture\",\"grant_id\":\"0000000a-0000-4000-8000-000000000001\",\"client_id\":\"0000000b-0000-4000-8000-000000000001\",\"request_id\":\"0000000c-0000-4000-8000-000000000001\",\"context_operation_id\":\"00000003-0000-4000-8000-000000000001\",\"execution_id\":\"0000000d-0000-4000-8000-000000000001\",\"profile_revision_id\":\"80000000-0000-4000-8000-000000000012\",\"namespace\":{\"registry_instance_id\":\"00000001-0000-4000-8000-000000000001\",\"namespace_id\":\"00000002-0000-4000-8000-000000000001\"},\"fencing_token\":\"5\",\"issued_at\":\"2026-10-09T13:29:00Z\",\"expires_at\":\"2026-10-09T13:35:00Z\",\"lease_expires_at\":\"2026-10-09T13:34:00Z\",\"request_body_sha256\":\"47ae32c415e9f41c1b7852d7755cb0e03e8e40df2549aa2a0b818c2976cf2c2c\",\"max_provider_cost\":\"0.05\",\"currency\":\"USD\"}",
+    "signature_hex": "6cd976b76509239b9701ea12293531b6e11b5aa35dca3e12c66d9de7c9991669cd98572f8c5ece6ff5f0b412d251ce0c18790ad16e8bb2b427fcc1deb4dcbc09"
+  },
+  "runtime_acceptance": "not_run"
+}

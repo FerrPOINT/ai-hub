@@ -79,3 +79,7 @@ Single owner specification каждой нормы указан в TRACEABILITY.
 ## Тарифы проектов
 
 [PROJECT_TARIFFS](PROJECT_TARIFFS.md): per-million цены, OpenRouter auto usage/cost, ручные Ollama Online/ChatGPT rates, default 20%, Namespace overrides и immutable начисления.
+
+[SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md) — target signed wire Fleet/Forge, а не расширение public metadata или permission на runtime starts.
+
+- [Закрытие полного ревью](REVIEW_RESOLUTION.md) — R01–R15, проверенный prototype и отдельные main/runtime gates.

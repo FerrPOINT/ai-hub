@@ -1,127 +1,134 @@
 {
   "kind": "prototype",
   "surface": "Codex in-app browser",
-  "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d",
+  "html_sha256": "e085ddf53b2d7085d2e8825faa5d35c686c476e2b10fa28fc40ddf93d78cb860",
+  "script_sha256": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
+  "checked_at": "2026-10-09",
   "flows": [
     {
       "name": "tariff-default-20-percent",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-tab-url",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-tab-reload",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-tab-back",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-tab-forward",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "subscription-manual-only",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "subscription-missing-price-not-zero",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "subscription-manual-revision",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "openrouter-default-auto",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "openrouter-manual-switch",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
-      "name": "manual-source-updates-cost-charge-margin",
+      "name": "source-model-price-isolation",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "openrouter-auto-restore",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-rate-scale-rejected",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-invalid-keeps-draft",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
+    },
+    {
+      "name": "tariff-draft-not-active",
+      "result": "PASS",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-custom-per-million",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-history-immutable",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-namespace-independent",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-namespace-readback",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
+    },
+    {
+      "name": "tariff-scheduled-not-early",
+      "result": "PASS",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-decimal-percent-exact",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-keyboard-tabs",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-cas-conflict",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "tariff-cas-keeps-draft",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "name": "unbound-no-project-tariff",
       "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "name": "ollama-online-manual-only",
-      "result": "PASS",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     }
   ],
   "geometry": [
@@ -139,8 +146,8 @@
       "width": 375,
       "measuredWidth": 375,
       "theme": "dark",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -156,8 +163,8 @@
       "width": 1440,
       "measuredWidth": 1440,
       "theme": "dark",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -173,8 +180,8 @@
       "width": 1920,
       "measuredWidth": 1920,
       "theme": "dark",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -190,8 +197,8 @@
       "width": 2560,
       "measuredWidth": 2560,
       "theme": "dark",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -207,8 +214,8 @@
       "width": 375,
       "measuredWidth": 375,
       "theme": "gray",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -224,8 +231,8 @@
       "width": 1440,
       "measuredWidth": 1440,
       "theme": "gray",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -241,8 +248,8 @@
       "width": 1920,
       "measuredWidth": 1920,
       "theme": "gray",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -258,8 +265,8 @@
       "width": 2560,
       "measuredWidth": 2560,
       "theme": "gray",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -275,8 +282,8 @@
       "width": 375,
       "measuredWidth": 375,
       "theme": "light",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -292,8 +299,8 @@
       "width": 1440,
       "measuredWidth": 1440,
       "theme": "light",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -309,8 +316,8 @@
       "width": 1920,
       "measuredWidth": 1920,
       "theme": "light",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -326,224 +333,8 @@
       "width": 2560,
       "measuredWidth": 2560,
       "theme": "light",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 360,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 360,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 375,
-      "measuredWidth": 375,
-      "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1440,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 1440,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 1440,
-      "measuredWidth": 1440,
-      "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1920,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 1920,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 1920,
-      "measuredWidth": 1920,
-      "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 2560,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 2560,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 2560,
-      "measuredWidth": 2560,
-      "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 360,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 360,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 375,
-      "measuredWidth": 375,
-      "theme": "gray",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1440,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 1440,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 1440,
-      "measuredWidth": 1440,
-      "theme": "gray",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1920,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 1920,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 1920,
-      "measuredWidth": 1920,
-      "theme": "gray",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 2560,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 2560,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 2560,
-      "measuredWidth": 2560,
-      "theme": "gray",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 360,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 360,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 375,
-      "measuredWidth": 375,
-      "theme": "light",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1440,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 1440,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 1440,
-      "measuredWidth": 1440,
-      "theme": "light",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1920,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 1920,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 1920,
-      "measuredWidth": 1920,
-      "theme": "light",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 2560,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 2560,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 2560,
-      "measuredWidth": 2560,
-      "theme": "light",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "source-price-catalog",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -559,9 +350,25 @@
       "width": 320,
       "measuredWidth": 320,
       "theme": "dark",
-      "section": "projects",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "tariffs-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
+    },
+    {
+      "bad": [],
+      "clientWidth": 305,
+      "namespaceState": "all",
+      "pageActions": 0,
+      "pendingEditable": 0,
+      "route": "/tariffs",
+      "scrollWidth": 305,
+      "scrollers": [],
+      "state": "ready",
+      "title": "Тарифы",
+      "width": 320,
+      "measuredWidth": 320,
+      "theme": "dark",
+      "scenario": "sources-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -577,9 +384,25 @@
       "width": 374,
       "measuredWidth": 374,
       "theme": "dark",
-      "section": "projects",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "tariffs-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
+    },
+    {
+      "bad": [],
+      "clientWidth": 359,
+      "namespaceState": "all",
+      "pageActions": 0,
+      "pendingEditable": 0,
+      "route": "/tariffs",
+      "scrollWidth": 359,
+      "scrollers": [],
+      "state": "ready",
+      "title": "Тарифы",
+      "width": 374,
+      "measuredWidth": 374,
+      "theme": "dark",
+      "scenario": "sources-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -595,9 +418,25 @@
       "width": 376,
       "measuredWidth": 376,
       "theme": "dark",
-      "section": "projects",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "tariffs-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
+    },
+    {
+      "bad": [],
+      "clientWidth": 361,
+      "namespaceState": "all",
+      "pageActions": 0,
+      "pendingEditable": 0,
+      "route": "/tariffs",
+      "scrollWidth": 361,
+      "scrollers": [],
+      "state": "ready",
+      "title": "Тарифы",
+      "width": 376,
+      "measuredWidth": 376,
+      "theme": "dark",
+      "scenario": "sources-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -613,9 +452,25 @@
       "width": 767,
       "measuredWidth": 767,
       "theme": "dark",
-      "section": "projects",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "tariffs-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
+    },
+    {
+      "bad": [],
+      "clientWidth": 752,
+      "namespaceState": "all",
+      "pageActions": 0,
+      "pendingEditable": 0,
+      "route": "/tariffs",
+      "scrollWidth": 752,
+      "scrollers": [],
+      "state": "ready",
+      "title": "Тарифы",
+      "width": 767,
+      "measuredWidth": 767,
+      "theme": "dark",
+      "scenario": "sources-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -631,117 +486,8 @@
       "width": 768,
       "measuredWidth": 768,
       "theme": "dark",
-      "section": "projects",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1264,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 1264,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 1279,
-      "measuredWidth": 1279,
-      "theme": "dark",
-      "section": "projects",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1265,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 1265,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 1280,
-      "measuredWidth": 1280,
-      "theme": "dark",
-      "section": "projects",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 305,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 305,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 320,
-      "measuredWidth": 320,
-      "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 359,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 359,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 374,
-      "measuredWidth": 374,
-      "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 361,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 361,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 376,
-      "measuredWidth": 376,
-      "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
-    },
-    {
-      "bad": [],
-      "clientWidth": 752,
-      "namespaceState": "all",
-      "pageActions": 0,
-      "pendingEditable": 0,
-      "route": "/tariffs",
-      "scrollWidth": 752,
-      "scrollers": [],
-      "state": "ready",
-      "title": "Тарифы",
-      "width": 767,
-      "measuredWidth": 767,
-      "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "tariffs-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
@@ -757,168 +503,198 @@
       "width": 768,
       "measuredWidth": 768,
       "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "sources-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
-      "clientWidth": 1279,
+      "clientWidth": 1264,
       "namespaceState": "all",
       "pageActions": 0,
       "pendingEditable": 0,
       "route": "/tariffs",
-      "scrollWidth": 1279,
+      "scrollWidth": 1264,
       "scrollers": [],
       "state": "ready",
       "title": "Тарифы",
       "width": 1279,
       "measuredWidth": 1279,
       "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "tariffs-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     },
     {
       "bad": [],
-      "clientWidth": 1280,
+      "clientWidth": 1264,
       "namespaceState": "all",
       "pageActions": 0,
       "pendingEditable": 0,
       "route": "/tariffs",
-      "scrollWidth": 1280,
+      "scrollWidth": 1264,
+      "scrollers": [],
+      "state": "ready",
+      "title": "Тарифы",
+      "width": 1279,
+      "measuredWidth": 1279,
+      "theme": "dark",
+      "scenario": "sources-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
+    },
+    {
+      "bad": [],
+      "clientWidth": 1265,
+      "namespaceState": "all",
+      "pageActions": 0,
+      "pendingEditable": 0,
+      "route": "/tariffs",
+      "scrollWidth": 1265,
       "scrollers": [],
       "state": "ready",
       "title": "Тарифы",
       "width": 1280,
       "measuredWidth": 1280,
       "theme": "dark",
-      "section": "sources",
-      "requested": "/tariffs",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d"
+      "scenario": "tariffs-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
+    },
+    {
+      "bad": [],
+      "clientWidth": 1265,
+      "namespaceState": "all",
+      "pageActions": 0,
+      "pendingEditable": 0,
+      "route": "/tariffs",
+      "scrollWidth": 1265,
+      "scrollers": [],
+      "state": "ready",
+      "title": "Тарифы",
+      "width": 1280,
+      "measuredWidth": 1280,
+      "theme": "dark",
+      "scenario": "sources-boundary",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8"
     }
   ],
   "screenshots": [
     {
+      "file": "review-tariffs-dark-375.png",
       "route": "/tariffs",
-      "pattern": "/tariffs",
-      "title": "Тарифы",
+      "theme": "dark",
       "width": 375,
       "height": 900,
-      "theme": "dark",
-      "file": "tariffs-tariffs-dark-375.png",
       "kind": "prototype-viewport",
-      "capture": "IAB scoped CDP native PNG",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d",
-      "sha256": "8a6c9529204ee13df630986e651b42e6742ac3c7484ee081b4ba80125232ba15",
+      "sha256": "a5ceeeac6981651a2717b1515d570435ff8709b84e3952de6550f8f458094864",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
       "inspected": false,
-      "captured_at": "2026-10-09",
-      "base_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
-      "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
+      "capture": "IAB scoped CDP native PNG"
     },
     {
+      "file": "review-tariffs-dark-1440.png",
       "route": "/tariffs",
-      "pattern": "/tariffs",
-      "title": "Тарифы",
-      "width": 1440,
-      "height": 900,
       "theme": "dark",
-      "file": "tariffs-tariffs-dark-1440.png",
-      "kind": "prototype-viewport",
-      "capture": "IAB scoped CDP native PNG",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d",
-      "sha256": "4cf3fc85d0e79e4bfa56f9507b6d202d7ea7b8823e18ff5ffff8bd8c41acbc30",
-      "inspected": true,
-      "captured_at": "2026-10-09",
-      "base_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
-      "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
-    },
-    {
-      "route": "/tariffs",
-      "pattern": "/tariffs",
-      "title": "Тарифы",
       "width": 1440,
       "height": 900,
+      "kind": "prototype-viewport",
+      "sha256": "06d9016a25b6bea1e2dd9a7a9aeeaec65f124523429389f6f7cdb79eca65c28d",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
+      "inspected": true,
+      "capture": "IAB scoped CDP native PNG"
+    },
+    {
+      "file": "review-tariffs-gray-1440.png",
+      "route": "/tariffs",
       "theme": "gray",
-      "file": "tariffs-tariffs-gray-1440.png",
-      "kind": "prototype-viewport",
-      "capture": "IAB scoped CDP native PNG",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d",
-      "sha256": "d3be4eacccab85c3aed95db665fce2bf6cbcf9fe3cf041c01f8bb20629597143",
-      "inspected": false,
-      "captured_at": "2026-10-09",
-      "base_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
-      "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
-    },
-    {
-      "route": "/tariffs",
-      "pattern": "/tariffs",
-      "title": "Тарифы",
       "width": 1440,
       "height": 900,
-      "theme": "light",
-      "file": "tariffs-tariffs-light-1440.png",
       "kind": "prototype-viewport",
-      "capture": "IAB scoped CDP native PNG",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d",
-      "sha256": "999bb6996eb1e2540a9ce55abb49b84455ef1adc5ebaeacabd61a817b5c5f94a",
+      "sha256": "9578b254191a0cc7423c6ea966c0c9291c9cf378c4ca51819a3df773a32bf7ff",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
       "inspected": false,
-      "captured_at": "2026-10-09",
-      "base_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
-      "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
+      "capture": "IAB scoped CDP native PNG"
     },
     {
+      "file": "review-tariffs-light-1440.png",
       "route": "/tariffs",
-      "pattern": "/tariffs",
-      "title": "Себестоимость подключений",
-      "width": 375,
+      "theme": "light",
+      "width": 1440,
       "height": 900,
-      "theme": "dark",
-      "file": "tariff-sources-dark-375.png",
       "kind": "prototype-viewport",
-      "capture": "IAB scoped CDP native PNG",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d",
-      "sha256": "dcf9e4c57e978d56ae8b134474901103bbebb3da74bb88ae264aae2fad897a2c",
-      "inspected": true,
-      "captured_at": "2026-10-09",
-      "base_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
-      "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
+      "sha256": "edf5a692556703b3bbe2d5a296e8797400121f19ea1ef5fa5459b3a07fe3b5fa",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
+      "inspected": false,
+      "capture": "IAB scoped CDP native PNG"
     },
     {
+      "file": "review-source-prices-dark-375.png",
       "route": "/tariffs",
-      "pattern": "/tariffs",
-      "title": "Ручная цена подписки",
+      "theme": "dark",
       "width": 375,
       "height": 900,
-      "viewport_origin_y": 761,
-      "theme": "dark",
-      "file": "tariff-subscription-manual-dark-375.png",
       "kind": "prototype-viewport",
-      "capture": "IAB scoped CDP native PNG",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d",
-      "sha256": "6f1c18ea092c3aa10a823dc0ebf23b5fa204806c9043cba1052ffb4059b74258",
-      "inspected": true,
-      "captured_at": "2026-10-09",
-      "base_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
-      "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
+      "sha256": "49a698eb69815a78f0a34775f31daef948a3cf0922bc24b0af386def9eb6e087",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
+      "inspected": false,
+      "capture": "IAB scoped CDP native PNG"
     },
     {
+      "file": "review-source-prices-dark-1440.png",
       "route": "/tariffs",
-      "pattern": "/tariffs",
-      "title": "Свои ставки проекта",
+      "theme": "dark",
+      "width": 1440,
+      "height": 900,
+      "kind": "prototype-viewport",
+      "sha256": "a3bfc23eb4b462f269bf93972938cade5e18ce31253fe9aefa0238f0f4adcc68",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
+      "inspected": false,
+      "capture": "IAB scoped CDP native PNG"
+    },
+    {
+      "file": "review-source-prices-gray-1440.png",
+      "route": "/tariffs",
+      "theme": "gray",
+      "width": 1440,
+      "height": 900,
+      "kind": "prototype-viewport",
+      "sha256": "7c7f0f410e99ae2ccfeae598508e6d6b539663b45d437da3676758e3a045801b",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
+      "inspected": false,
+      "capture": "IAB scoped CDP native PNG"
+    },
+    {
+      "file": "review-source-prices-light-1440.png",
+      "route": "/tariffs",
+      "theme": "light",
+      "width": 1440,
+      "height": 900,
+      "kind": "prototype-viewport",
+      "sha256": "915378f9dfe42beda34116c34e4d710271189fc9f98312a524d25c503275344f",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
+      "inspected": true,
+      "capture": "IAB scoped CDP native PNG"
+    },
+    {
+      "file": "review-chatgpt-price-form-dark-375.png",
+      "route": "/tariffs",
+      "theme": "dark",
       "width": 375,
       "height": 900,
-      "viewport_origin_y": 335,
-      "theme": "dark",
-      "file": "tariff-project-custom-dark-375.png",
       "kind": "prototype-viewport",
-      "capture": "IAB scoped CDP native PNG",
-      "sourceScriptHash": "d77e7e94878ba2fa5c083b0101789ab2dc9fb9c8c557d034819c96b64d49518d",
-      "sha256": "849a9a06c5c7fcd8979886e5972e49ab5e8153cd86b124f540d1928455f0a89c",
+      "sha256": "add6027532faf3594872292beffbb7f550270828f6e22cbae570f6b9035cb209",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
       "inspected": true,
-      "captured_at": "2026-10-09",
-      "base_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
-      "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
+      "capture": "IAB scoped CDP native PNG"
+    },
+    {
+      "file": "review-project-price-form-dark-375.png",
+      "route": "/tariffs",
+      "theme": "dark",
+      "width": 375,
+      "height": 900,
+      "kind": "prototype-viewport",
+      "sha256": "f1cc939943ca5d57b5af60869c3271cda13898931f00c0b8dc6e0817e17c5d1d",
+      "sourceScriptHash": "69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8",
+      "inspected": true,
+      "capture": "IAB scoped CDP native PNG"
     }
   ],
   "actual_app_acceptance": "not_run"
