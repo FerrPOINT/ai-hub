@@ -2,12 +2,14 @@
   "schema_version": 1,
   "kind": "prototype",
   "surface": "Codex in-app browser",
-  "html_sha256": "44bf355a2f410c980fc8b13e3eba53df210e7a55423a122e208227d0b1fac70d",
-  "script_sha256": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
+  "html_sha256": "3759d54a83b19c8ec3cdaf65d0b4acb80e1bea21d5b5af18441cc632774d72aa",
+  "script_sha256": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
   "geometry": [
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 360,
       "scrollers": [],
@@ -16,11 +18,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 360,
       "scrollers": [],
@@ -29,11 +33,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/providers",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 360,
       "scrollers": [],
@@ -42,11 +48,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 360,
       "scrollers": [],
@@ -55,11 +63,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/models",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 360,
       "scrollers": [],
@@ -68,11 +78,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 360,
       "scrollers": [],
@@ -81,11 +93,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/requests",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 360,
       "scrollers": [],
@@ -94,11 +108,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/requests/a17d",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 360,
       "scrollers": [],
@@ -107,11 +123,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/statistics",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 360,
       "scrollers": [],
@@ -120,11 +138,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/expenses",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 360,
       "scrollers": [],
@@ -133,11 +153,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/budgets",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 360,
       "scrollers": [],
@@ -146,11 +168,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/clients",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 360,
       "scrollers": [],
@@ -159,11 +183,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/evaluations",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 360,
       "scrollers": [],
@@ -172,11 +198,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/evaluations/run-24",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 360,
       "scrollers": [],
@@ -185,11 +213,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/audit",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 360,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 360,
       "scrollers": [],
@@ -198,11 +228,13 @@
       "width": 375,
       "theme": "dark",
       "requested": "/settings",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -211,11 +243,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -224,11 +258,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/providers",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -237,11 +273,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -250,11 +288,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/models",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -263,11 +303,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -276,11 +318,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/requests",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -289,11 +333,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/requests/a17d",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -302,11 +348,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/statistics",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -315,11 +363,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/expenses",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -328,11 +378,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/budgets",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -341,11 +393,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/clients",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -354,11 +408,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/evaluations",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -367,11 +423,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/evaluations/run-24",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -380,11 +438,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/audit",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -393,11 +453,13 @@
       "width": 1440,
       "theme": "dark",
       "requested": "/settings",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2545,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 2545,
       "scrollers": [],
@@ -406,11 +468,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2545,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 2545,
       "scrollers": [],
@@ -419,11 +483,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/providers",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2560,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 2560,
       "scrollers": [],
@@ -432,11 +498,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2560,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 2560,
       "scrollers": [],
@@ -445,11 +513,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/models",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2545,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 2545,
       "scrollers": [],
@@ -458,11 +528,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2560,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 2560,
       "scrollers": [],
@@ -471,11 +543,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/requests",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2545,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 2545,
       "scrollers": [],
@@ -484,11 +558,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/requests/a17d",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2545,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 2545,
       "scrollers": [],
@@ -497,11 +573,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/statistics",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2545,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 2545,
       "scrollers": [],
@@ -510,11 +588,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/expenses",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2560,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 2560,
       "scrollers": [],
@@ -523,11 +603,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/budgets",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2560,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 2560,
       "scrollers": [],
@@ -536,11 +618,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/clients",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2560,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 2560,
       "scrollers": [],
@@ -549,11 +633,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/evaluations",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2545,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 2545,
       "scrollers": [],
@@ -562,11 +648,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/evaluations/run-24",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2560,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 2560,
       "scrollers": [],
@@ -575,11 +663,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/audit",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 2545,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 2545,
       "scrollers": [],
@@ -588,11 +678,13 @@
       "width": 2560,
       "theme": "dark",
       "requested": "/settings",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -601,11 +693,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -614,11 +708,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/providers",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -627,11 +723,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -640,11 +738,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/models",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -653,11 +753,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -666,11 +768,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/requests",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -679,11 +783,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/requests/a17d",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -692,11 +798,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/statistics",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -705,11 +813,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/expenses",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -718,11 +828,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/budgets",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -731,11 +843,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/clients",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -744,11 +858,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/evaluations",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -757,11 +873,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/evaluations/run-24",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -770,11 +888,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/audit",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -783,11 +903,13 @@
       "width": 1440,
       "theme": "gray",
       "requested": "/settings",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -796,11 +918,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -809,11 +933,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/providers",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -822,11 +948,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -835,11 +963,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/models",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -848,11 +978,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -861,11 +993,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/requests",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -874,11 +1008,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/requests/a17d",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -887,11 +1023,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/statistics",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -900,11 +1038,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/expenses",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -913,11 +1053,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/budgets",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -926,11 +1068,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/clients",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -939,11 +1083,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/evaluations",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -952,11 +1098,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/evaluations/run-24",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
@@ -965,11 +1113,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/audit",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1425,
       "scrollers": [],
@@ -978,11 +1128,13 @@
       "width": 1440,
       "theme": "light",
       "requested": "/settings",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 305,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 305,
       "scrollers": [],
@@ -991,11 +1143,13 @@
       "width": 320,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 305,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 305,
       "scrollers": [],
@@ -1004,11 +1158,13 @@
       "width": 320,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 305,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 305,
       "scrollers": [],
@@ -1017,11 +1173,13 @@
       "width": 320,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 375,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 375,
       "scrollers": [],
@@ -1030,11 +1188,13 @@
       "width": 390,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 375,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 375,
       "scrollers": [],
@@ -1043,11 +1203,13 @@
       "width": 390,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 375,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 375,
       "scrollers": [],
@@ -1056,11 +1218,13 @@
       "width": 390,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 415,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 415,
       "scrollers": [],
@@ -1069,11 +1233,13 @@
       "width": 430,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 415,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 415,
       "scrollers": [],
@@ -1082,11 +1248,13 @@
       "width": 430,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 415,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 415,
       "scrollers": [],
@@ -1095,11 +1263,13 @@
       "width": 430,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 752,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 752,
       "scrollers": [],
@@ -1108,11 +1278,13 @@
       "width": 767,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 752,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 752,
       "scrollers": [],
@@ -1121,11 +1293,13 @@
       "width": 767,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 752,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 752,
       "scrollers": [],
@@ -1134,30 +1308,28 @@
       "width": 767,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 753,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 753,
-      "scrollers": [
-        {
-          "name": "Последние запросы",
-          "scroll": 715,
-          "width": 647
-        }
-      ],
+      "scrollers": ["Последние запросы"],
       "state": "ready",
       "title": "Обзор",
       "width": 768,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 753,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 753,
       "scrollers": [],
@@ -1166,11 +1338,13 @@
       "width": 768,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 753,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 753,
       "scrollers": [],
@@ -1179,11 +1353,13 @@
       "width": 768,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1008,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1008,
       "scrollers": [],
@@ -1192,11 +1368,13 @@
       "width": 1023,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1008,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1008,
       "scrollers": [],
@@ -1205,11 +1383,13 @@
       "width": 1023,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1008,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1008,
       "scrollers": [],
@@ -1218,11 +1398,13 @@
       "width": 1023,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1009,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1009,
       "scrollers": [],
@@ -1231,11 +1413,13 @@
       "width": 1024,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1009,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1009,
       "scrollers": [],
@@ -1244,11 +1428,13 @@
       "width": 1024,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1024,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1024,
       "scrollers": [],
@@ -1257,11 +1443,13 @@
       "width": 1024,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1264,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1264,
       "scrollers": [],
@@ -1270,11 +1458,13 @@
       "width": 1279,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1264,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1264,
       "scrollers": [],
@@ -1283,11 +1473,13 @@
       "width": 1279,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1279,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1279,
       "scrollers": [],
@@ -1296,11 +1488,13 @@
       "width": 1279,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1265,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1265,
       "scrollers": [],
@@ -1309,11 +1503,13 @@
       "width": 1280,
       "theme": "dark",
       "requested": "/",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1265,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1265,
       "scrollers": [],
@@ -1322,11 +1518,13 @@
       "width": 1280,
       "theme": "dark",
       "requested": "/models/main-dev",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1280,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1280,
       "scrollers": [],
@@ -1335,2540 +1533,2820 @@
       "width": 1280,
       "theme": "dark",
       "requested": "/providers/api-a",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     }
   ],
   "states": [
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/models/main-dev",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/statistics",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/expenses",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Бюджеты",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/budgets",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/audit",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "loading",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "loading",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/models/main-dev",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/requests",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/statistics",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/expenses",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Бюджеты",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/budgets",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/audit",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "empty",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "empty",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/models/main-dev",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/requests",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/statistics",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/expenses",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Бюджеты",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/budgets",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/audit",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "error",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "error",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/models/main-dev",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/statistics",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/expenses",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Бюджеты",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/budgets",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/audit",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "forbidden",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "forbidden",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/models/main-dev",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/statistics",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/expenses",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Бюджеты",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/budgets",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/audit",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "not_found",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "not_found",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "partial",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "partial",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "partial",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "partial",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "partial",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 18,
       "requested": "/models/main-dev",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "partial",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/requests",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "partial",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "partial",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/statistics",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "partial",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/expenses",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1425,
-      "route": "/budgets",
-      "scrollWidth": 1425,
-      "scrollers": [],
-      "state": "partial",
-      "title": "Бюджеты",
-      "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
-      "requested": "/budgets",
-      "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
+      "route": "/budgets",
+      "scrollWidth": 1440,
+      "scrollers": [],
+      "state": "partial",
+      "title": "Бюджеты",
+      "width": 1440,
+      "requested": "/budgets",
+      "expectedState": "partial",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "bad": [],
+      "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "partial",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "partial",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "partial",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "partial",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 2,
       "requested": "/audit",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "partial",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "partial",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "stale",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "stale",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "stale",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "stale",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "stale",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 18,
       "requested": "/models/main-dev",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "stale",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/requests",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "stale",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "stale",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/statistics",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "stale",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/expenses",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1425,
-      "route": "/budgets",
-      "scrollWidth": 1425,
-      "scrollers": [],
-      "state": "stale",
-      "title": "Бюджеты",
-      "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
-      "requested": "/budgets",
-      "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
+      "route": "/budgets",
+      "scrollWidth": 1440,
+      "scrollers": [],
+      "state": "stale",
+      "title": "Бюджеты",
+      "width": 1440,
+      "requested": "/budgets",
+      "expectedState": "stale",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "bad": [],
+      "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "stale",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "stale",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "stale",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "stale",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 2,
       "requested": "/audit",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "stale",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "stale",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "conflict",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "conflict",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "conflict",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "conflict",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "conflict",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 18,
       "requested": "/models/main-dev",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "conflict",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/requests",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "conflict",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "conflict",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/statistics",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "conflict",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/expenses",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1425,
-      "route": "/budgets",
-      "scrollWidth": 1425,
-      "scrollers": [],
-      "state": "conflict",
-      "title": "Бюджеты",
-      "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
-      "requested": "/budgets",
-      "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
+      "route": "/budgets",
+      "scrollWidth": 1440,
+      "scrollers": [],
+      "state": "conflict",
+      "title": "Бюджеты",
+      "width": 1440,
+      "requested": "/budgets",
+      "expectedState": "conflict",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "bad": [],
+      "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "conflict",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "conflict",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "conflict",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "conflict",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 2,
       "requested": "/audit",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "conflict",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "conflict",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "pending",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "pending",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "pending",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "pending",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "pending",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/models/main-dev",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "pending",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/requests",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "pending",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "pending",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/statistics",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "pending",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/expenses",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1425,
-      "route": "/budgets",
-      "scrollWidth": 1425,
-      "scrollers": [],
-      "state": "pending",
-      "title": "Бюджеты",
-      "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
-      "requested": "/budgets",
-      "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
+      "route": "/budgets",
+      "scrollWidth": 1440,
+      "scrollers": [],
+      "state": "pending",
+      "title": "Бюджеты",
+      "width": 1440,
+      "requested": "/budgets",
+      "expectedState": "pending",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "bad": [],
+      "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "pending",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "pending",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "pending",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "pending",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/audit",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "pending",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "pending",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 18,
       "requested": "/models/main-dev",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/requests",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/statistics",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/expenses",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
-    },
-    {
-      "bad": [],
-      "clientWidth": 1425,
-      "route": "/budgets",
-      "scrollWidth": 1425,
-      "scrollers": [],
-      "state": "budget_exhausted",
-      "title": "Бюджеты",
-      "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
-      "requested": "/budgets",
-      "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
+      "route": "/budgets",
+      "scrollWidth": 1440,
+      "scrollers": [],
+      "state": "budget_exhausted",
+      "title": "Бюджеты",
+      "width": 1440,
+      "requested": "/budgets",
+      "expectedState": "budget_exhausted",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "bad": [],
+      "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 2,
       "requested": "/audit",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "budget_exhausted",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "budget_exhausted",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "long",
       "title": "Обзор",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/providers",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "long",
       "title": "Провайдеры",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/providers",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/providers/:id",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "long",
       "title": "OpenAI-compatible",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/providers/api-a",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/models",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "long",
       "title": "Модели",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/models",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/models/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "long",
       "title": "main-dev",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 18,
       "requested": "/models/main-dev",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/requests",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "long",
       "title": "Запросы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/requests",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/requests/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "long",
       "title": "Запрос req_a17d",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/requests/a17d",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/statistics",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "long",
       "title": "Статистика",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 4,
       "requested": "/statistics",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/expenses",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "long",
       "title": "Расходы",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 3,
       "requested": "/expenses",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/budgets",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "long",
       "title": "Бюджеты",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/budgets",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/clients",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "long",
       "title": "Приложения",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/clients",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/evaluations",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "long",
       "title": "Тестирование",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/evaluations",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 0,
+      "pendingEditable": 0,
       "route": "/evaluations/:id",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "long",
       "title": "Coding smoke · сравнение 24",
       "width": 1440,
-      "pageActions": 0,
-      "pendingEditable": 0,
       "requested": "/evaluations/run-24",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1440,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/audit",
       "scrollWidth": 1440,
       "scrollers": [],
       "state": "long",
       "title": "Аудит",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 2,
       "requested": "/audit",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
       "bad": [],
       "clientWidth": 1425,
+      "pageActions": 1,
+      "pendingEditable": 0,
       "route": "/settings",
       "scrollWidth": 1425,
       "scrollers": [],
       "state": "long",
       "title": "Настройки",
       "width": 1440,
-      "pageActions": 1,
-      "pendingEditable": 0,
       "requested": "/settings",
       "expectedState": "long",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f"
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     }
   ],
   "flows": [
     {
-      "case": "D-05/D-07",
+      "name": "served-source-hash",
       "result": "PASS",
-      "evidence": 1
+      "details": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
-      "case": "D-06",
-      "result": "PASS"
-    },
-    {
-      "case": "D-08",
+      "name": "single-header-service-name",
       "result": "PASS",
-      "preservedDraft": true
+      "details": "one label",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
-      "case": "D-04/D-10",
-      "result": "PASS"
+      "name": "current-service-marked",
+      "result": "PASS",
+      "details": "selected",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
-      "case": "D-13",
-      "result": "PASS"
+      "name": "connection-edit-prefill",
+      "result": "PASS",
+      "details": "current",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
-      "case": "D-12/D-15",
-      "result": "PASS"
+      "name": "connection-edit-identity",
+      "result": "PASS",
+      "details": "same id",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
-      "case": "D-14",
-      "result": "PASS"
+      "name": "connection-edit-visible",
+      "result": "PASS",
+      "details": "literal text, no HTML",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
-      "case": "D-03",
-      "result": "PASS"
+      "name": "connection-disable-visible",
+      "result": "PASS",
+      "details": "status",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
-      "case": "D-16",
-      "result": "PASS"
+      "name": "statistics-currency",
+      "result": "PASS",
+      "details": "EUR only",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     },
     {
-      "case": "D-11",
-      "result": "PASS"
+      "name": "statistics-dimension",
+      "result": "PASS",
+      "details": "provider",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "statistics-project-neighbor",
+      "result": "PASS",
+      "details": "testing",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "statistics-day",
+      "result": "PASS",
+      "details": "seven rows",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "combined-request-filters",
+      "result": "PASS",
+      "details": "testing failed empty",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "combined-request-filters-neighbor",
+      "result": "PASS",
+      "details": "platform failed one",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "expense-ledger-currency",
+      "result": "PASS",
+      "details": "EUR rows",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "expense-ledger-scope",
+      "result": "PASS",
+      "details": "testing EUR empty",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "audit-combined-filter",
+      "result": "PASS",
+      "details": "query retained + publish",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "audit-filter-neighbor",
+      "result": "PASS",
+      "details": "query + access empty",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "budget-edit-prefill",
+      "result": "PASS",
+      "details": "installation",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "budget-edit-decimal",
+      "result": "PASS",
+      "details": "60-47.25-.72",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "budget-scope-target",
+      "result": "PASS",
+      "details": "no client under project",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "budget-threshold-validation",
+      "result": "PASS",
+      "details": "draft remains",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "client-existing-form",
+      "result": "PASS",
+      "details": "testing",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "client-edit-visible",
+      "result": "PASS",
+      "details": "selected row updated",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "client-save-no-key-issue",
+      "result": "PASS",
+      "details": "no secret issued",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "explicit-key-issue",
+      "result": "PASS",
+      "details": "synthetic",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "deployment-catalog-bound",
+      "result": "PASS",
+      "details": "Ollama choices from its catalog",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "deployment-edit-selected-row",
+      "result": "PASS",
+      "details": "second route",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "changed-route-invalidates-proof",
+      "result": "PASS",
+      "details": "disabled",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "invalid-bounds-block-proof",
+      "result": "PASS",
+      "details": "sum exceeds context",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "profile-publication",
+      "result": "PASS",
+      "details": "r13",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "profile-history-current-record",
+      "result": "PASS",
+      "details": "own revision",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "request-frozen-revision",
+      "result": "PASS",
+      "details": "request retains r12",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "profile-history-neighbor",
+      "result": "PASS",
+      "details": "app-test r4",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "pinned-route",
+      "result": "PASS",
+      "details": "one route",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "dataset-validation",
+      "result": "PASS",
+      "details": "object rejected",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "dataset-visible",
+      "result": "PASS",
+      "details": "one case saved",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "dataset-launch-choice",
+      "result": "PASS",
+      "details": "saved dataset selectable",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "new-run-identity",
+      "result": "PASS",
+      "details": "new run-26",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "new-run-no-fake-results",
+      "result": "PASS",
+      "details": "queued no historical outcomes",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "new-run-cancel",
+      "result": "PASS",
+      "details": "cancelled",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "new-run-neighbor",
+      "result": "PASS",
+      "details": "second distinct run",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "financial-save-visible",
+      "result": "PASS",
+      "details": "new row",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "keyboard-tabs",
+      "result": "PASS",
+      "details": "next tab",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "export-downloaded-snapshot",
+      "result": "PASS",
+      "details": {
+        "kind": "prototype",
+        "rows": 2
+      },
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "cancel-visible-preserves-unknown",
+      "result": "PASS",
+      "details": "still unknown, reserve held",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "dirty-navigation",
+      "result": "PASS",
+      "details": "guard",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "conflict-preserves-draft",
+      "result": "PASS",
+      "details": "input value retained",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "conflict-blocks-save",
+      "result": "PASS",
+      "details": "inline conflict, no mutation",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "missing-entity",
+      "result": "PASS",
+      "details": "404",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "existing-neighbor",
+      "result": "PASS",
+      "details": "correct request",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "mobile-drawer-escape",
+      "result": "PASS",
+      "details": "closed",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "mobile-drawer-navigation",
+      "result": "PASS",
+      "details": "target shown, drawer closed",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "neutral-login",
+      "result": "PASS",
+      "details": "neutral wording",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
+    },
+    {
+      "name": "login-direct-return",
+      "result": "PASS",
+      "details": "no transition page",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a"
     }
   ],
   "contrast": [
     {
       "theme": "dark",
-      "token": "--color-text-primary",
-      "ratio": 16.973898642198108
-    },
-    {
-      "theme": "dark",
-      "token": "--color-text-muted",
-      "ratio": 6.912758604004126
+      "token": "--color-danger",
+      "ratio": 6.404858202451587
     },
     {
       "theme": "dark",
@@ -3877,23 +4355,23 @@
     },
     {
       "theme": "dark",
+      "token": "--color-text-muted",
+      "ratio": 6.912758604004126
+    },
+    {
+      "theme": "dark",
+      "token": "--color-text-primary",
+      "ratio": 16.973898642198108
+    },
+    {
+      "theme": "dark",
       "token": "--color-warning",
       "ratio": 10.612883560521828
     },
     {
-      "theme": "dark",
+      "theme": "gray",
       "token": "--color-danger",
-      "ratio": 6.404858202451587
-    },
-    {
-      "theme": "gray",
-      "token": "--color-text-primary",
-      "ratio": 12.990856872282576
-    },
-    {
-      "theme": "gray",
-      "token": "--color-text-muted",
-      "ratio": 6.938273582424236
+      "ratio": 7.523361495322792
     },
     {
       "theme": "gray",
@@ -3902,23 +4380,23 @@
     },
     {
       "theme": "gray",
+      "token": "--color-text-muted",
+      "ratio": 6.938273582424236
+    },
+    {
+      "theme": "gray",
+      "token": "--color-text-primary",
+      "ratio": 12.990856872282576
+    },
+    {
+      "theme": "gray",
       "token": "--color-warning",
       "ratio": 10.83156505539113
     },
     {
-      "theme": "gray",
+      "theme": "light",
       "token": "--color-danger",
-      "ratio": 7.523361495322792
-    },
-    {
-      "theme": "light",
-      "token": "--color-text-primary",
-      "ratio": 17.71676507806213
-    },
-    {
-      "theme": "light",
-      "token": "--color-text-muted",
-      "ratio": 7.729820868495424
+      "ratio": 6.4700447145121895
     },
     {
       "theme": "light",
@@ -3927,13 +4405,18 @@
     },
     {
       "theme": "light",
-      "token": "--color-warning",
-      "ratio": 7.090048300172369
+      "token": "--color-text-muted",
+      "ratio": 7.729820868495424
     },
     {
       "theme": "light",
-      "token": "--color-danger",
-      "ratio": 6.4700447145121895
+      "token": "--color-text-primary",
+      "ratio": 17.71676507806213
+    },
+    {
+      "theme": "light",
+      "token": "--color-warning",
+      "ratio": 7.090048300172369
     }
   ],
   "screenshots": [
@@ -3946,8 +4429,8 @@
       "theme": "dark",
       "file": "overview-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "eb051df9b1c95f88bcc02417ef69ff3b4e5e66a7c4083a2a1af7e8202c88c3ee",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "b18441a66058799e0359d34faac2549359ea45a7829ec222a7b3062a3bacb539",
       "inspected": true
     },
     {
@@ -3959,9 +4442,9 @@
       "theme": "dark",
       "file": "providers-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "d0c027d9b9d7a70f2e1ccdd704d3efd87550ad18214f802dcd2ba812ca42a62c",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "bba2b609bc000cba3aeffc9c4324df36de62786ca053410dd0286cb787813b39",
+      "inspected": false
     },
     {
       "route": "/providers/api-a",
@@ -3972,9 +4455,9 @@
       "theme": "dark",
       "file": "providers-api-a-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
       "sha256": "200e3b41ab145e4275e4071ba61efc671bec887d34912b55e3cc3c9ff9ced0a4",
-      "inspected": true
+      "inspected": false
     },
     {
       "route": "/models",
@@ -3985,9 +4468,9 @@
       "theme": "dark",
       "file": "models-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
       "sha256": "08243d3ad2f42274d85993eea01a945e2b8edf4f3155acd8711092dc760e2eba",
-      "inspected": true
+      "inspected": false
     },
     {
       "route": "/models/main-dev",
@@ -3998,9 +4481,9 @@
       "theme": "dark",
       "file": "models-main-dev-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "08f85db628ea67472734a1e22fd8615f53929fa8ce58c9e7ccccf39d68f3dedf",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "890359abefc48282e0c93ee91738957acfed6be560f82d862ac1da468b080bdb",
+      "inspected": false
     },
     {
       "route": "/requests",
@@ -4011,9 +4494,9 @@
       "theme": "dark",
       "file": "requests-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "c07c9650570930510b6f6db14fe46c6f9f08a41afc922eff7bcd36fa6f949801",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "fbbc01b537180518ef467453fe24d660aa677709d3c0841d8787ab02511c4750",
+      "inspected": false
     },
     {
       "route": "/requests/a17d",
@@ -4024,9 +4507,9 @@
       "theme": "dark",
       "file": "requests-a17d-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
       "sha256": "aa36947b69cfd75e0bc865c59c73aa57186d267ca794f169d0fd87d22b30b804",
-      "inspected": true
+      "inspected": false
     },
     {
       "route": "/statistics",
@@ -4037,9 +4520,9 @@
       "theme": "dark",
       "file": "statistics-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "091de20a9eac2704b7f887bddfdd6740a48a14b7e6697db2580d15a638c1938b",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "ef81bd47e396c76a0a969179f4c09c178e287bfcd8669855445b83216b70532c",
+      "inspected": false
     },
     {
       "route": "/expenses",
@@ -4050,9 +4533,9 @@
       "theme": "dark",
       "file": "expenses-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "af72d1f70d3fdb392c37e44009f7d5b1f893fba8e3178f7b3df210c149829763",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "57dd5a235636c39dd845e26267badd7e99f25502eee9d3b4337b96100dbbb856",
+      "inspected": false
     },
     {
       "route": "/budgets",
@@ -4063,9 +4546,9 @@
       "theme": "dark",
       "file": "budgets-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "2613a317eee1a7167abf27f029b3849707e877cf76961ac8a63ae5a3ee28aab5",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "63efbfdb96574187ce9b4063e5629ef2b2c83eb5e00f43e01ac95c4342ce11d7",
+      "inspected": false
     },
     {
       "route": "/clients",
@@ -4076,8 +4559,8 @@
       "theme": "dark",
       "file": "clients-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "ead2dc1908b1e7b493d34d1e35411075add509fdbeea3702c204cc27f7463ab2",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "8591a47a15dbf56e0e649153a12e2091f4cf934db2967190dc9bbee7ba30771b",
       "inspected": true
     },
     {
@@ -4089,9 +4572,9 @@
       "theme": "dark",
       "file": "evaluations-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
       "sha256": "387e562136c87c7123e715172f509a457190cdb8768ef439434c99ad22e04775",
-      "inspected": true
+      "inspected": false
     },
     {
       "route": "/evaluations/run-24",
@@ -4102,7 +4585,7 @@
       "theme": "dark",
       "file": "evaluations-run-24-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
       "sha256": "15c7b07905a176fc4b024bdbb68b3c9fd532a648aef94d4d10a83a9b3df892b3",
       "inspected": true
     },
@@ -4115,9 +4598,9 @@
       "theme": "dark",
       "file": "audit-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
       "sha256": "0b016c945500f9f012a57a7f311f549e2c2302a570deed1341f485eca1728110",
-      "inspected": true
+      "inspected": false
     },
     {
       "route": "/settings",
@@ -4128,9 +4611,9 @@
       "theme": "dark",
       "file": "settings-dark-375.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
       "sha256": "7c7c43e534ec8a2e4ddbdedb485c66b3137a8516c41c3a3d6d20a6d387bee157",
-      "inspected": true
+      "inspected": false
     },
     {
       "route": "/",
@@ -4141,8 +4624,8 @@
       "theme": "dark",
       "file": "overview-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "17da6fcb4a79e72f6f53008fe46a6a1b975f39a00a74a9c0cf12129f54d626c1",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "ab156910044312d40a0d3e6cf19b99b1c3f54bfa63832b9f6c4b3c2ecad5a321",
       "inspected": true
     },
     {
@@ -4154,8 +4637,8 @@
       "theme": "dark",
       "file": "providers-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "4ad5ebb737f7b18d3d2b045e375283cfee5b5f0319beb527ebb88eaa8ebbaa7c",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "c4582862bd2c687bb466b8225d6144b01fd040a1b9898e357b9f393a958d24db",
       "inspected": true
     },
     {
@@ -4167,8 +4650,8 @@
       "theme": "dark",
       "file": "providers-api-a-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "24e253d2d1b50dea8b3dbc3b5d0aa04243ba742b256a5537b1d462b21c571322",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "77718c3680203fca6bf010bc3a5a26ae95a0c3bfbeecc996648a79a80127620d",
       "inspected": true
     },
     {
@@ -4180,8 +4663,8 @@
       "theme": "dark",
       "file": "models-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "ce069e53cd93ce0ddc158b42484688ea91728db030249861cf772b4346122310",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "a5563f319f6796f665e9119ec4c1906d5247e3de636cd70fad219bf49299399e",
       "inspected": true
     },
     {
@@ -4193,8 +4676,8 @@
       "theme": "dark",
       "file": "models-main-dev-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "c2229a5ebf50e5238f076470d92f7032787c61c8c4ebb787fcde29ba4a99d09f",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "4b4ab0e1ea19927eb935d74a539bab86ddeaebd0571cac8898602ce82a824bea",
       "inspected": true
     },
     {
@@ -4206,8 +4689,8 @@
       "theme": "dark",
       "file": "requests-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "7efffff52353dc7c4d9d09a292cb7c4476a5311d5dd125567f2d7e391305472b",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "a3b088128931593061688ab422d5429165b607b3fa0e70bc1dc802fd7f828a1d",
       "inspected": true
     },
     {
@@ -4219,8 +4702,8 @@
       "theme": "dark",
       "file": "requests-a17d-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "f30a9b6e199a611421a3a5292a417b6b39c77d8835bb65611b34d58a764ac5c3",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "0c03c383c689360073eefcbb25d792054388ce148d0882ed8380f3f92a66f8a8",
       "inspected": true
     },
     {
@@ -4232,8 +4715,8 @@
       "theme": "dark",
       "file": "statistics-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "62cab694add2810b03d2744cdcc8e1524fd3f0253d864e9dc7c40eb2f84d947d",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "a52f4cf1aeabfea7d66294b8d4b6f7e9891bc6eae8cc9a50a41854e066ae0557",
       "inspected": true
     },
     {
@@ -4245,8 +4728,8 @@
       "theme": "dark",
       "file": "expenses-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "ab40796b43de09737071713143bfbe610a85e47cc9a5d71828e9328e808d2521",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "a308b096c7716e5be0d68a0003f0ae763411878d2bf9ccce1404e57668e661a4",
       "inspected": true
     },
     {
@@ -4258,8 +4741,8 @@
       "theme": "dark",
       "file": "budgets-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "6b64a4d1ab747128a717f874ec2a7ca74daf3233bcb222cd6bf241d22ffc0522",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "0139895fdf592f13eadd7a8a3b5720e515be99f0b2a6a349aca1ec4f5d7b5be3",
       "inspected": true
     },
     {
@@ -4271,8 +4754,8 @@
       "theme": "dark",
       "file": "clients-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "13f3c371edf57954bc00f234e026f10e73748cd543ae7451d3f42cf058ecdf6e",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "9bdfa63664d822b2ea077fa542c25f3a7a0749d9e30ca4cf5a008759cae50b26",
       "inspected": true
     },
     {
@@ -4284,8 +4767,8 @@
       "theme": "dark",
       "file": "evaluations-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "cf79957f8dd242ff51933645e6dedb1a06a8a9de04cab4f53d787439d17e4c19",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "03aa755e5be3a99dcc491d2c528b419df01afdf1a49e6fbffdec28d3b098e97e",
       "inspected": true
     },
     {
@@ -4297,8 +4780,8 @@
       "theme": "dark",
       "file": "evaluations-run-24-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "06db7a077b48b16c7ef16fd5266d1933cb9059ec24006d3aaa9ec5945755820a",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "153913721f1181d2afe37d7c10ed135873903c7fb2c84103be2dddb1e0340e0b",
       "inspected": true
     },
     {
@@ -4310,8 +4793,8 @@
       "theme": "dark",
       "file": "audit-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "1ca894822961f67e94dd64744e1bf71eb692738799eb5ef50aecae42b3ed38a9",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "d9bf0ff5b50cdecd438eb5f5212db190d22b4619634f9c18fb4ef437a3199f61",
       "inspected": true
     },
     {
@@ -4323,8 +4806,8 @@
       "theme": "dark",
       "file": "settings-dark-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "5d68db3b8d8ba0f5dd0f668e0e7ce00cb9a3610b63f0eb6f3f47fb1a4d2c0f6b",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "6db3a5f1f51d647ae9b96b26d16bf5f480435e2be901e3fffab0a28cfa25d579",
       "inspected": true
     },
     {
@@ -4336,8 +4819,8 @@
       "theme": "gray",
       "file": "overview-gray-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "d899acd4d3e63cc48e0a5216186aea031ace9fad74572853920e8dd0defc30e1",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "27c609f4238a48794932dea8a3b7f0deb659494487b5e7aa9a793efa20cec303",
       "inspected": true
     },
     {
@@ -4349,9 +4832,9 @@
       "theme": "gray",
       "file": "models-main-dev-gray-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "af9f9d9c344ea9a740949bc5428fec927e9630cb93fb205b1a62d6ae0e1620b4",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "a825103182085cf06f41b228e4b92be25e86c68405a6ea1ed979555e50151ed1",
+      "inspected": false
     },
     {
       "route": "/expenses",
@@ -4362,9 +4845,9 @@
       "theme": "gray",
       "file": "expenses-gray-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "39c6ce29753d759d29576959e2b468803c2fe2bbca86ae4fb7b4976f683fc2c8",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "73a43b0803c3ef245cfe0dd23c5906134748a2adfee77af88909f3e1e3641ef1",
+      "inspected": false
     },
     {
       "route": "/",
@@ -4375,8 +4858,8 @@
       "theme": "light",
       "file": "overview-light-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "14370140ea61d98207f7039c30f352ee4eb6a6644749c0d0157c42678509c56d",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "9e90dbb529917c78ac2f0d6062eddbef424b3ff8916f314c2172212f345d674b",
       "inspected": true
     },
     {
@@ -4388,9 +4871,9 @@
       "theme": "light",
       "file": "models-main-dev-light-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "496535c0aa1b8399ba37f9e7c7ee9c3a486587a9f48907a27feb1e156943fc74",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "7ffd0974d6e57841e06ff133d9f7c14ee8d7ce9d60737e7cdc0b857e0283c229",
+      "inspected": false
     },
     {
       "route": "/expenses",
@@ -4401,9 +4884,9 @@
       "theme": "light",
       "file": "expenses-light-1440.jpg",
       "kind": "prototype-viewport",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "73f08b6c799e2888f0f49b5052f02fa65d0ef62d07b75b1b9e5d57ab0ad3f761",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "ebea2de6cd7c345e4d77a7f635715303498d1635d1df4fdf782938de9495f81e",
+      "inspected": false
     },
     {
       "route": "/expenses",
@@ -4415,9 +4898,9 @@
       "theme": "dark",
       "file": "expenses-error-1440.jpg",
       "kind": "prototype-state",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "3badc29db5259e9a060bd976297004abf174d35e56ca2c40f485cf56cdc29cb4",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "32e1b4c84b89f307b6dcd73a408353e64b37af99f96c4ee03804265dc1f602db",
+      "inspected": false
     },
     {
       "route": "/expenses",
@@ -4429,9 +4912,9 @@
       "theme": "dark",
       "file": "expenses-partial-1440.jpg",
       "kind": "prototype-state",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "93c8aa868fc52d46e7caf8cb8bfcfb549c3adbdd91fa078fef9897f3d792d60a",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "995c4143b56ef1b41b75e233b633032377e5274d85309dbc9f82cedce1082c17",
+      "inspected": false
     },
     {
       "route": "/models/main-dev",
@@ -4443,9 +4926,9 @@
       "theme": "dark",
       "file": "models-main-dev-conflict-1440.jpg",
       "kind": "prototype-state",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "435f156420cfe93021258c25fadb16a35415ed62de24b837de7a2eea0b9324ba",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "4db866e8ffe43975047392cc6426e267266c53108c9774864daa33f12bdd1d41",
+      "inspected": false
     },
     {
       "route": "/models/main-dev",
@@ -4457,9 +4940,9 @@
       "theme": "dark",
       "file": "models-main-dev-pending-1440.jpg",
       "kind": "prototype-state",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "91892d9581df1c7c2338c981d326f34b6e2734689322d09056c46b32096f40b9",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "6c81651ab712f035b0c864b92972fe4a3fc3ca976a705bad0bfc1ec9c40f5837",
+      "inspected": false
     },
     {
       "route": "/budgets",
@@ -4471,9 +4954,9 @@
       "theme": "dark",
       "file": "budgets-budget_exhausted-1440.jpg",
       "kind": "prototype-state",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "0b59357d4da48afa1ca5da29003876180b380a792fea3120ca3f1ec73ed65d30",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "0b723bf48dbfb1eb81fc3f4d43c274967977ff3c7d2b2c970009ab4eca6599c2",
+      "inspected": false
     },
     {
       "route": "/login",
@@ -4484,9 +4967,9 @@
       "theme": "dark",
       "file": "login-dark-375.jpg",
       "kind": "prototype-auth",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
       "sha256": "d50995dccbf12feebcbd7082182c61ddce9ac633ce72e82793a613b520b91321",
-      "inspected": true
+      "inspected": false
     },
     {
       "route": "/expenses",
@@ -4498,12 +4981,14 @@
       "theme": "dark",
       "file": "expenses-subscriptions-dark-1440.jpg",
       "kind": "prototype-tab",
-      "sourceScriptHash": "970fdcb74afafcb95def846857d2005d97b8fcada012c8290969a60550f1314f",
-      "sha256": "cbf78b484fbbf87067dc0bb1ddd190d987d28fb087ce30bdd2b8a3f0c03b3fee",
-      "inspected": true
+      "sourceScriptHash": "9fd8ce435c6053279b5d2619a6efc592659e5a5b82e0437e3775b528d5545f1a",
+      "sha256": "ce8cb451e3314cf413bbfab041a278c27b3a4c83cbade66f24cddbe84967133d",
+      "inspected": false
     }
   ],
   "console_errors": [],
-  "application_acceptance": "not_run",
-  "provider_calls": 0
+  "provider_calls": 0,
+  "actual_app_acceptance": "not_run",
+  "checked_at": "2026-10-09",
+  "review": "UX recheck of behavior and final source"
 }

@@ -32,3 +32,5 @@ Prototype routes используют читаемые demo IDs, production API 
 Не переносить demo names, fixed clock, fixture amounts, native no-op feedback или
 QA toolbar в production flows. Product screenshots и design screenshots имеют
 разные manifests/qa kinds.
+
+[Повторная UI/UX проверка](UX_RECHECK.md) описывает исправленные ошибки и сценарии регрессии.

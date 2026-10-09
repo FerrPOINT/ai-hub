@@ -72,6 +72,24 @@ class DesignHandoffTests(unittest.TestCase):
         )
         self.assertTrue(any("surface/kind" in e for e in validate(self.root)))
 
+    def test_stale_individual_flow(self):
+        self.change(
+            "docs/design/evidence.json",
+            lambda d: d["flows"][0].update(sourceScriptHash="old-script"),
+        )
+        self.assertTrue(any("Stale individual" in e for e in validate(self.root)))
+
+    def test_missing_behavioral_regression(self):
+        self.change(
+            "docs/design/evidence.json",
+            lambda d: d.update(
+                flows=[x for x in d["flows"] if x["name"] != "connection-edit-identity"]
+            ),
+        )
+        self.assertTrue(
+            any("behavioral UX regression" in e for e in validate(self.root))
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

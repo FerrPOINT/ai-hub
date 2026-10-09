@@ -140,6 +140,32 @@ def validate(root=ROOT, require_evidence=True):
             errors.append("Missing/changed screenshot: " + shot["file"])
     if not evidence["flows"] or any(x["result"] != "PASS" for x in evidence["flows"]):
         errors.append("Unverified design flows")
+    for collection in ("geometry", "states", "flows", "screenshots"):
+        if any(
+            item.get("sourceScriptHash") != script_sha
+            for item in evidence.get(collection, [])
+        ):
+            errors.append("Stale individual design evidence: " + collection)
+    required_flows = {
+        "single-header-service-name",
+        "connection-edit-identity",
+        "combined-request-filters",
+        "combined-request-filters-neighbor",
+        "expense-ledger-currency",
+        "deployment-catalog-bound",
+        "invalid-bounds-block-proof",
+        "request-frozen-revision",
+        "budget-edit-decimal",
+        "client-save-no-key-issue",
+        "dataset-validation",
+        "new-run-identity",
+        "new-run-neighbor",
+        "financial-save-visible",
+        "export-downloaded-snapshot",
+        "conflict-preserves-draft",
+    }
+    if not required_flows <= {item.get("name") for item in evidence["flows"]}:
+        errors.append("Missing behavioral UX regression evidence")
     if evidence.get("console_errors"):
         errors.append("Prototype console errors")
     if any(x["ratio"] < 4.5 for x in evidence.get("contrast", [])):

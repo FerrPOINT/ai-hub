@@ -1,6 +1,6 @@
 # Текущее состояние
 
-Дата: 2026-10-08. Stage: DEVELOP_READY — полный docs/design пакет, можно начинать S1.
+Дата: 2026-10-09. Stage: DEVELOP_READY — полный docs/design пакет, можно начинать S1.
 
 - Документированы назначение/scope, stack/owner boundaries, providers и profiles.
 - Определены API/data/ledger/statistics/budgets/evaluations/security/UI scenarios.
@@ -18,5 +18,9 @@ Publication exact-head readback фиксируется отдельно в hando
 Следующий implementation frontier — S1 с собственными manifests/grants/schema.
 
 Полный интерактивный дизайн:15 screens,12 states,3 themes; evidence kind prototype.
-102 geometry +165 state checks,10 flow records; typed DD34 tables/294 fields.
+102 geometry +165 state checks,54 behavioral assertions; typed DD34 tables/294 fields.
 Снимки/source hashes и handoff в design/QA, DEVELOP_READY; app acceptance not_run.
+
+Повторная UI/UX проверка устранила дублирование шапки, ложные сохранения,
+неработающие разрезы/фильтры и подмену нового запуска историческим.
+Причины, регрессии и ограничения — [UX_RECHECK](design/UX_RECHECK.md).

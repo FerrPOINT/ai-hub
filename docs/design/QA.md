@@ -9,12 +9,12 @@ Kind: prototype. Surface: Codex in-app browser. Native screenshots без ред
   непредусмотренных mobile horizontal scrollers.
 - 165 state checks: loading/empty/error/403/404/partial/stale/412/pending/
   budget-exhausted/long, including no CRUD at denied/missing scope and pending guards.
-- 10 flow records: draft/proof/publication/pinned/bounds, dirty/stale/412,
+- 54 behavioral assertions: draft/proof/publication/pinned/bounds, dirty/stale/412,
   exact lookup/neighbor, explicit key issue, typed budget/modal focus, dataset JSON,
   drawer keyboard, neutral login и expenses/prices/subscriptions/currency.
 - 15 color-token contrast checks: normal/muted/success/warning/danger over actual
   surface in three themes; min measured ratio >6.4. Это не formal full WCAG audit.
-  -43 viewport/tab/state/auth screenshots; long pages интерактивно scrollable.
+- 43 viewport/tab/state/auth screenshots; long pages интерактивно scrollable.
   Gallery [gallery](gallery.html) и prototype показывают полный content.
 
 ## Разделение evidence
@@ -24,3 +24,6 @@ Kind: prototype. Surface: Codex in-app browser. Native screenshots без ред
 matches final source, но API/DB/auth/SSO real acceptance not_run.
 Source-only assertions не подменяют rendered design; future actual-app screenshots
 собираются по TC и served build identity отдельно.
+
+Повторная проверка 2026-10-09: [UX_RECHECK](UX_RECHECK.md). Все записи evidence
+пересобраны для текущего скрипта; геометрия не заменяет проверку поведения.

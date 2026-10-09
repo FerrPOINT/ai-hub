@@ -1752,8 +1752,7 @@
           <svg class="icon" aria-hidden="true">
             <use href="#i-menu"></use>
           </svg></button
-        ><span class="logo" aria-hidden="true">H</span
-        ><span class="brand-name">AI Hub</span>
+        ><span class="logo" aria-hidden="true">H</span>
       </div>
       <div
         class="platform-header-services"
@@ -2202,7 +2201,301 @@
         activeProfile = null,
         toastTimer,
         draftValues = {},
-        filterValues = {};
+        filterValues = {},
+        editingConnection = null,
+        editingClient = null,
+        editingDeployment = 0,
+        editingBudget = null;
+      const connectionMeta = Object.fromEntries(
+        sources.map((p) => [
+          p[0],
+          {
+            kind: p[0] === "api-a" ? "api" : p[0],
+            endpoint: p[0] === "ollama" ? "ollama" : "api-a",
+            billing: p[0] === "chatgpt" ? "subscription" : "metered",
+          },
+        ]),
+      );
+      const clientMeta = {};
+      const requestCancellations = new Set();
+      const profileRoutes = {};
+      const modelOptions = (provider) => {
+        const p = sources.find((p) => p[0] === provider);
+        return [
+          [p[3], p[3]],
+          ["model-b-small", "model-b-small"],
+        ].filter(([v]) => v !== "Не выбран");
+      };
+      const requestRevisions = Object.fromEntries(
+        requests.map((r) => [r[0], profiles.find((p) => p.id === r[2]).rev]),
+      );
+      const previewChanges = [];
+      const previewRuns = [];
+      const previewDatasets = [];
+      const budgetRecords = [
+        {
+          scope: "installation",
+          target: "hub-demo",
+          name: "Установка",
+          currency: "USD",
+          limit: "50.00",
+          charged: "47.25",
+          reserved: "0.72",
+          period: "month",
+          first: 80,
+          second: 95,
+        },
+        {
+          scope: "client",
+          target: "ci-test",
+          name: "CI тесты",
+          currency: "USD",
+          limit: "10.00",
+          charged: "7.90",
+          reserved: "0.35",
+          period: "month",
+          first: 80,
+          second: 95,
+        },
+        {
+          scope: "project",
+          target: "platform",
+          name: "Платформа",
+          currency: "EUR",
+          limit: "20.00",
+          charged: "2.45",
+          reserved: "0.00",
+          period: "month",
+          first: 80,
+          second: 95,
+        },
+      ];
+      const decimalUnits = (v) => {
+        const [whole, fraction = ""] = v.split(".");
+        return BigInt(whole) * 10n ** 18n + BigInt(fraction.padEnd(18, "0"));
+      };
+      const formatUnits = (v) => {
+        const negative = v < 0n;
+        const n = negative ? -v : v;
+        return (
+          (negative ? "−" : "") +
+          (n / 10n ** 18n).toString() +
+          "," +
+          (n % 10n ** 18n).toString().padStart(18, "0").slice(0, 2)
+        );
+      };
+      function previewPanel(kind) {
+        const rows = previewChanges
+          .filter((x) => x.kind === kind)
+          .map((x) => [
+            esc(x.name),
+            esc(x.summary),
+            badge("Сохранено в макете", "neutral"),
+          ]);
+        return rows.length
+          ? tablePanel(
+              "Добавлено в этой сессии",
+              ["Запись", "Параметры", "Состояние"],
+              rows,
+              "",
+              "После перезагрузки изменения макета сбрасываются. Исторические расходы не пересчитываются.",
+            )
+          : "";
+      }
+      function refreshBudgetTarget() {
+        const scope = document.querySelector("#budget-scope").value;
+        const options = {
+          installation: [["hub-demo", "Установка"]],
+          client: clients.map((c) => [c[0], c[1]]),
+          project: [
+            ["platform", "Платформа"],
+            ["testing", "Тестирование"],
+          ],
+          profile: profiles.map((p) => [p.id, p.id]),
+        };
+        document.querySelector("#budget-target").innerHTML = options[scope]
+          .map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`)
+          .join("");
+      }
+      const breakdownFacts = [
+        {
+          client: "Fleet Control",
+          project: "platform",
+          model: "main-dev",
+          provider: "API",
+          count: 880,
+          usd: 565,
+          estimate: 235,
+          eur: 140,
+          eurEstimate: 20,
+          unknown: 2,
+        },
+        {
+          client: "Forge CI/CD",
+          project: "platform",
+          model: "main-dev",
+          provider: "API",
+          count: 360,
+          usd: 420,
+          estimate: 125,
+          eur: 70,
+          eurEstimate: 15,
+          unknown: 1,
+        },
+        {
+          client: "CI тесты",
+          project: "testing",
+          model: "app-test",
+          provider: "Ollama Cloud",
+          count: 144,
+          usd: 255,
+          estimate: 125,
+          eur: 0,
+          eurEstimate: 0,
+          unknown: 0,
+        },
+      ];
+      const cents = (n, currency) =>
+        Math.trunc(n / 100) +
+        "," +
+        String(n % 100).padStart(2, "0") +
+        (currency === "EUR" ? " €" : " $");
+      function breakdown() {
+        const project = filterValues["project-filter"] || "all",
+          currency = filterValues["currency-filter"] || "USD",
+          dimension = filterValues.dimension || "client";
+        const labels = {
+          client: "По приложениям",
+          model: "По виртуальным моделям",
+          provider: "По провайдерам",
+          day: "По дням",
+        };
+        const facts = breakdownFacts.filter(
+          (x) => project === "all" || x.project === project,
+        );
+        const groups = new Map();
+        for (const fact of facts) {
+          const key = fact[dimension] || fact.client;
+          const row = groups.get(key) || {
+            count: 0,
+            confirmed: 0,
+            estimate: 0,
+            unknown: 0,
+          };
+          row.count += fact.count;
+          row.confirmed += currency === "EUR" ? fact.eur : fact.usd;
+          row.estimate += currency === "EUR" ? fact.eurEstimate : fact.estimate;
+          row.unknown += currency === "EUR" ? 0 : fact.unknown;
+          groups.set(key, row);
+        }
+        let rows = [...groups].map(([key, r]) => [
+          esc(key),
+          String(r.count),
+          cents(r.confirmed, currency),
+          cents(r.estimate, currency),
+          String(r.unknown),
+        ]);
+        if (dimension === "day") {
+          const counts =
+            {
+              all: [192, 181, 210, 168, 201, 224, 208],
+              platform: [168, 162, 188, 155, 180, 205, 182],
+              testing: [24, 19, 22, 13, 21, 19, 26],
+            }[project] || [];
+          const totals = [...groups.values()].reduce(
+            (a, r) => ({
+              confirmed: a.confirmed + r.confirmed,
+              estimate: a.estimate + r.estimate,
+              unknown: a.unknown + r.unknown,
+            }),
+            { confirmed: 0, estimate: 0, unknown: 0 },
+          );
+          rows = counts.map((count, i) => [
+            `${i + 2} октября`,
+            String(count),
+            cents(
+              (currency === "EUR"
+                ? {
+                    all: [20, 30, 15, 25, 30, 40, 50],
+                    platform: [20, 30, 15, 25, 30, 40, 50],
+                    testing: [0, 0, 0, 0, 0, 0, 0],
+                  }
+                : {
+                    all: [144, 158, 163, 150, 204, 216, 205],
+                    platform: [100, 120, 130, 120, 160, 180, 175],
+                    testing: [44, 38, 33, 30, 44, 36, 30],
+                  })[project][i],
+              currency,
+            ),
+            cents(
+              Math.trunc(totals.estimate / 7) +
+                (i === 6 ? totals.estimate % 7 : 0),
+              currency,
+            ),
+            i === 6 ? String(totals.unknown) : "0",
+          ]);
+        }
+        return tablePanel(
+          labels[dimension],
+          [
+            dimension === "day" ? "День" : "Объект",
+            "Запросы",
+            "Подтверждено · " + currency,
+            "Оценка · " + currency,
+            "Неизвестно",
+          ],
+          rows,
+          btn(icon("download") + "Экспорт", "export"),
+          "Использование 2–8 октября. Подписки учитываются отдельно; группировка по первой выбранной модели подключения.",
+        );
+      }
+      function applyListFilters() {
+        if (["/", "/requests"].includes(current[0])) {
+          const project = filterValues["project-filter"] || "all",
+            status = filterValues["request-status"] || "all";
+          document.querySelectorAll("#main tbody tr").forEach((row, i) => {
+            const record = requests[i];
+            if (!record) return;
+            const client = clients.find((c) => c[1] === record[3]);
+            const recordProject =
+              client?.[2] === "Тестирование" ? "testing" : "platform";
+            row.hidden =
+              (project !== "all" && recordProject !== project) ||
+              (current[0] === "/requests" &&
+                status !== "all" &&
+                record[5] !==
+                  { unknown: "Исход неизвестен", failed: "Ошибка" }[status]);
+          });
+          const wrap = document.querySelector("#main .table-wrap");
+          if (wrap) {
+            const visible = [...wrap.querySelectorAll("tbody tr")].filter(
+              (r) => !r.hidden,
+            ).length;
+            const footer = wrap.parentElement.querySelector(".table-footer");
+            if (footer)
+              footer.textContent = `Показано ${visible} последних записей выбранного проекта. Демонстрационная выборка.`;
+            if (!visible)
+              wrap.insertAdjacentHTML(
+                "afterend",
+                '<p class="panel-body muted">Нет запросов с выбранными фильтрами.</p>',
+              );
+          }
+        }
+        if (current[0] === "/audit") {
+          const query = (
+              document.querySelector("#audit-query")?.value || ""
+            ).toLowerCase(),
+            action = filterValues["audit-action"] || "all";
+          document.querySelectorAll("#main tbody tr").forEach((row) => {
+            const cells = row.querySelectorAll("td");
+            const kind = cells[2]?.textContent || "";
+            row.hidden =
+              !row.textContent.toLowerCase().includes(query) ||
+              (action === "publish" && !kind.includes("Публикация")) ||
+              (action === "access" && !kind.includes("ключа"));
+          });
+        }
+      }
       document.documentElement.dataset.theme = theme;
       for (const key of [
         "project-filter",
@@ -2210,6 +2503,7 @@
         "period",
         "request-status",
         "dimension",
+        "audit-action",
       ]) {
         const value = new URLSearchParams(location.search).get(key);
         if (value) filterValues[key] = value;
@@ -2227,8 +2521,13 @@
           routeDefs.find((r) => r[0] === p) ||
           routeDefs.find(
             (r) => r[0].includes(":") && p.startsWith(r[0].split(":")[0]),
-          ) ||
-          routeDefs[0]
+          ) || [
+            "/not-found",
+            "Страница не найдена",
+            "overview",
+            "reading",
+            "Проверьте адрес или вернитесь к обзору.",
+          ]
         );
       }
       function id() {
@@ -2298,7 +2597,11 @@
           d = scopeSnapshots[project] || scopeSnapshots.all,
           symbol = currency === "EUR" ? "€" : "$",
           confirmed =
-            currency === "EUR" ? d.eur : period === "30" ? d.usdMonth : d.usd,
+            currency === "EUR"
+              ? d.eur
+              : period === "30" && project === "all"
+                ? d.usdMonth
+                : d.usd,
           estimate = currency === "EUR" ? d.eurEstimate : d.estimate,
           reserve = currency === "EUR" ? "0,00" : d.reserve;
         document.querySelectorAll("#main .metric").forEach((el) => {
@@ -2320,7 +2623,12 @@
             value.innerHTML =
               (currency === "EUR" ? "0" : d.unknownCost) +
               " <small>попытки</small>";
-          if (label === "Неизвестный исход") value.textContent = d.unknown;
+          if (label === "Данные неполны")
+            value.innerHTML = d.unknownCost + " <small>попытки</small>";
+          if (label === "Неизвестный исход") {
+            value.textContent = d.unknown;
+            foot.textContent = d.unknownCost + " попытки без полной стоимости";
+          }
           if (label === "Входные токены")
             value.innerHTML = d.input + " <small>млн</small>";
           if (label === "Выходные токены")
@@ -2330,28 +2638,6 @@
             foot.textContent = d.success + " из " + d.terminal + " завершённых";
           }
         });
-        if (["/", "/requests"].includes(current[0]))
-          document.querySelectorAll("#main tbody tr").forEach((row) => {
-            const text = row.textContent;
-            row.hidden =
-              project === "testing"
-                ? !text.includes("CI тесты")
-                : project === "platform"
-                  ? text.includes("CI тесты")
-                  : false;
-          });
-        if (current[0] === "/statistics")
-          document
-            .querySelectorAll("#main tbody tr")
-            .forEach(
-              (row) =>
-                (row.hidden =
-                  project === "testing"
-                    ? !row.textContent.includes("CI тесты")
-                    : project === "platform"
-                      ? row.textContent.includes("CI тесты")
-                      : false),
-            );
         if (current[2] === "overview") {
           document.querySelectorAll("#main dt").forEach((dt) => {
             if (dt.textContent === "Успешные")
@@ -2362,6 +2648,17 @@
                 " из " +
                 d.terminal +
                 " завершённых";
+            if (dt.textContent === "Задержка p95")
+              dt.nextElementSibling.textContent =
+                (project === "testing" ? "2,10 с" : "2,84 с") +
+                " · " +
+                d.terminal +
+                " измерений";
+            if (dt.textContent === "Первый фрагмент p95")
+              dt.nextElementSibling.textContent =
+                project === "testing"
+                  ? "Нет потоковых ответов в выборке"
+                  : "0,74 с · 912 потоковых ответов";
             if (dt.textContent === "Переключение на резерв")
               dt.nextElementSibling.textContent =
                 project === "testing"
@@ -2372,6 +2669,45 @@
               dt.nextElementSibling.textContent = reserve + " " + symbol;
           });
         }
+        if (current[2] === "overview") {
+          const legend = document.querySelector("#main .chart-legend");
+          if (legend)
+            legend.textContent =
+              "Логические запросы · " + d.count + " за 2–8 октября";
+          const warning = [...document.querySelectorAll("#main .callout")].find(
+            (el) => el.textContent.includes("Есть неопределённые попытки"),
+          );
+          if (warning) warning.hidden = d.unknown === "0";
+        }
+        if (current[2] === "statistics")
+          document.querySelectorAll("#main dt").forEach((dt) => {
+            if (dt.textContent === "Выборка")
+              dt.nextElementSibling.textContent = d.terminal + " запросов";
+            if (dt.textContent === "Переключение")
+              dt.nextElementSibling.textContent =
+                (project === "testing" ? "0" : "43") + " из " + d.count;
+            if (dt.textContent === "Отмены")
+              dt.nextElementSibling.textContent =
+                (project === "testing"
+                  ? "2"
+                  : project === "platform"
+                    ? "12"
+                    : "14") + " · отдельная категория";
+          });
+        if (current[2] === "expenses")
+          document.querySelectorAll("#main dt").forEach((dt) => {
+            const amounts = {
+              "USD · подтверждено":
+                (period === "30" && project === "all" ? d.usdMonth : d.usd) +
+                " $",
+              "USD · оценка": d.estimate + " $",
+              "USD · резерв": d.reserve + " $",
+              "EUR · подтверждено": d.eur + " €",
+              "EUR · оценка": d.eurEstimate + " €",
+            };
+            if (amounts[dt.textContent])
+              dt.nextElementSibling.textContent = amounts[dt.textContent];
+          });
         if (period === "30" && current[2] === "expenses") {
           const notes = document.querySelectorAll(
             "#main .chart-legend,#main .panel-body p.label",
@@ -2379,12 +2715,12 @@
           notes.forEach(
             (x) =>
               (x.textContent =
-                "График: последние7 дней. Cash total 30 дней включает платёж подписки 1 октября."),
+                "График: 2–8 октября. Итог 30 дней включает платёж подписки 1 октября только для USD, без привязки к проекту."),
           );
         }
       }
 
-      function filters(extra = "") {
+      function filters(extra = "", showCurrency = true) {
         return `<div class="filter-bar">${field(
           "period",
           "Период",
@@ -2392,7 +2728,7 @@
             "period",
             [
               ["7", "2–8 октября · 7 дней"],
-              ["30", "Сентябрь–октябрь · 30 дней"],
+              ["30", "9 сентября–8 октября · 30 дней"],
             ],
             "7",
           ),
@@ -2408,18 +2744,22 @@
             ],
             "all",
           ),
-        )}${field(
-          "currency-filter",
-          "Валюта сумм",
-          select(
-            "currency-filter",
-            [
-              ["USD", "USD · доллар"],
-              ["EUR", "EUR · евро"],
-            ],
-            "USD",
-          ),
-        )}${extra}<span class="label muted right">На 13:30 UTC · Новосибирск</span></div>`;
+        )}${
+          showCurrency
+            ? field(
+                "currency-filter",
+                "Валюта сумм",
+                select(
+                  "currency-filter",
+                  [
+                    ["USD", "USD · доллар"],
+                    ["EUR", "EUR · евро"],
+                  ],
+                  "USD",
+                ),
+              )
+            : ""
+        }${extra}<span class="label muted right">На 13:30 UTC · 20:30 Новосибирск</span></div>`;
       }
       function chart(kind = "requests") {
         const scope = filterValues["project-filter"] || "all",
@@ -2467,12 +2807,12 @@
         ]);
       }
       function dashboard() {
-        return `${filters()}<div class="metrics">${metric("Запросы", "1 384", "1 300 завершены · 62 ошибки")}${metric("Подтверждённые расходы", "12,40 <small>$</small>", "Списания в выбранном периоде")}${metric("Оценочные расходы", "4,85 <small>$</small>", "Usage × зафиксированный тариф", "warning")}${metric("Неизвестный исход", "8", "3 попытки без полной стоимости", "warning")}</div><div class="grid-2">${panel("Поток запросов", chart() + `<div class="chart-legend"><span><i class="dot"></i>Логические запросы</span><span>1 384 за 7 дней</span></div>`, badge("2–8 октября"))}${panel(
+        return `${filters()}<div class="metrics">${metric("Запросы", "1 384", "1 300 завершены · 62 ошибки")}${metric("Подтверждённые расходы", "12,40 <small>$</small>", "Списания в выбранном периоде")}${metric("Оценочные расходы", "4,85 <small>$</small>", "Токены × зафиксированный тариф", "warning")}${metric("Неизвестный исход", "8", "3 попытки без полной стоимости", "warning")}</div><div class="grid-2">${panel("Поток запросов", chart() + `<div class="chart-legend"><span><i class="dot"></i>Логические запросы</span><span>1 384 за 7 дней</span></div>`, badge("2–8 октября"))}${panel(
           "Качество и ограничения",
           `<div class="stack-tight">${kv([
             ["Успешные", "94,5% · 1 300 из 1 376 завершённых"],
             ["Задержка p95", "2,84 с · 1 376 измерений"],
-            ["Первый фрагмент p95", "0,74 с · 912 stream"],
+            ["Первый фрагмент p95", "0,74 с · 912 потоковых ответов"],
             ["Переключение на резерв", "43 запроса · 3,1%"],
             ["Удержанный резерв", '<span class="warning">0,72 $</span>'],
           ])}${callout("Есть неопределённые попытки", "Стоимость уточняется. Резерв остаётся удержанным.", "warn", `<a class="btn" href="#/requests/c94e">Посмотреть</a>`)}</div>`,
@@ -2482,13 +2822,13 @@
         return `<div class="grid-3">${sources
           .map(
             (p) =>
-              `<section class="panel provider-card"><div class="flex align-start"><span class="provider-mark">${p[2]}</span><div class="grow"><h2>${p[1]}</h2><p class="muted label">${p[0] === "ollama" ? "Локальный / облачный endpoint" : p[0] === "chatgpt" ? "Managed authorization" : "API-подключение"}</p></div></div><div>${badge(p[4], p[5])}</div>${kv(
+              `<section class="panel provider-card"><div class="flex align-start"><span class="provider-mark">${p[2]}</span><div class="grow"><h2>${esc(p[1])}</h2><p class="muted label">${connectionMeta[p[0]].kind === "ollama" ? "Локальное / облачное подключение" : connectionMeta[p[0]].kind === "chatgpt" ? "Вход через подписку" : "API-подключение"}</p></div></div><div>${badge(p[4], p[5])}</div>${kv(
                 [
                   ["Модель", `<span class="mono">${p[3]}</span>`],
                   ["Контекст", p[6]],
                   ["Квота", p[7]],
                 ],
-              )}<div class="flex wrap"><a class="btn grow" href="#/providers/${p[0]}">Подключение</a>${btn(icon("info"), "capabilities", "icon-only", `aria-label="Возможности ${p[1]}"`)}</div></section>`,
+              )}<div class="flex wrap"><a class="btn grow" href="#/providers/${p[0]}">Подключение</a>${btn(icon("info"), "capabilities", "icon-only", `aria-label="Возможности ${esc(p[1])}"`)}</div></section>`,
           )
           .join(
             "",
@@ -2497,14 +2837,14 @@
       function providerDetail() {
         const p = sources.find((x) => x[0] === id()) || sources[0];
         const tt = tabChoice.provider || "catalog";
-        return `<div class="page-split"><div class="stack">${panel("Состояние подключения", `<div class="flex wrap space"><div class="flex"><span class="provider-mark">${p[2]}</span><div><h2>${p[1]}</h2><p class="muted">Подключение conn_${p[0]} · generation 3</p></div></div>${badge(p[4], p[5])}</div>`)}<div class="tabs" role="tablist" aria-label="Подключение провайдера">${[
+        return `<div class="page-split"><div class="stack">${panel("Состояние подключения", `<div class="flex wrap space"><div class="flex"><span class="provider-mark">${p[2]}</span><div><h2>${esc(p[1])}</h2><p class="muted">Подключение conn_${p[0]} · generation 3</p></div></div>${badge(p[4], p[5])}</div>`)}<div class="tabs" role="tablist" aria-label="Подключение провайдера">${[
           ["catalog", "Каталог"],
           ["connection", "Авторизация"],
           ["history", "Проверки"],
         ]
           .map(
             ([v, t]) =>
-              `<button class="tab" role="tab" aria-selected="${tt === v}" data-tab="provider" data-value="${v}">${t}</button>`,
+              `<button class="tab" role="tab" aria-selected="${tt === v}" tabindex="${tt === v ? 0 : -1}" data-tab="provider" data-value="${v}">${t}</button>`,
           )
           .join("")}</div>${
           tt === "catalog"
@@ -2531,11 +2871,16 @@
               ? panel(
                   "Собственная авторизация",
                   `<div class="stack-tight">${kv([
-                    ["Тип", "API key / managed login"],
+                    [
+                      "Тип",
+                      connectionMeta[p[0]].kind === "chatgpt"
+                        ? "Вход через подписку"
+                        : "Ключ API",
+                    ],
                     ["Секрет", "Не возвращается в интерфейс"],
                     ["Поколение", "3"],
                     ["Состояние", badge(p[4], p[5])],
-                  ])}<div class="flex wrap">${btn("Ввести ключ", "credentials", "primary")}${btn("Войти через подписку", "managed-login")}${btn("Отозвать авторизацию", "revoke-connection", "danger")}</div></div>`,
+                  ])}<div class="flex wrap">${connectionMeta[p[0]].kind === "chatgpt" ? btn("Войти через подписку", "managed-login", "primary") : btn("Ввести ключ", "credentials", "primary")}${btn("Отозвать авторизацию", "revoke-connection", "danger")}</div></div>`,
                 )
               : tablePanel(
                   "Последние проверки",
@@ -2561,7 +2906,10 @@
             ["Endpoint", "Разрешённый оператором"],
             ["Адаптер", "demo-adapter / r1"],
             ["Квота", p[7]],
-            ["Последняя проверка", "13:26 UTC"],
+            [
+              "Последняя проверка",
+              p[5] === "good" ? "13:26 UTC" : "Нет актуальной проверки",
+            ],
           ]),
         )}${panel("Действия", `<div class="stack-tight">${btn("Изменить подключение", "edit-connection")}${btn("Отключить", "disable-connection", "danger")}<p class="muted label">История запросов и учёта сохраняется.</p></div>`)}</aside></div>`;
       }
@@ -2596,6 +2944,7 @@
       function modelDetail() {
         activeProfile = profiles.find((x) => x.id === id()) || profiles[0];
         const p = activeProfile;
+        const effectiveMode = draftValues[p.id]?.["model-mode"] || p.mode;
         verified = p.verified;
         return `<form id="model-form" class="page-readable" novalidate><div class="stack"><div class="flex wrap space">${badge(p.mode === "pinned_test" ? "Закреплённое тестирование" : "Разработка", "neutral")}<span class="label muted">${p.rev ? "Опубликована r" + p.rev : "Не опубликован"} · черновик v13</span></div><section class="panel"><div class="form-section"><h2>Профиль</h2><p>Имя для приложений и параметры новой версии.</p><div class="form-grid">${field("display-name", "Название", input("display-name", p.name, "text", 'maxlength="120" required'))}${field("model-slug", "Публичное имя", input("model-slug", p.id, "text", "readonly"), "Имя используется API-клиентами.")}${field(
           "model-mode",
@@ -2608,7 +2957,7 @@
             ],
             p.mode,
           ),
-        )}${field("model-timeout", "Общая deadline, секунды", input("model-timeout", "120", "number", 'min="1" max="600" required')) + field("max-attempts", "Максимум внешних попыток", input("max-attempts", p.mode === "pinned_test" ? "1" : "3", "number", 'min="1" max="5" required ' + (p.mode === "pinned_test" ? "disabled" : "")), "В pinned_test строго одна попытка.")}</div></div><div class="form-section"><div class="flex wrap space"><div><h2>Маршрут</h2><p class="muted label">Порядок провайдеров фиксируется в опубликованной версии.</p></div>${btn(icon("plus") + "Добавить резерв", "add-deployment")}</div><div class="stack-tight" id="deployment-list" style="margin-top:16px">${deployments(p.mode, p.model)}</div></div><div class="form-section"><h2>Контекст и генерация</h2><p>Не превышают проверенные пределы выбранных моделей.</p><div class="form-grid">${field("input-limit", "Входной лимит, токены", input("input-limit", "100000", "number", 'min="1" required'))}${field("output-limit", "Лимит ответа, токены", input("output-limit", "8000", "number", 'min="1" required'))}${field("context-limit", "Общий контекст, токены", input("context-limit", "128000", "number", 'min="1" required'))}${field("temperature", "Temperature", input("temperature", "0.2", "number", 'min="0" max="2" step="0.1"'))}<div class="span-all">${
+        )}${field("model-timeout", "Общий таймаут, секунды", input("model-timeout", "120", "number", 'min="1" max="600" required')) + field("max-attempts", "Максимум внешних попыток", input("max-attempts", p.mode === "pinned_test" ? "1" : "3", "number", 'min="1" max="5" required ' + (p.mode === "pinned_test" ? "disabled" : "")), "В pinned_test строго одна попытка.")}</div></div><div class="form-section"><div class="flex wrap space"><div><h2>Маршрут</h2><p class="muted label">Порядок провайдеров фиксируется в опубликованной версии.</p></div>${btn(icon("plus") + "Добавить резерв", "add-deployment")}</div><div class="stack-tight" id="deployment-list" style="margin-top:16px">${deployments(effectiveMode, p.model)}</div></div><div class="form-section"><h2>Контекст и генерация</h2><p>Не превышают проверенные пределы выбранных моделей.</p><div class="form-grid">${field("input-limit", "Входной лимит, токены", input("input-limit", "100000", "number", 'min="1" required'))}${field("output-limit", "Лимит ответа, токены", input("output-limit", "8000", "number", 'min="1" required'))}${field("context-limit", "Общий контекст, токены", input("context-limit", "128000", "number", 'min="1" required'))}${field("temperature", "Temperature", input("temperature", "0.2", "number", 'min="0" max="2" step="0.1"'))}<div class="span-all">${
           field(
             "reasoning",
             "Reasoning effort",
@@ -2632,16 +2981,23 @@
         }</div><div class="span-all"><h3>Переопределения клиента</h3><p class="muted label">По умолчанию запрещены. Публикация проверяет поддержку каждого разрешённого параметра.</p><div class="checkrow"><input type="checkbox" id="override-temperature"><label for="override-temperature">temperature</label></div><div class="checkrow"><input type="checkbox" id="override-top_p"><label for="override-top_p">top_p</label></div><div class="checkrow"><input type="checkbox" id="override-max_output_tokens"><label for="override-max_output_tokens">max_output_tokens</label></div><div class="checkrow"><input type="checkbox" id="override-reasoning_effort"><label for="override-reasoning_effort">reasoning_effort</label></div></div></div></div><div class="form-section"><h2>Обязательные возможности</h2>${["Потоковый ответ", "Function tools", "JSON Schema"].map((x, i) => `<div class="checkrow"><input type="checkbox" id="cap-${i}" checked><label for="cap-${i}">${x}</label></div>`).join("")}</div><div class="form-actions">${btn("История версий", "revisions")}${btn("Сохранить черновик", "save-model", "primary")}</div></section><div id="model-validation" aria-live="polite"></div><section class="panel"><div class="panel-body stack-tight"><div class="flex wrap space"><h2>Проверка и публикация</h2><span id="proof-badge">${badge(verified ? "Точный черновик проверен" : "Черновик изменён · нужна проверка", verified ? "good" : "warn")}</span></div><p class="muted">Публикация переключит активную версию только для новых запросов.</p><div class="flex wrap">${btn("Проверить черновик", "verify-profile")}${btn("Опубликовать", "publish-profile", "primary", verified ? "" : "disabled")}</div></div></section></div></form>`;
       }
       function deployments(mode, firstModel) {
-        const first = sources.find((p) => p[3] === firstModel) || sources[0];
-        const second = sources.find(
-          (p) => p[5] === "good" && p[0] !== first[0],
-        );
-        return (
-          mode === "pinned_test" ? [first] : [first, second].filter(Boolean)
-        )
+        if (!profileRoutes[activeProfile.id]) {
+          const first = sources.find((p) => p[3] === firstModel) || sources[0],
+            second = sources.find((p) => p[5] === "good" && p[0] !== first[0]);
+          profileRoutes[activeProfile.id] = (
+            mode === "pinned_test" ? [first] : [first, second].filter(Boolean)
+          ).map((p) => ({
+            provider: p[0],
+            model: p[3],
+            checked: p[5] === "good",
+          }));
+        }
+        const rows = profileRoutes[activeProfile.id];
+        if (mode === "pinned_test") rows.splice(1);
+        return rows
           .map(
-            (p, i) =>
-              `<div class="deployment"><span class="order">${i + 1}</span><div class="grow"><strong>${p[1]}</strong><div class="muted mono">${p[3]} · generation 3</div></div>${badge("Проверен", "good")}<div class="section-tools">${btn("Изменить", "edit-deployment", "", `data-index="${i}"`)}${i ? btn("Вверх", "move-deployment", "", `data-index="${i}"`) : ""}</div></div>`,
+            (r, i) =>
+              `<div class="deployment"><span class="order">${i + 1}</span><div class="grow"><strong>${esc(sources.find((p) => p[0] === r.provider)?.[1] || r.provider)}</strong><div class="muted mono">${esc(r.model)} · поколение 3</div></div>${badge(r.checked ? "Проверен" : "Не проверен", r.checked ? "good" : "warn")}<div class="section-tools">${btn("Изменить", "edit-deployment", "", `data-index="${i}"`)}${i ? btn("Вверх", "move-deployment", "", `data-index="${i}"`) : ""}</div></div>`,
           )
           .join("");
       }
@@ -2660,13 +3016,14 @@
               "all",
             ),
           ),
-        )}${tablePanel("Запросы", ["Запрос", "Профиль", "Приложение", "Модель", "Статус", "Стоимость", "Попытки"], requestRows(), "", `<span>1–6 из 1 384</span><div class="flex">${btn("Назад", "page-back", "", "disabled")}${btn("Дальше", "page-next")}</div>`)}`;
+          false,
+        )}${tablePanel("Запросы", ["Запрос", "Профиль", "Приложение", "Модель", "Статус", "Стоимость", "Попытки"], requestRows(), "", `<span>Демонстрационная выборка · последние 6 записей</span>`)}`;
       }
       function requestDetail() {
         const r = requests.find((x) => x[0] === id()),
           unknown = r[6] === "warn",
           fallback = r[9] > 1,
-          rev = profiles.find((x) => x.id === r[2])?.rev || 0;
+          rev = requestRevisions[r[0]];
         const steps = `<ol class="timeline"><li class="done"><div class="time">${r[1]} UTC</div><strong>Запрос принят</strong><p class="muted">${r[2]} r${rev} · ${r[3]}</p></li><li class="${unknown ? "unknown" : "done"}"><div class="time">Попытка 1</div><strong>${r[2] === "app-test" ? "Ollama Cloud" : "API"} / ${unknown ? "model-a" : fallback ? "model-a" : r[4]}</strong><p class="muted">${unknown ? "Отправлено. Terminal receipt отсутствует." : fallback ? "HTTP 429: квалифицированный отказ до принятия. Подтверждён только фиксированный сбор." : r[5] + " · известный результат попытки."}</p></li>${fallback ? `<li class="done"><div class="time">Попытка 2</div><strong>Ollama Cloud / model-b</strong><p class="muted">Поток завершён. Новая attempt зарезервирована до отправки.</p></li>` : ""}</ol>`;
         const attemptRows = unknown
           ? [
@@ -2719,7 +3076,7 @@
             ["Резерв", unknown ? "0,24 $" : "Нет удержанного"],
             ["Idempotency", "Привязан к запросу"],
           ]),
-        )}${panel("Действия", `<div class="stack-tight">${btn("Запросить отмену", "cancel-request", "danger", unknown ? "" : "disabled")}${btn("Скопировать ID", "copy-request")}<p class="muted label">Отмена после dispatch не означает нулевой стоимости.</p></div>`)}</aside></div>`;
+        )}${panel("Действия", `<div class="stack-tight">${btn("Запросить отмену", "cancel-request", "danger", unknown && !requestCancellations.has(id()) ? "" : "disabled")}${btn("Скопировать ID", "copy-request")}<p class="muted label">${requestCancellations.has(id()) ? "Отмена запрошена. Резерв удерживается." : "Отмена после отправки не означает нулевой стоимости."}</p></div>`)}</aside></div>`;
       }
       function statistics() {
         return `${filters(
@@ -2747,23 +3104,113 @@
             ["Переключение", "43 из 1 384"],
             ["Отмены", "14 · отдельная категория"],
           ]),
-        )}</div>${tablePanel(
-          "По приложениям",
-          [
-            "Приложение",
-            "Проект",
-            "Запросы",
-            "Подтверждено",
-            "Оценка",
-            "Неизвестно",
-          ],
-          [
-            ["Fleet Control", "Платформа", "880", "5,65 $", "2,35 $", "2"],
-            ["Forge CI/CD", "Платформа", "360", "4,20 $", "1,25 $", "1"],
-            ["CI тесты", "Тестирование", "144", "2,55 $", "1,25 $", "0"],
-          ],
-          btn(icon("download") + "Экспорт", "export"),
-        )}`;
+        )}</div>${breakdown()}`;
+      }
+
+      function ledgerRows() {
+        const currency = filterValues["currency-filter"] || "USD",
+          project = filterValues["project-filter"] || "all",
+          period = filterValues.period || "7";
+        const records = [
+          {
+            project: "platform",
+            currency: "USD",
+            date: "8 окт · 13:29",
+            basis: "Попытка req_a17d / 2",
+            amount: "0,0108 $",
+            confidence: "Оценка",
+            source: "Токены × облачный тариф r5",
+          },
+          {
+            project: "platform",
+            currency: "USD",
+            date: "8 окт · 13:29",
+            basis: "Попытка req_a17d / 1",
+            amount: "0,0002 $",
+            confidence: "Подтверждено",
+            source: "Подтверждение demo-41",
+          },
+          {
+            project: "platform",
+            currency: "USD",
+            date: "8 окт · 12:50",
+            basis: "Уточнение req_f31b",
+            amount: "0,0120 $",
+            confidence: "Подтверждено",
+            source: "Заменяет прежнюю оценку",
+          },
+          {
+            project: "testing",
+            currency: "USD",
+            date: "8 окт · 13:29",
+            basis: "Запрос req_b82c",
+            amount: "0,0080 $",
+            confidence: "Подтверждено",
+            source: "Подтверждение demo-42",
+          },
+          {
+            project: "platform",
+            currency: "USD",
+            date: "7 окт · 10:12",
+            basis: "Возврат по подтверждению",
+            amount: "−0,0200 $",
+            confidence: "Подтверждено",
+            source: "Коррекция, история сохранена",
+          },
+          {
+            project: "platform",
+            currency: "EUR",
+            date: "8 окт · 12:10",
+            basis: "Использование Fleet Control",
+            amount: "1,4000 €",
+            confidence: "Подтверждено",
+            source: "Демо-подтверждение EUR-1",
+          },
+          {
+            project: "platform",
+            currency: "EUR",
+            date: "7 окт · 11:20",
+            basis: "Использование Forge CI/CD",
+            amount: "0,7000 €",
+            confidence: "Подтверждено",
+            source: "Демо-подтверждение EUR-2",
+          },
+          {
+            project: null,
+            currency: "USD",
+            date: "1 окт · 00:00",
+            basis: "Демонстрационная подписка",
+            amount: "30,00 $",
+            confidence: "Подтверждено",
+            source: "Оплата периода 1–31 октября",
+            earlier: true,
+          },
+        ];
+        const rows = records
+          .filter(
+            (r) =>
+              r.currency === currency &&
+              (project === "all" || r.project === project) &&
+              (period === "30" || !r.earlier),
+          )
+          .map((r) => [
+            r.date,
+            r.basis,
+            r.amount,
+            badge(r.confidence, r.confidence === "Оценка" ? "warn" : "good"),
+            r.source,
+          ]);
+        return rows.length
+          ? rows
+          : [
+              [
+                "—",
+                "Нет операций в демонстрационной выборке",
+                "—",
+                "—",
+                "Выберите другой проект или валюту",
+              ],
+            ];
       }
       function expenses() {
         const t = tabChoice.expenses || "ledger";
@@ -2774,12 +3221,12 @@
         ]
           .map(
             ([v, l]) =>
-              `<button class="tab" role="tab" aria-selected="${t === v}" data-tab="expenses" data-value="${v}">${l}</button>`,
+              `<button class="tab" role="tab" aria-selected="${t === v}" tabindex="${t === v ? 0 : -1}" data-tab="expenses" data-value="${v}">${l}</button>`,
           )
           .join("")}</div>${
           t === "ledger"
-            ? `<div class="grid-2">${panel("Подтверждённые расходы по дням", chart("money") + `<p class="label muted">USD · группировка по времени списания</p>`)}${panel(
-                "По валютам",
+            ? `<div class="grid-2">${panel("Подтверждённые расходы по дням", chart("money") + `<p class="label muted">${filterValues["currency-filter"] || "USD"} · группировка по времени списания · 2–8 октября</p>`)}${panel(
+                "По валютам · выбранный проект и период",
                 `<div class="stack-tight"><div class="currency-group">${kv([
                   ["USD · подтверждено", "12,40 $"],
                   ["USD · оценка", "4,85 $"],
@@ -2791,41 +3238,13 @@
               )}</div>${tablePanel(
                 "Операции учёта",
                 ["Когда", "Основание", "Сумма", "Статус", "Источник"],
-                [
-                  [
-                    "8 окт · 13:29",
-                    "Запрос req_a17d",
-                    "0,0108 $",
-                    badge("Оценка", "warn"),
-                    "usage × тариф r5",
-                  ],
-                  [
-                    "8 окт · 13:29",
-                    "Попытка req_a17d / 1",
-                    "0,0002 $",
-                    badge("Подтверждено", "good"),
-                    "receipt demo-41",
-                  ],
-                  [
-                    "8 окт · 12:50",
-                    "Уточнение req_f31b",
-                    "0,0120 $",
-                    badge("Подтверждено", "good"),
-                    "Заменяет прежнюю оценку",
-                  ],
-                  [
-                    "7 окт · 10:12",
-                    "Возврат по receipt",
-                    "−0,0200 $",
-                    badge("Подтверждено", "good"),
-                    "Correction, история сохранена",
-                  ],
-                ],
-                btn("Уточнить по receipt", "correction"),
+                ledgerRows(),
+                btn("Уточнить по подтверждению", "correction"),
+                "Последние операции выбранного проекта и валюты. Таблица показывает часть операций периода.",
               )}`
             : t === "prices"
               ? tablePanel(
-                  "Версии тарифов",
+                  "Версии тарифов · все подключения",
                   [
                     "Модель",
                     "Валюта",
@@ -2844,19 +3263,19 @@
                       "r5 · с 1 октября",
                     ],
                     [
-                      "model-b",
+                      "model-b · локальный Ollama",
                       "USD",
                       "0,00",
                       "0,00",
                       "0,00",
-                      "r2 · доказанная local policy",
+                      "r2 · локальный запуск",
                     ],
                   ],
                   btn(icon("plus") + "Новый тариф", "price", "primary"),
                   "<span>Демонстрационные тарифы · не цены провайдеров</span>",
                 )
               : tablePanel(
-                  "Плата за подписки",
+                  "Плата за подписки · все периоды",
                   ["Подписка", "Период услуги", "Платёж", "Статус", "Квота"],
                   [
                     [
@@ -2877,36 +3296,31 @@
                   btn("Учесть подписку", "subscription", "primary"),
                   "<span>Плата учитывается один раз. Платёж 1 октября не входит в cash-период 2–8 октября.</span>",
                 )
-        }`;
+        }${previewPanel(t)}`;
       }
       function budgets() {
-        return `<div class="grid-3">${[
-          ["Установка · USD", "50,00", "47,25", "0,72", "2,03", 96],
-          ["CI тесты · USD", "10,00", "7,90", "0,35", "1,75", 83],
-          ["Платформа · EUR", "20,00", "2,45", "0,00", "17,55", 12],
-        ]
-          .map(
-            (b, i) =>
-              `<section class="panel"><div class="panel-head"><h2>${b[0]}</h2>${badge(i === 0 ? "Порог 95%" : i === 1 ? "Порог 80%" : "В пределах лимита", i <= 1 ? "warn" : "good")}</div><div class="panel-body stack-tight">${kv(
+        return `<div class="grid-3">${budgetRecords
+          .map((b, i) => {
+            const limit = decimalUnits(b.limit),
+              used = decimalUnits(b.charged) + decimalUnits(b.reserved),
+              remaining = limit - used;
+            const pct = limit ? Number((used * 100n) / limit) : 100;
+            const tone = pct >= b.first ? "warn" : "good";
+            return `<section class="panel"><div class="panel-head"><h2>${esc(b.name)} · ${b.currency}</h2>${badge(pct >= 100 ? "Лимит исчерпан" : pct >= b.second ? `Порог ${b.second}%` : pct >= b.first ? `Порог ${b.first}%` : "В пределах лимита", tone)}</div><div class="panel-body stack-tight">${kv(
+              [
                 [
-                  ["Лимит в месяц", b[1]],
-                  ["Учтено", b[2]],
-                  ["Резерв", b[3]],
-                  ["Доступно", `<strong>${b[4]}</strong>`],
+                  b.period === "month" ? "Лимит в месяц" : "Лимит в день",
+                  formatUnits(limit),
                 ],
-              )}<div class="progress ${i <= 1 ? "warn" : ""}"><span style="width:${b[5]}%"></span></div><p class="label muted">Сброс 1 ноября · 00:00 UTC</p>${btn("Изменить", "budget", "", `data-budget="${i}"`)}</div></section>`,
-          )
+                ["Учтено", b.charged.replace(".", ",")],
+                ["Резерв", b.reserved.replace(".", ",")],
+                ["Доступно", formatUnits(remaining > 0n ? remaining : 0n)],
+              ],
+            )}<div class="progress ${tone}"><span style="width:${Math.min(100, pct)}%"></span></div><p class="label muted">${b.period === "month" ? "Сброс 1 ноября" : "Сброс 9 октября"} · 00:00 UTC</p>${btn("Изменить", "budget", "", `data-budget="${i}"`)}</div></section>`;
+          })
           .join(
             "",
-          )}</div>${callout("Порог достигнут для CI тестов", "Учтённые расходы и резерв используют 83% лимита. Новые запросы разрешены в доступном остатке.", "warn")}${panel(
-          "Правила предупреждений",
-          kv([
-            ["Первый порог", "80% · одно уведомление за период"],
-            ["Второй порог", "95% · одно уведомление за период"],
-            ["Жёсткий лимит", "Отказ до внешнего вызова"],
-            ["Неизвестный исход", "Резерв удерживается до подтверждения"],
-          ]),
-        )}`;
+          )}</div>${callout("Расходы и резерв учитываются вместе", "Порог предупреждает один раз за период. Жёсткий лимит проверяется до внешнего вызова.", "neutral")}`;
       }
       function clientsPage() {
         return `${tablePanel(
@@ -2921,13 +3335,14 @@
             "Действие",
           ],
           clients.map((c) => [
-            `<strong>${c[1]}</strong><span class="muted mono">${c[0]}</span>`,
+            `<strong>${esc(c[1])}</strong><span class="muted mono">${esc(c[0])}</span>`,
             c[2],
             `<span class="mono">${c[3]}</span>`,
             c[4],
             c[5],
-            badge(c[6], "good"),
-            btn("Доступ", "client-access", "", `data-client="${c[0]}"`),
+            badge(c[6], c[6] === "Активен" ? "good" : "neutral"),
+            btn("Доступ", "client-access", "", `data-client="${esc(c[0])}"`) +
+              btn("Ключи", "client-keys", "", `data-client="${esc(c[0])}"`),
           ]),
         )}${callout("Ключ приложения — не ключ провайдера", "Приложение получает доступ только к разрешённым профилям и собственным запросам. Секрет провайдера ему не передаётся.", "neutral")}`;
       }
@@ -2938,11 +3353,23 @@
             ["Coding smoke", "v3 · 24 случая"],
             ["JSON & tools", "v2 · 12 случаев"],
             ["Dataset hash", "Зафиксирован в запуске"],
+            ...previewDatasets.map((d) => [
+              esc(d.name),
+              "v1 · " + d.cases.length + " случаев",
+            ]),
           ])}<div class="flex wrap">${btn("Добавить набор", "dataset")}${btn("Открыть состав", "dataset-view")}</div></div>`,
         )}${panel("Закреплённое сравнение", `<p class="muted">Одинаковые случаи, версии профилей и параметры. Без fallback и cache; фактическая модель должна быть подтверждена.</p><div class="flex wrap" style="margin-top:16px">${badge("Один deployment", "neutral")}${badge("Цена каждого вызова", "neutral")}</div>`)}</div>${tablePanel(
           "Запуски",
           ["Запуск", "Dataset", "Профили", "Результат", "Стоимость", "Когда"],
           [
+            ...previewRuns.map((r) => [
+              link("/evaluations/" + r.id, r.name),
+              esc(r.dataset),
+              esc(r.profiles),
+              badge(r.cancelled ? "Отменён" : "В очереди", "neutral"),
+              "Неизвестно",
+              "В этой сессии",
+            ]),
             [
               link("/evaluations/run-24", "Coding smoke · сравнение 24"),
               "Coding smoke v3",
@@ -2964,6 +3391,32 @@
         )}`;
       }
       function evaluationDetail() {
+        const newRun = previewRuns.find((r) => r.id === id());
+        if (newRun)
+          return panel(
+            "Новый запуск",
+            kv([
+              ["Набор", esc(newRun.dataset)],
+              ["Версии профилей", esc(newRun.profiles)],
+              ["Повторы", newRun.repetitions],
+              ["Параллельность", newRun.concurrency],
+              [
+                "Статус",
+                badge(newRun.cancelled ? "Отменён" : "В очереди", "neutral"),
+              ],
+              ["Результат", "Ещё не получен"],
+              [
+                "Стоимость",
+                "Неизвестно · внешние вызовы макетом не выполняются",
+              ],
+            ]) +
+              btn(
+                "Остановить",
+                "cancel-evaluation",
+                "danger",
+                newRun.cancelled ? "disabled" : "",
+              ),
+          );
         const partial = id() === "run-25",
           total = partial ? 12 : 24,
           passed = partial ? 10 : 21,
@@ -3245,10 +3698,11 @@
           providers: sources.map((x) => x[0]),
           models: profiles.map((x) => x.id),
           requests: requests.map((x) => x[0]),
-          evaluations: ["run-24", "run-25"],
+          evaluations: ["run-24", "run-25", ...previewRuns.map((r) => r.id)],
         };
         const missing =
-          current[0].includes(":") && !entitySets[current[2]].includes(id());
+          current[0] === "/not-found" ||
+          (current[0].includes(":") && !entitySets[current[2]].includes(id()));
         document.querySelector("#desktop-nav").innerHTML = nav();
         document.querySelector("#mobile-nav").innerHTML = nav();
         let title = current[1];
@@ -3258,9 +3712,10 @@
         if (current[0] === "/requests/:id") title = "Запрос req_" + id();
         if (current[0] === "/evaluations/:id")
           title =
-            id() === "run-25"
+            previewRuns.find((r) => r.id === id())?.name ||
+            (id() === "run-25"
               ? "JSON & tools · сравнение 25"
-              : "Coding smoke · сравнение 24";
+              : "Coding smoke · сравнение 24");
         const body = missing
           ? stateBody("not_found")
           : ["empty", "error", "forbidden", "not_found", "loading"].includes(
@@ -3304,6 +3759,7 @@
           const el = document.getElementById(key);
           if (el) el.value = value;
         }
+        applyListFilters();
         if (activeProfile && document.querySelector("#model-form")) {
           for (const [key, value] of Object.entries(
             draftValues[activeProfile.id] || {},
@@ -3396,6 +3852,18 @@
         const inputs = [...container.querySelectorAll("input,select,textarea")];
         let ok = true;
         for (const e of inputs) {
+          if (e.type === "text") e.value = e.value.trim();
+          if (
+            [
+              "price-input",
+              "price-output",
+              "price-cached",
+              "budget-limit",
+              "sub-amount",
+              "price-fee",
+            ].includes(e.id)
+          )
+            e.value = e.value.trim().replace(",", ".");
           if (["price-input", "price-output", "price-cached"].includes(e.id))
             e.pattern = "(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?";
           if (["budget-limit", "sub-amount", "price-fee"].includes(e.id))
@@ -3403,8 +3871,8 @@
           const invalid = !e.checkValidity();
           e.setAttribute("aria-invalid", String(invalid));
           if (invalid) {
+            if (ok) e.focus();
             ok = false;
-            e.focus();
           }
         }
         const errorBox = container.querySelector("#dialog-error");
@@ -3472,22 +3940,32 @@
           case "services":
             dialog(
               "Сервисы платформы",
-              '<p class="muted">AI Hub выбран. В продукте список приходит из безопасного каталога Admin.</p>' +
+              '<div class="stack-tight">' +
                 [
-                  "AI Hub",
-                  "Fleet Control",
-                  "Forge CI/CD",
-                  "Task Tracker",
-                  "Wiki",
+                  ["AI Hub", true],
+                  ["Fleet Control", false],
+                  ["Forge CI/CD", false],
+                  ["Task Tracker", false],
+                  ["Wiki", false],
                 ]
-                  .map((x) => btn(x, "service-demo"))
-                  .join(""),
+                  .map(([name, selected]) =>
+                    btn(
+                      name + (selected ? " · текущий сервис" : ""),
+                      "service-demo",
+                      "",
+                      selected
+                        ? 'disabled aria-current="true"'
+                        : `data-service="${name}"`,
+                    ),
+                  )
+                  .join("") +
+                "</div>",
             );
             break;
           case "service-demo":
-            closeModal();
-            toast(
-              "Макет показывает только AI Hub. Переход к сервису описан в Base integration.",
+            dialog(
+              button.dataset.service,
+              "<p>Экран этого сервиса не входит в макет AI Hub.</p>",
             );
             break;
           case "logout":
@@ -3509,6 +3987,7 @@
             break;
           case "connection":
           case "edit-connection":
+            editingConnection = action === "edit-connection" ? id() : null;
             dataForm(
               action === "connection"
                 ? "Подключить провайдера"
@@ -3519,7 +3998,9 @@
                   "Название",
                   input(
                     "connection-name",
-                    "Мой API",
+                    editingConnection
+                      ? sources.find((p) => p[0] === editingConnection)[1]
+                      : "",
                     "text",
                     'required maxlength="120"',
                   ),
@@ -3567,26 +4048,59 @@
               ],
               "save-connection",
             );
+            if (editingConnection)
+              for (const [field, key] of [
+                ["provider-kind", "kind"],
+                ["endpoint-ref", "endpoint"],
+                ["billing-mode", "billing"],
+              ])
+                document.getElementById(field).value =
+                  connectionMeta[editingConnection][key];
+            if (editingConnection)
+              document.querySelector("#provider-kind").disabled = true;
             break;
           case "save-connection":
             if (validateFields(modal)) {
               const display = document.querySelector("#connection-name").value;
-              const newId = "connection-" + (sources.length + 1);
-              sources.push([
-                newId,
-                display,
-                "API",
-                "model-a",
-                "Не проверен",
-                "neutral",
-                "Не проверено",
-                "Нет данных",
-              ]);
+              const newId =
+                editingConnection || "connection-" + (sources.length + 1);
+              const kind = document.querySelector("#provider-kind").value;
+              const meta = {
+                kind,
+                endpoint: document.querySelector("#endpoint-ref").value,
+                billing: document.querySelector("#billing-mode").value,
+              };
+              if (editingConnection) {
+                const record = sources.find((p) => p[0] === editingConnection),
+                  previous = connectionMeta[editingConnection];
+                record[1] = display;
+                if (
+                  previous.endpoint !== meta.endpoint ||
+                  previous.billing !== meta.billing
+                ) {
+                  record[4] = "Нужна проверка";
+                  record[5] = "warn";
+                }
+              } else
+                sources.push([
+                  newId,
+                  display,
+                  kind.toUpperCase(),
+                  "Не выбран",
+                  "Не проверен",
+                  "neutral",
+                  "Не проверено",
+                  "Нет данных",
+                ]);
+              connectionMeta[newId] = meta;
               closeModal();
               scene = "ready";
               location.hash = "/providers/" + newId;
+              render();
               toast(
-                "Черновик подключения создан. Авторизация и проверка — отдельные действия.",
+                editingConnection
+                  ? "Подключение обновлено в макете."
+                  : "Подключение создано. Добавьте авторизацию и проверьте модель.",
               );
             }
             break;
@@ -3602,7 +4116,13 @@
           case "save-credential":
             if (validateFields(modal)) {
               document.querySelector("#credential").value = "";
+              {
+                const p = sources.find((p) => p[0] === id());
+                p[4] = "Нужна проверка";
+                p[5] = "warn";
+              }
               closeModal();
+              render();
               toast(
                 "В макете ключ не сохраняется. Новый generation требует новой проверки.",
               );
@@ -3621,7 +4141,13 @@
             );
             break;
           case "login-success":
+            {
+              const p = sources.find((p) => p[0] === id());
+              p[4] = "Авторизован · нужна проверка";
+              p[5] = "warn";
+            }
             closeModal();
+            render();
             toast(
               "Состояние макета: вход завершён. Каталог ещё не является проверкой модели.",
             );
@@ -3634,14 +4160,21 @@
                 ["Модель", "model-a"],
                 ["Проверки", "Текст, stream, tools, JSON Schema"],
                 ["Лимит проверки", "До 0,05 USD"],
-                ["Budget policy", "Установка · USD"],
+                ["Бюджет", "Установка · USD"],
               ])}<p class="muted">Все вызовы проверки должны быть учтены. Профиль пока не активируется.</p></div>`,
               btn("Отмена", "close-modal") +
                 btn("Проверить в макете", "provider-proof", "primary"),
             );
             break;
           case "provider-proof":
+            {
+              const p = sources.find((p) => p[0] === id());
+              p[4] = "Проверен";
+              p[5] = "good";
+              if (p[3] === "Не выбран") p[3] = "model-a";
+            }
             closeModal();
+            render();
             toast(
               "Синтетическая проверка завершена: capabilities подтверждены для exact model/generation.",
             );
@@ -3670,7 +4203,13 @@
             );
             break;
           case "confirm-disable":
+            {
+              const p = sources.find((p) => p[0] === id());
+              p[4] = "Отключён";
+              p[5] = "neutral";
+            }
             closeModal();
+            render();
             toast("Синтетическое подключение отключено. История сохранена.");
             break;
           case "new-profile":
@@ -3781,6 +4320,7 @@
               break;
             }
             activeProfile.name = document.querySelector("#display-name").value;
+            activeProfile.model = profileRoutes[activeProfile.id][0].model;
             activeProfile.mode = document.querySelector("#model-mode").value;
             dirty = false;
             toast("Черновик сохранён. Публикация не выполнялась.");
@@ -3792,6 +4332,22 @@
             break;
           }
           case "verify-profile":
+            {
+              const f = document.querySelector("#model-form");
+              if (
+                !validateFields(f) ||
+                Number(document.querySelector("#input-limit").value) +
+                  Number(document.querySelector("#output-limit").value) >
+                  Number(document.querySelector("#context-limit").value)
+              ) {
+                document.querySelector("#model-validation").innerHTML = callout(
+                  "Проверьте параметры",
+                  "Заполните поля. Сумма входного лимита и ответа не должна превышать общий контекст.",
+                  "bad",
+                );
+                break;
+              }
+            }
             dialog(
               "Проверить точный черновик",
               kv([
@@ -3803,7 +4359,7 @@
                     ? "Один deployment"
                     : "Каждый выбранный deployment",
                 ],
-                ["Budget policy", "Установка · USD"],
+                ["Бюджет", "Установка · USD"],
                 ["Потолок проверки", "0,05 USD"],
               ]),
               btn("Отмена", "close-modal") +
@@ -3813,7 +4369,7 @@
           case "profile-proof":
             verified = true;
             activeProfile.verified = true;
-            dirty = false;
+            profileRoutes[activeProfile.id].forEach((r) => (r.checked = true));
             closeModal();
             document.querySelector("#proof-badge").innerHTML = badge(
               "Точный черновик проверен",
@@ -3843,32 +4399,22 @@
             toast("Активная версия переключена в синтетическом состоянии.");
             break;
           case "revisions":
-            if (!activeProfile?.rev) {
-              dialog(
-                "История версий",
-                "<p>Профиль ещё не опубликован. Черновик можно сохранить до проверки.</p>",
-              );
-              break;
-            }
             dialog(
               "История версий",
-              table(
-                ["Версия", "Состояние", "Изменение"],
-                [
-                  ["r12", badge("Активная", "good"), "model-a → model-b"],
-                  ["r11", "Предыдущая", "Уточнены bounds"],
-                  ["r10", "История", "Начальная версия"],
-                ],
-                "История версий",
-              ),
-              btn("Закрыть", "close-modal") +
-                btn("Откатить на r11", "rollback", "danger"),
-            );
-            break;
-          case "rollback":
-            closeModal();
-            toast(
-              "Макет rollback: active pointer r11. Начатые запросы и ledger не изменяются.",
+              activeProfile?.rev
+                ? table(
+                    ["Версия", "Состояние", "Профиль"],
+                    [
+                      [
+                        "r" + activeProfile.rev,
+                        badge("Активная", "good"),
+                        esc(activeProfile.id),
+                      ],
+                    ],
+                    "История версий",
+                  ) +
+                    '<p class="modal-note">Исторические снимки конфигурации в макете не представлены. Откат доступен после их загрузки в приложении.</p>'
+                : "<p>Профиль ещё не опубликован.</p>",
             );
             break;
           case "add-deployment":
@@ -3888,7 +4434,7 @@
                     "reserve-provider",
                     [
                       ["ollama", "Ollama · generation 3"],
-                      ["api", "API · generation 3"],
+                      ["api-a", "API · поколение 3"],
                     ],
                     "ollama",
                   ),
@@ -3896,44 +4442,45 @@
                 field(
                   "reserve-model",
                   "Модель",
-                  select(
-                    "reserve-model",
-                    [
-                      ["model-b", "model-b"],
-                      ["model-a", "model-a"],
-                    ],
-                    "model-b",
-                  ),
+                  select("reserve-model", modelOptions("ollama"), "model-b"),
                 ),
               ],
               "add-reserve",
             );
             break;
-          case "add-reserve":
+          case "add-reserve": {
+            const provider = document.querySelector("#reserve-provider").value,
+              model = document.querySelector("#reserve-model").value;
+            const rows = profileRoutes[activeProfile.id];
+            if (
+              rows.some((r) => r.provider === provider && r.model === model)
+            ) {
+              document.querySelector("#dialog-error").textContent =
+                "Этот маршрут уже есть в профиле.";
+              break;
+            }
+            rows.push({ provider, model, checked: false });
             closeModal();
-            document
-              .querySelector("#deployment-list")
-              .insertAdjacentHTML(
-                "beforeend",
-                `<div class="deployment"><span class="order">3</span><div class="grow"><strong>Ollama</strong><p class="mono muted">model-b · generation 3</p></div>${badge("Не проверен", "warn")}</div>`,
-              );
             updateProof();
+            render();
             toast("Резерв добавлен в черновик.");
             break;
+          }
           case "edit-deployment":
+            editingDeployment = Number(button.dataset.index);
             dataForm(
-              "Изменить deployment",
+              "Изменить модель маршрута",
               [
                 field(
                   "deployment-model",
                   "Модель",
                   select(
                     "deployment-model",
-                    [
-                      ["model-a", "model-a"],
-                      ["model-b", "model-b"],
-                    ],
-                    "model-a",
+                    modelOptions(
+                      profileRoutes[activeProfile.id][editingDeployment]
+                        .provider,
+                    ),
+                    profileRoutes[activeProfile.id][editingDeployment].model,
                   ),
                 ),
               ],
@@ -3941,25 +4488,38 @@
             );
             break;
           case "deployment-save":
+            profileRoutes[activeProfile.id][editingDeployment].model =
+              document.querySelector("#deployment-model").value;
+            profileRoutes[activeProfile.id][editingDeployment].checked = false;
             closeModal();
             updateProof();
-            toast("Изменение deployment инвалидирует старый proof.");
+            render();
+            toast("Маршрут изменён. Проверьте новый черновик.");
             break;
           case "move-deployment": {
-            const rows = document.querySelector("#deployment-list");
-            rows.insertBefore(rows.children[1], rows.children[0]);
-            [...rows.children].forEach(
-              (r, i) => (r.querySelector(".order").textContent = i + 1),
-            );
+            const rows = profileRoutes[activeProfile.id],
+              i = Number(button.dataset.index);
+            [rows[i - 1], rows[i]] = [rows[i], rows[i - 1]];
             updateProof();
+            render();
             break;
           }
           case "copy-request":
-          case "copy-settings":
-            toast(
-              "Сведения макета подготовлены. В продукте копируется только безопасная metadata.",
-            );
+          case "copy-settings": {
+            const text =
+              action === "copy-request"
+                ? "req_" + id()
+                : "AI Hub · демонстрационное окружение hub-demo · лимит 20";
+            navigator.clipboard
+              .writeText(text)
+              .then(() => toast("Скопировано в буфер обмена."))
+              .catch(() =>
+                toast(
+                  "Буфер обмена недоступен. Выделите и скопируйте текст вручную.",
+                ),
+              );
             break;
+          }
           case "recover-result":
             dialog(
               "Восстановление результата",
@@ -3989,9 +4549,11 @@
             );
             break;
           case "cancel-confirm":
+            requestCancellations.add(id());
             closeModal();
+            render();
             toast(
-              "Cancel_requested в макете. Unknown billing reserve не освобождён.",
+              "Отмена запрошена. Исход попытки остаётся неизвестным, резерв удерживается.",
             );
             break;
           case "export":
@@ -4021,15 +4583,58 @@
                 ),
               ],
               "export-confirm",
-              "Подготовить экспорт",
+              "Скачать пример",
             );
             break;
-          case "export-confirm":
+          case "export-confirm": {
+            const format = document.querySelector("#export-format").value;
+            const columns = [
+              ...document.querySelectorAll("#main table th"),
+            ].map((el) => el.textContent);
+            const rows = [...document.querySelectorAll("#main table tbody tr")]
+              .filter((el) => !el.hidden)
+              .map((el) =>
+                [...el.querySelectorAll("td")].map((td) =>
+                  td.textContent.trim(),
+                ),
+              );
+            const snapshot = {
+              kind: "prototype",
+              synthetic: true,
+              as_of: "2026-10-08T13:30:00Z",
+              route: location.hash,
+              filters: filterValues,
+              columns,
+              rows,
+            };
+            const quote = (value) =>
+              '"' +
+              (/^[=+@-]/.test(value) ? "'" : "") +
+              value.replaceAll('"', '""') +
+              '"';
+            const content =
+              format === "json"
+                ? JSON.stringify(snapshot, null, 2)
+                : [columns, ...rows]
+                    .map((row) => row.map(quote).join(","))
+                    .join("\r\n");
+            const url = URL.createObjectURL(
+              new Blob([content], {
+                type:
+                  format === "json"
+                    ? "application/json"
+                    : "text/csv;charset=utf-8",
+              }),
+            );
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "ai-hub-demo." + format;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
             closeModal();
-            toast(
-              "Экспорт макета подготовлен: snapshot, UTC, currency, confidence и null сохранены.",
-            );
+            toast("Скачан пример с видимыми строками и выбранными фильтрами.");
             break;
+          }
           case "price":
             dataForm(
               "Новая версия тарифа",
@@ -4169,12 +4774,12 @@
                 ),
                 field(
                   "sub-end",
-                  "Конец периода, exclusive",
+                  "Конец периода, не включая дату",
                   input("sub-end", "2026-11-01", "date", "required"),
                 ),
                 field(
                   "sub-receipt",
-                  "Receipt reference",
+                  "Ссылка на подтверждение",
                   input(
                     "sub-receipt",
                     "",
@@ -4197,7 +4802,7 @@
                 ),
                 field(
                   "receipt-ref",
-                  "Trusted receipt reference",
+                  "Ссылка на доверенное подтверждение",
                   input("receipt-ref", "", "text", "required"),
                 ),
                 field(
@@ -4210,6 +4815,10 @@
             );
             break;
           case "budget":
+            editingBudget =
+              button.dataset.budget === undefined
+                ? null
+                : Number(button.dataset.budget);
             dataForm(
               "Бюджет",
               [
@@ -4229,7 +4838,7 @@
                 ),
                 field(
                   "budget-target",
-                  "Объект scope",
+                  "Объект бюджета",
                   select(
                     "budget-target",
                     [
@@ -4298,9 +4907,32 @@
               ],
               "save-generic",
             );
+            if (editingBudget !== null) {
+              const b = budgetRecords[editingBudget];
+              for (const [key, value] of [
+                ["budget-scope", b.scope],
+                ["budget-currency", b.currency],
+                ["budget-limit", b.limit],
+                ["budget-period", b.period],
+                ["warn-first", b.first],
+                ["warn-second", b.second],
+              ])
+                document.getElementById(key).value = value;
+              refreshBudgetTarget();
+              document.querySelector("#budget-target").value = b.target;
+              for (const key of [
+                "budget-scope",
+                "budget-target",
+                "budget-currency",
+                "budget-period",
+              ])
+                document.getElementById(key).disabled = true;
+            } else refreshBudgetTarget();
             break;
           case "client":
           case "client-access":
+            editingClient =
+              action === "client-access" ? button.dataset.client : null;
             dataForm(
               action === "client" ? "Добавить приложение" : "Доступ приложения",
               [
@@ -4309,7 +4941,7 @@
                   "Имя приложения",
                   input(
                     "application-key",
-                    button.dataset.client || "my-app",
+                    editingClient || "",
                     "text",
                     "required",
                   ),
@@ -4370,7 +5002,7 @@
                 ),
                 field(
                   "client-cost",
-                  "Cost policy",
+                  "Политика расходов",
                   select(
                     "client-cost",
                     [
@@ -4384,31 +5016,88 @@
               ],
               "client-save",
             );
+            if (editingClient) {
+              const c = clients.find((c) => c[0] === editingClient),
+                m = clientMeta[editingClient] || {};
+              document.querySelector("#application-key").disabled = true;
+              document.querySelector("#client-project").value =
+                c[2] === "Тестирование" ? "testing" : "platform";
+              document.querySelector("#client-profile").value = c[3];
+              for (const [key, value] of Object.entries(m)) {
+                const el = document.getElementById(key);
+                if (el) {
+                  if (el.type === "checkbox") el.checked = value;
+                  else el.value = value;
+                }
+              }
+            }
             break;
           case "client-save":
             if (validateFields(modal)) {
-              closeModal();
-              toast(
-                "Права сохранены в макете. Ключ выдаётся отдельным явным действием.",
+              const key = document
+                .querySelector("#application-key")
+                .value.trim();
+              if (!editingClient && clients.some((c) => c[0] === key)) {
+                document.querySelector("#dialog-error").textContent =
+                  "Приложение с таким именем уже существует.";
+                break;
+              }
+              if (
+                !document.querySelector("#client-infer").checked &&
+                !document.querySelector("#client-usage").checked &&
+                !document.querySelector("#client-result").checked
+              ) {
+                document.querySelector("#dialog-error").textContent =
+                  "Выберите хотя бы одно право доступа.";
+                break;
+              }
+              const c = editingClient
+                ? clients.find((c) => c[0] === editingClient)
+                : [key, key, "", "", "0", "0,00 $", "Без ключа"];
+              c[2] =
+                document.querySelector(
+                  "#client-project",
+                ).selectedOptions[0].text;
+              c[3] = document.querySelector("#client-profile").value;
+              clientMeta[key] = Object.fromEntries(
+                [...modal.querySelectorAll("[id^='client-']")].map((el) => [
+                  el.id,
+                  el.type === "checkbox" ? el.checked : el.value,
+                ]),
               );
-              dialog(
-                "Ключи приложения",
-                '<p>Ключ приложения показывается один раз. В дизайне используется заведомо нерабочее значение.</p><div class="callout neutral">Новый ключ ещё не выдавался.</div><p class="modal-note">Повтор не создаёт второй ключ. Для утраченного ответа нужна explicit rotation.</p>',
-                btn("Закрыть", "close-modal") +
-                  btn("Выдать новый ключ", "issue-client-key", "primary") +
-                  btn("Отозвать ключ", "client-revoke", "danger"),
+              if (!editingClient) clients.push(c);
+              closeModal();
+              scene = "ready";
+              render();
+              toast(
+                "Доступ приложения сохранён в макете. Ключ выдаётся отдельно.",
               );
             }
             break;
+          case "client-keys":
+            editingClient = button.dataset.client;
+            dialog(
+              "Ключи приложения · " +
+                esc(clients.find((c) => c[0] === editingClient)[1]),
+              "<p>Синтетический ключ показывается только при выдаче.</p>",
+              btn("Закрыть", "close-modal") +
+                btn("Выдать новый ключ", "issue-client-key", "primary") +
+                btn("Отозвать ключ", "client-revoke", "danger"),
+            );
+            break;
           case "issue-client-key":
+            clients.find((c) => c[0] === editingClient)[6] = "Активен";
             closeModal();
+            render();
             dialog(
               "Однократная выдача ключа",
               '<p>Синтетическое значение: <code>DEMO-NOT-A-REAL-KEY</code></p><p class="muted">Показан только после явной операции issueClientKey. Не provider credential.</p>',
             );
             break;
           case "client-revoke":
+            clients.find((c) => c[0] === editingClient)[6] = "Ключ отозван";
             closeModal();
+            render();
             toast("Синтетический ключ отозван. Новые admissions запрещены.");
             break;
           case "dataset":
@@ -4440,17 +5129,59 @@
             break;
           case "dataset-save":
             try {
-              JSON.parse(document.querySelector("#dataset-content").value);
+              if (!validateFields(modal)) break;
+              const cases = JSON.parse(
+                document.querySelector("#dataset-content").value,
+              );
+              if (
+                !Array.isArray(cases) ||
+                !cases.length ||
+                cases.some(
+                  (c) =>
+                    !c ||
+                    typeof c.case_id !== "string" ||
+                    !c.case_id.trim() ||
+                    typeof c.input !== "string" ||
+                    !["exact_match", "json_schema", "function_args"].includes(
+                      c.assertion_kind,
+                    ) ||
+                    !("expected" in c),
+                ) ||
+                new Set(cases.map((c) => c.case_id)).size !== cases.length
+              )
+                throw Error("Invalid cases");
+              previewDatasets.push({
+                id: "dataset-" + (previewDatasets.length + 1),
+                name: document.querySelector("#dataset-name").value,
+                cases,
+              });
               closeModal();
+              render();
               toast(
                 "Версия dataset макета сохранена. Рабочие conversations не импортировались.",
               );
             } catch {
               document.querySelector("#dialog-error").textContent =
-                "Не удалось прочитать JSON. Черновик сохранён в форме.";
+                "Нужен непустой JSON-массив случаев с уникальными case_id, input, assertion_kind и expected. Черновик сохранён.";
             }
             break;
           case "dataset-view":
+            if (previewDatasets.length) {
+              const d = previewDatasets.at(-1);
+              dialog(
+                esc(d.name) + " · v1",
+                table(
+                  ["Случай", "Проверка", "Ожидание"],
+                  d.cases.map((c) => [
+                    esc(c.case_id),
+                    esc(c.assertion_kind),
+                    esc(JSON.stringify(c.expected)),
+                  ]),
+                  "Набор тестов",
+                ),
+              );
+              break;
+            }
             dialog(
               "Coding smoke · v3",
               table(
@@ -4476,6 +5207,10 @@
                     [
                       ["coding", "Coding smoke v3 · 24 случая"],
                       ["json", "JSON & tools v2 · 12 случаев"],
+                      ...previewDatasets.map((d) => [
+                        d.id,
+                        d.name + " v1 · " + d.cases.length + " случаев",
+                      ]),
                     ],
                     "coding",
                   ),
@@ -4514,7 +5249,7 @@
                 ),
                 field(
                   "eval-budget",
-                  "Budget policy",
+                  "Бюджет",
                   select(
                     "eval-budget",
                     [["ci", "CI тесты · доступно 1,75 USD"]],
@@ -4540,9 +5275,23 @@
             break;
           case "start-evaluation":
             if (validateFields(modal)) {
+              const run = {
+                id: "run-" + (26 + previewRuns.length),
+                name: "Новое сравнение · " + (26 + previewRuns.length),
+                dataset:
+                  document.querySelector("#eval-dataset").selectedOptions[0]
+                    .text,
+                profiles:
+                  document.querySelector("#eval-profile").selectedOptions[0]
+                    .text,
+                repetitions: document.querySelector("#eval-repetitions").value,
+                concurrency: document.querySelector("#eval-concurrency").value,
+                cancelled: false,
+              };
+              previewRuns.push(run);
               closeModal();
               scene = "ready";
-              location.hash = "/evaluations/run-24";
+              location.hash = "/evaluations/" + run.id;
               toast(
                 "Создан новый синтетический запуск. Frozen dataset/revisions и расходы фиксируются.",
               );
@@ -4562,7 +5311,12 @@
             );
             break;
           case "cancel-evaluation":
+            {
+              const run = previewRuns.find((r) => r.id === id());
+              if (run) run.cancelled = true;
+            }
             closeModal();
+            render();
             toast(
               "Новые cases остановлены. Начатые calls и расходы сохраняются.",
             );
@@ -4581,9 +5335,70 @@
                 end.setAttribute("aria-invalid", "true");
                 return;
               }
+              const value = (id) => document.getElementById(id)?.value || "";
+              if (document.getElementById("budget-limit")) {
+                if (
+                  Number(value("warn-first")) >= Number(value("warn-second"))
+                ) {
+                  document.querySelector("#dialog-error").textContent =
+                    "Первый порог должен быть меньше второго.";
+                  return;
+                }
+                const old =
+                  editingBudget === null ? null : budgetRecords[editingBudget];
+                const target = document.querySelector("#budget-target");
+                const record = {
+                  scope: value("budget-scope"),
+                  target: target.value,
+                  name: target.selectedOptions[0].text,
+                  currency: value("budget-currency"),
+                  period: value("budget-period"),
+                  limit: value("budget-limit"),
+                  charged: old?.charged || "0.00",
+                  reserved: old?.reserved || "0.00",
+                  first: Number(value("warn-first")),
+                  second: Number(value("warn-second")),
+                };
+                if (
+                  !old &&
+                  budgetRecords.some(
+                    (b) =>
+                      b.scope === record.scope &&
+                      b.target === record.target &&
+                      b.currency === record.currency,
+                  )
+                ) {
+                  document.querySelector("#dialog-error").textContent =
+                    "Для этой области и валюты бюджет уже существует. Измените его карточку.";
+                  return;
+                }
+                if (old) budgetRecords[editingBudget] = record;
+                else budgetRecords.push(record);
+              } else {
+                const kind = document.getElementById("price-model")
+                  ? "prices"
+                  : document.getElementById("sub-amount")
+                    ? "subscriptions"
+                    : "ledger";
+                const fields = [...modal.querySelectorAll("input,select")].map(
+                  (el) =>
+                    (modal.querySelector(`label[for="${el.id}"]`)
+                      ?.textContent || el.id) +
+                    ": " +
+                    (el.tagName === "SELECT"
+                      ? el.selectedOptions[0].text
+                      : el.value),
+                );
+                previewChanges.push({
+                  kind,
+                  name: document.querySelector("#modal-title").textContent,
+                  summary: fields.join(" · "),
+                });
+              }
               closeModal();
+              render();
               toast(
-                "Изменение макета сохранено. Реальная запись требует server validation, CAS и audit.",
+                "Запись сохранена в макете. Исторические расходы не изменены.",
               );
             }
             break;
@@ -4644,6 +5459,13 @@
           document.documentElement.dataset.theme = theme;
           document.querySelector("#account-menu").hidden = true;
         }
+        if (e.target.id === "reserve-provider")
+          document.querySelector("#reserve-model").innerHTML = modelOptions(
+            e.target.value,
+          )
+            .map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`)
+            .join("");
+        if (e.target.id === "budget-scope") refreshBudgetTarget();
         if (e.target.id === "model-mode") {
           document.querySelector("#deployment-list").innerHTML = deployments(
             e.target.value,
@@ -4670,37 +5492,61 @@
           const url = new URL(location.href);
           url.searchParams.set(e.target.id, e.target.value);
           history.replaceState(null, "", url);
-          if (e.target.id === "request-status" && current[0] === "/requests") {
-            const status = e.target.value;
-            document
-              .querySelectorAll("#main tbody tr")
-              .forEach(
-                (row) =>
-                  (row.hidden =
-                    status === "unknown"
-                      ? !row.textContent.includes("Исход неизвестен")
-                      : status === "failed"
-                        ? !row.textContent.includes("Ошибка")
-                        : false),
-              );
-          } else {
-            render();
-            toast(
-              "Выбран scope: " +
-                e.target.options[e.target.selectedIndex].text +
-                ". Валюта изменяет суммы, не конвертирует ledger.",
-            );
-          }
+          render();
         }
       });
       document.addEventListener("input", (e) => {
         if (e.target.closest("#model-form")) updateProof();
+        if (e.target.id === "audit-query") {
+          filterValues["audit-query"] = e.target.value;
+          applyListFilters();
+        }
       });
       document.addEventListener("keydown", (e) => {
+        if (
+          e.key === "Enter" &&
+          e.target.closest("#dialog-form") &&
+          e.target.tagName === "INPUT"
+        ) {
+          const submit = modal.querySelector(".modal-actions .primary");
+          if (submit && !submit.disabled) {
+            e.preventDefault();
+            handleAction(submit.dataset.action, submit);
+            return;
+          }
+        }
         if (e.key === "Escape")
           document.querySelector("#account-menu").hidden = true;
+        const tab = e.target.closest('[role="tab"]');
+        if (tab && ["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) {
+          e.preventDefault();
+          const tabs = [...tab.parentElement.querySelectorAll('[role="tab"]')],
+            i = tabs.indexOf(tab);
+          const next =
+            e.key === "Home"
+              ? tabs[0]
+              : e.key === "End"
+                ? tabs.at(-1)
+                : tabs[
+                    (i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) %
+                      tabs.length
+                  ];
+          tabChoice[next.dataset.tab] = next.dataset.value;
+          const selector = `[data-tab="${next.dataset.tab}"][data-value="${next.dataset.value}"]`;
+          render();
+          document.querySelector(selector).focus();
+        }
       });
-      document.addEventListener("submit", (e) => e.preventDefault());
+      document.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const submit = e.target.querySelector(".modal-actions .primary");
+        if (submit && !submit.disabled)
+          handleAction(submit.dataset.action, submit);
+      });
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest('#account-menu,[data-action="account"]'))
+          document.querySelector("#account-menu").hidden = true;
+      });
       window.addEventListener("hashchange", () => {
         dirty = false;
         render();
