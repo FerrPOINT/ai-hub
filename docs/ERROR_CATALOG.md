@@ -30,3 +30,9 @@ SSE после первого content/tool fragment: safe protocol failure/close
 request ID и unknown/cancel status; no false finish_reason=stop/completed.
 Cancellation подтверждается adapter; cost unknown может остаться после terminal cancel.
 Notifications дают user action, не автоматическую credential/budget policy смену.
+
+| Код / HTTP                 | Boundary                     | Feedback                                            | Правило                                                  |
+| -------------------------- | ---------------------------- | --------------------------------------------------- | -------------------------------------------------------- |
+| currency_unqualified /422  | Account currency evidence    | Валюта расходов не подтверждена                     | No guessed currency/FX; deny before I/O                  |
+| tariff_state_conflict /409 | Cancellation/activation time | Расписание уже началось, отменено или время занято  | No historical mutation; original key replays its witness |
+| scorer_invalid /422        | Dataset/scorer suite         | Некорректная assertion/schema или unsupported suite | Reject before dataset storage/run admission; keep draft  |

@@ -56,3 +56,5 @@ input; OpenAI Responses streaming — typed SSE. Mapping сверяется с e
 ## Pricing sources
 
 OpenRouter explicit preset поддерживает qualified automatic catalog pricing и terminal usage.cost / generation readback. Ollama Online/ChatGPT по подписке получают manual per-million rates как allocation; это не API list price или confirmed cash. [PROJECT_TARIFFS](PROJECT_TARIFFS.md) хранит official source/date и unknown rules.
+
+Billing currency квалифицируется отдельно от per-token price по exact account statement/receipt witness. Unconfigured rates не означают unknown currency разрешена; currency_unqualified отвергается до inference. Caller metadata и provider display name не источник валюты.

@@ -77,3 +77,13 @@ multi-currency и concurrency across processes.
 
 Все TC остаются actual-app not_run до реализации. Prototype runner и offline
 signature vectors отдельно подтверждают design behavior; их PASS не runtime qualification.
+
+## TC-040 — готовность перед реализацией
+
+| Test   | Requirements                            | Сценарий                                                                                                                                                                              |
+| ------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-040 | FR-002/004/009/012/013/021/030, NFR-007 | S2a prerequisites before probe, guarded unconfigured source, scheduled cancellation CAS/replay/expiry/namespace, full query/echo/export filters and discriminated service invocation. |
+
+Offline check_readiness и negative mutation tests проверяют обязательные контракты.
+Independent schema validator проверяет положительные/отрицательные соседние payloads.
+Actual API/SQL/provider acceptance остаётся not_run до реализации; IAB проверяет prototype cancellation lifecycle.

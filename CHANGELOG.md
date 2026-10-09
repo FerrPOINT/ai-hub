@@ -38,3 +38,10 @@ Runtime-реализации и выпущенной версии пока не�
 - Dataset/run/manual score parity, canonical exports and full filter echo.
 - Signed service adapter with exact v2 context/body binding and revoke tombstones; public SDK unchanged.
 - Final evidence and current status refreshed after the coordinated gate; actual runtime not implemented.
+
+## 2026-10-09 — Readiness-01–05
+
+S2a financial primitives precede proof; truthful unconfigured pricing source, durable
+scheduled tariff cancellation/CAS, canonical StatisticsFilters and protocol-discriminated
+service DTO. OpenAPI 0.5.0-design. Fresh final documentation/design gate collected separately;
+runtime/SQL/provider calls/main cutover remain outside this documentation delivery.

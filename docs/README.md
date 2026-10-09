@@ -83,3 +83,7 @@ Single owner specification каждой нормы указан в TRACEABILITY.
 [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md) — target signed wire Fleet/Forge, а не расширение public metadata или permission на runtime starts.
 
 - [Закрытие полного ревью](REVIEW_RESOLUTION.md) — R01–R15, проверенный prototype и отдельные main/runtime gates.
+
+- [ADR-0009 — readiness contract](adr/0009-implementation-readiness.md) — закрытие READY-01–05 перед реализацией.
+
+- [Готовность перед реализацией](READINESS_AUDIT.md) — завершённый requirements/contract/data/design audit и future execution boundaries.

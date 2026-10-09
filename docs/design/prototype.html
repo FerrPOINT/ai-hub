@@ -2528,6 +2528,7 @@
             [
               "period",
               "currency-filter",
+              "timezone-filter",
               "request-status",
               "dimension",
               "audit-action",
@@ -2868,6 +2869,7 @@
       for (const key of [
         "project-filter",
         "currency-filter",
+        "timezone-filter",
         "period",
         "request-status",
         "dimension",
@@ -3300,6 +3302,7 @@
             "client-enable",
             "edit-project-price",
             "activate-tariff",
+            "cancel-tariff",
             "manual-score",
           ]);
           document.querySelectorAll("#main [data-action]").forEach((e) => {
@@ -3442,7 +3445,16 @@
         return n
           ? {
               tracker_instance_id: "30000000-0000-4000-8000-000000000001",
-              tracker_project_id: wireId("tracker-project", id),
+              tracker_project_id: {
+                "20000000-0000-4000-8000-000000000001":
+                  "31000000-0000-4000-8000-000000000001",
+                "20000000-0000-4000-8000-000000000002":
+                  "31000000-0000-4000-8000-000000000002",
+                "20000000-0000-4000-8000-000000000003":
+                  "31000000-0000-4000-8000-000000000003",
+                "20000000-0000-4000-8000-000000000004":
+                  "31000000-0000-4000-8000-000000000004",
+              }[id],
               key: n.project,
               label: n.label,
             }
@@ -3457,6 +3469,115 @@
             }[b.target] || b.target;
           b.target = b.namespace_id;
         }
+      function validLocalSchema(schema, depth = 0) {
+        if (depth > 32) return false;
+        if (typeof schema === "boolean") return true;
+        if (!schema || typeof schema !== "object" || Array.isArray(schema))
+          return false;
+        if (
+          schema.$schema &&
+          schema.$schema !== "https://json-schema.org/draft/2020-12/schema"
+        )
+          return false;
+        if (
+          ["$ref", "$dynamicRef"].some(
+            (k) =>
+              schema[k] !== undefined &&
+              (typeof schema[k] !== "string" || !schema[k].startsWith("#")),
+          )
+        )
+          return false;
+        const mapKeys = [
+            "$defs",
+            "definitions",
+            "properties",
+            "patternProperties",
+            "dependentSchemas",
+          ],
+          singleKeys = [
+            "additionalProperties",
+            "unevaluatedProperties",
+            "unevaluatedItems",
+            "items",
+            "contains",
+            "propertyNames",
+            "contentSchema",
+            "if",
+            "then",
+            "else",
+            "not",
+          ],
+          arrayKeys = ["allOf", "anyOf", "oneOf", "prefixItems"];
+        for (const key of mapKeys)
+          if (
+            schema[key] !== undefined &&
+            (!schema[key] ||
+              typeof schema[key] !== "object" ||
+              Array.isArray(schema[key]) ||
+              Object.values(schema[key]).some(
+                (v) => !validLocalSchema(v, depth + 1),
+              ))
+          )
+            return false;
+        for (const key of singleKeys)
+          if (
+            schema[key] !== undefined &&
+            !validLocalSchema(schema[key], depth + 1)
+          )
+            return false;
+        for (const key of arrayKeys)
+          if (
+            schema[key] !== undefined &&
+            (!Array.isArray(schema[key]) ||
+              schema[key].some((v) => !validLocalSchema(v, depth + 1)))
+          )
+            return false;
+        return true;
+      }
+      function validCaseAssertion(c) {
+        const tools = c.tools || [];
+        if (
+          !Array.isArray(tools) ||
+          tools.some(
+            (t) =>
+              !t ||
+              t.type !== "function" ||
+              Object.keys(t).some((k) => !["type", "function"].includes(k)) ||
+              !t.function ||
+              !/^[a-zA-Z0-9_-]{1,64}$/.test(t.function.name) ||
+              Object.keys(t.function).some(
+                (k) => !["name", "parameters", "description"].includes(k),
+              ) ||
+              typeof t.function.parameters !== "object" ||
+              Array.isArray(t.function.parameters) ||
+              !validLocalSchema(t.function.parameters) ||
+              (t.function.description !== undefined &&
+                typeof t.function.description !== "string"),
+          )
+        )
+          return false;
+        try {
+          if (c.assertion_kind === "json_schema")
+            return validLocalSchema(JSON.parse(c.expected));
+          if (c.assertion_kind === "tool_args") {
+            const e = JSON.parse(c.expected);
+            return (
+              !!e &&
+              typeof e === "object" &&
+              !Array.isArray(e) &&
+              Object.keys(e).length === 2 &&
+              typeof e.name === "string" &&
+              e.arguments !== null &&
+              typeof e.arguments === "object" &&
+              !Array.isArray(e.arguments) &&
+              tools.some((t) => t.function.name === e.name)
+            );
+          }
+          return true;
+        } catch {
+          return false;
+        }
+      }
       const builtInDatasets = [
         {
           id: "coding",
@@ -3468,7 +3589,20 @@
               case_id: "case-01",
               input: "Синтетический код",
               assertion_kind: "tool_args",
-              expected: "{}",
+              expected: '{"name":"verify","arguments":{}}',
+              tools: [
+                {
+                  type: "function",
+                  function: {
+                    name: "verify",
+                    parameters: {
+                      type: "object",
+                      properties: {},
+                      additionalProperties: false,
+                    },
+                  },
+                },
+              ],
             },
           ],
         },
@@ -3794,7 +3928,22 @@
                 ),
               )
             : ""
-        }${extra}<span class="label muted right">На 13:30 UTC · 20:30 Новосибирск</span></div>`;
+        }${
+          ["statistics", "expenses"].includes(current[2])
+            ? field(
+                "timezone-filter",
+                "Часовой пояс отображения",
+                select(
+                  "timezone-filter",
+                  [
+                    ["Asia/Novosibirsk", "Новосибирск · UTC+7"],
+                    ["UTC", "UTC"],
+                  ],
+                  filterValues["timezone-filter"] || "Asia/Novosibirsk",
+                ),
+              )
+            : ""
+        }${extra}<span class="label muted right">${filterValues["timezone-filter"] === "UTC" ? "На 13:30 UTC" : "На 13:30 UTC · 20:30 Новосибирск"}</span></div>`;
       }
       const emptyDailyFacts = {
         requests: Array(7).fill(0),
@@ -4412,12 +4561,15 @@
       ];
       const costPriceHistory = [],
         tariffRevisions = [],
-        tariffActivations = [];
+        tariffActivations = [],
+        tariffCancellations = [];
       const policyVersions = {};
       const pricingNow = "2026-10-09T13:30:00Z";
       let editingSourcePrice = null,
         editingProjectPrice = null,
-        editingProjectModel = null;
+        editingProjectModel = null,
+        editingTariffCancellation = null,
+        draftPolicyVersions = {};
       const tariffHistory = [
         {
           namespace: "20000000-0000-4000-8000-000000000001",
@@ -4478,8 +4630,16 @@
                 a.from || "1970-01-01T00:00:00Z",
               ) || b.version - a.version,
           )[0];
-        return latest && (!latest.to || at < latest.to)
-          ? latest
+        return latest
+          ? !latest.to || at < latest.to
+            ? latest
+            : {
+                ...latest,
+                input: null,
+                output: null,
+                cached: null,
+                quote_state: "expired",
+              }
           : {
               key: connection,
               model,
@@ -4498,6 +4658,84 @@
       function policyKey(namespace, profile, currency) {
         return [namespace, profile || "*", currency].join("/");
       }
+      function tariffCancellation(activation) {
+        return tariffCancellations.find(
+          (c) => c.activation_id === activation.id,
+        );
+      }
+      function activationStatus(activation, at = pricingNow) {
+        if (tariffCancellation(activation)) return "cancelled";
+        if (activation.at > at) return "scheduled";
+        const revision = tariffRevisions.find(
+          (r) => r.id === activation.revision,
+        );
+        if (revision?.to && at >= revision.to) return "superseded";
+        return tariffActivations.some(
+          (a) =>
+            a.key === activation.key &&
+            a.id !== activation.id &&
+            !tariffCancellation(a) &&
+            a.at > activation.at &&
+            a.at <= at,
+        )
+          ? "superseded"
+          : "active";
+      }
+      function tariffTimelineRow(r) {
+        const a = tariffActivations.find((a) => a.revision === r.id),
+          c = a && tariffCancellation(a),
+          state = a ? activationStatus(a) : "draft",
+          labels = {
+            draft: "Черновик",
+            scheduled: "Запланирован",
+            active: "Действует",
+            superseded: "Замещён / завершён",
+            cancelled: "Отменён",
+          },
+          allowed =
+            namespaceCatalog.find((n) => n.id === r.namespace).state ===
+            "active";
+        const action = !a
+          ? btn(
+              "Активировать",
+              "activate-tariff",
+              "",
+              'data-revision="' + r.id + '" ' + (allowed ? "" : "disabled"),
+            )
+          : state === "scheduled"
+            ? btn(
+                "Отменить расписание",
+                "cancel-tariff",
+                "danger",
+                'data-activation="' + a.id + '" ' + (allowed ? "" : "disabled"),
+              )
+            : c
+              ? btn(
+                  "Прочитать отмену",
+                  "tariff-cancel-readback",
+                  "",
+                  'data-activation="' + a.id + '"',
+                )
+              : "—";
+        return [
+          namespaceCatalog.find((n) => n.id === r.namespace).label,
+          r.profile || "Все профили",
+          r.currency,
+          "r" + r.version,
+          r.from + " — " + (r.to || "без окончания"),
+          a ? "Опубликован" : "Черновик",
+          a ? a.at : "—",
+          labels[state] +
+            (c
+              ? '<span class="muted">' +
+                esc(c.reason) +
+                " · " +
+                c.actor_subject +
+                "</span>"
+              : ""),
+          action,
+        ];
+      }
       function tariffAt(namespace, profile, currency, at = pricingNow) {
         for (const key of [
           policyKey(namespace, profile, currency),
@@ -4505,7 +4743,7 @@
         ]) {
           const entry = tariffActivations
             .filter(
-              (a) => a.key === key && a.status !== "cancelled" && a.at <= at,
+              (a) => a.key === key && !tariffCancellation(a) && a.at <= at,
             )
             .sort((a, b) => b.at.localeCompare(a.at))[0];
           const revision =
@@ -4589,6 +4827,22 @@
             ) === i,
         );
       }
+      function sourcePricingState(p) {
+        if (!p.version) return "Не настроена";
+        if (p.from && p.from > pricingNow) return "Запланирована";
+        if (p.to && p.to <= pricingNow) return "Истекла";
+        return [...sourcePrices, ...costPriceHistory].some(
+          (x) =>
+            x.key === p.key &&
+            x.model === p.model &&
+            x.currency === p.currency &&
+            (x.from || "1970-01-01T00:00:00Z") >
+              (p.from || "1970-01-01T00:00:00Z") &&
+            (x.from || "1970-01-01T00:00:00Z") <= pricingNow,
+        )
+          ? "Замещена"
+          : "Действует";
+      }
       function tariffs() {
         const q = new URLSearchParams(location.search),
           tab = q.get("tariff_tab") === "sources" ? "sources" : "projects",
@@ -4631,19 +4885,27 @@
                 "Вход / 1M",
                 "Выход / 1M",
                 "Версия",
+                "Разрешённое окно · UTC",
+                "Состояние сейчас",
                 "Действие",
               ],
               sourceCatalogRows().map((p) => [
                 esc(sources.find((c) => c[0] === p.key)?.[1] || p.key) +
                   " · " +
                   esc(p.model),
-                p.mode === "provider_auto"
-                  ? "Автоматически от провайдера"
-                  : "Введено вручную · расчёт",
+                p.version === 0
+                  ? "Цена не задана · стоимость неизвестна"
+                  : p.mode === "provider_auto"
+                    ? "Автоматически от провайдера"
+                    : "Введено вручную · расчёт",
                 p.currency,
                 p.input ?? "Не задана",
                 p.output ?? "Не задана",
-                "r" + p.version,
+                p.version ? "r" + p.version : "Не настроена",
+                p.version
+                  ? (p.from || "Ранее") + " — " + (p.to || "без окончания")
+                  : "—",
+                sourcePricingState(p),
                 btn(
                   "Настроить цену",
                   "edit-source-price",
@@ -4814,8 +5076,10 @@
               "Профиль",
               "Валюта",
               "Версия",
-              "Окно",
-              "Статус",
+              "Разрешённое окно",
+              "Публикация",
+              "Активация · UTC",
+              "Состояние сейчас",
               "Действие",
             ],
             tariffRevisions
@@ -4824,31 +5088,11 @@
                   (!ctx || r.namespace === ctx.id) &&
                   r.currency === selection.currency,
               )
-              .map((r) => [
-                namespaceCatalog.find((n) => n.id === r.namespace).label,
-                r.profile || "Все профили",
-                r.currency,
-                "r" + r.version,
-                r.from + " — " + (r.to || "без окончания"),
-                tariffActivations.some((a) => a.revision === r.id)
-                  ? "Опубликован"
-                  : "Черновик",
-                btn(
-                  "Активировать",
-                  "activate-tariff",
-                  "",
-                  'data-revision="' +
-                    r.id +
-                    '" ' +
-                    (tariffActivations.some((a) => a.revision === r.id) ||
-                    namespaceCatalog.find((n) => n.id === r.namespace).state !==
-                      "active"
-                      ? "disabled"
-                      : ""),
-                ),
-              ]),
+              .map(tariffTimelineRow),
             "",
-            "CAS policy timeline закрывает предыдущий интервал без изменения revision.",
+            "На " +
+              pricingNow +
+              ". Отмена сохраняет исходную запись, audit и snapshots; previous interval продолжается.",
           ) +
           tablePanel(
             "Исторические начисления · пример",
@@ -4945,6 +5189,9 @@
             "save-project-price",
             "activate-tariff",
             "activate-tariff-confirm",
+            "cancel-tariff",
+            "cancel-tariff-confirm",
+            "tariff-cancel-readback",
           ].includes(action)
         )
           return false;
@@ -4961,6 +5208,128 @@
           ].includes(action)
         ) {
           toast("Новые записи закрыты для этого Namespace.");
+          return true;
+        }
+        if (
+          ["cancel-tariff", "cancel-tariff-confirm"].includes(action) &&
+          ns &&
+          ns.state !== "active"
+        ) {
+          toast("Изменения расписания закрыты для этого Namespace.");
+          return true;
+        }
+        if (action === "cancel-tariff") {
+          const a = tariffActivations.find(
+            (a) => a.id === button.dataset.activation,
+          );
+          if (!a || activationStatus(a) !== "scheduled") {
+            toast("409: отменить можно только будущее расписание.");
+            return true;
+          }
+          const r = tariffRevisions.find((r) => r.id === a.revision);
+          editingTariffCancellation = {
+            activation_id: a.id,
+            key: a.key,
+            expected_policy_version: policyVersions[a.key],
+            operation_id: crypto.randomUUID(),
+          };
+          dataForm(
+            "Отменить запланированный тариф",
+            [
+              field(
+                "cancel-policy-version",
+                "Версия политики",
+                input(
+                  "cancel-policy-version",
+                  String(policyVersions[a.key]),
+                  "number",
+                  "readonly",
+                ),
+              ),
+              field(
+                "cancel-tariff-reason",
+                "Причина отмены",
+                input(
+                  "cancel-tariff-reason",
+                  "",
+                  "text",
+                  'required minlength="1" maxlength="500"',
+                ),
+              ),
+              '<p class="span-all">' +
+                esc(namespaceCatalog.find((n) => n.id === r.namespace).label) +
+                " · " +
+                esc(a.at) +
+                ". Исходная запись и прежние начисления сохраняются.</p>",
+            ],
+            "cancel-tariff-confirm",
+            "Подтвердить отмену",
+          );
+          return true;
+        }
+        if (action === "cancel-tariff-confirm") {
+          if (!validateFields(modal)) return true;
+          const draft = editingTariffCancellation,
+            a = tariffActivations.find((a) => a.id === draft.activation_id),
+            existing = tariffCancellations.find(
+              (c) => c.operation_id === draft.operation_id,
+            );
+          if (existing) {
+            closeModal();
+            render();
+            toast("Прочитана первоначальная отмена; повторного действия нет.");
+            return true;
+          }
+          if (
+            scene === "conflict" ||
+            policyVersions[a.key] !== draft.expected_policy_version
+          ) {
+            document.querySelector("#dialog-error").textContent =
+              "412: политика изменилась. Причина и ввод сохранены; прочитайте current version.";
+            return true;
+          }
+          if (activationStatus(a) !== "scheduled" || a.at <= pricingNow) {
+            document.querySelector("#dialog-error").textContent =
+              "409: расписание уже началось или отменено.";
+            return true;
+          }
+          const version = policyVersions[a.key] + 1;
+          policyVersions[a.key] = version;
+          tariffCancellations.push({
+            id: crypto.randomUUID(),
+            activation_id: a.id,
+            policy_id: wireId("tariff-policy", a.key),
+            policy_version: version,
+            cancelled_at: pricingNow,
+            actor_subject: "demo-user",
+            reason: document.querySelector("#cancel-tariff-reason").value,
+            operation_id: draft.operation_id,
+          });
+          closeModal();
+          render();
+          toast(
+            "Расписание отменено отдельным witness. История и занятое время сохраняются.",
+          );
+          return true;
+        }
+        if (action === "tariff-cancel-readback") {
+          const a = tariffActivations.find(
+              (a) => a.id === button.dataset.activation,
+            ),
+            c = a && tariffCancellation(a);
+          if (!c) return true;
+          dialog(
+            "Первоначальная отмена",
+            kv([
+              ["Отмена", c.id],
+              ["Активация", a.id],
+              ["Operation", c.operation_id],
+              ["Policy version", c.policy_version],
+              ["Когда · UTC", c.cancelled_at],
+              ["Автор", c.actor_subject],
+              ["Причина", c.reason],
+            ]),
+          );
           return true;
         }
         if (action === "edit-source-price") {
@@ -5134,6 +5503,7 @@
         }
         if (action === "edit-project-price") {
           const selection = pricingSelection();
+          draftPolicyVersions = clone(policyVersions);
           editingProjectPrice = button.dataset.namespace;
           editingProjectModel = selection.profile.id;
           const p = tariffAt(
@@ -5259,6 +5629,12 @@
               "Окончание должно быть позже начала.";
             return true;
           }
+          if ((policyVersions[key] || 0) !== (draftPolicyVersions[key] || 0)) {
+            document.querySelector("#dialog-error").textContent =
+              "412: policy изменилась; черновик сохранён.";
+            return true;
+          }
+          policyVersions[key] = (policyVersions[key] || 0) + 1;
           tariffRevisions.push({
             id: crypto.randomUUID(),
             key,
@@ -5313,6 +5689,9 @@
             "Подтвердить активацию",
           );
           modal.dataset.tariffRevision = r.id;
+          modal.dataset.tariffPolicyVersion = String(
+            policyVersions[r.key] || 0,
+          );
           return true;
         }
         if (action === "activate-tariff-confirm") {
@@ -5323,18 +5702,18 @@
             at = utcInput(document.querySelector("#tariff-activate-at").value);
           if (
             scene === "conflict" ||
-            (policyVersions[r.key] || 0) !== r.expected_policy_version
+            (policyVersions[r.key] || 0) !==
+              Number(modal.dataset.tariffPolicyVersion)
           ) {
             document.querySelector("#dialog-error").textContent =
               "412: policy изменилась. Прочитайте новую версию; черновик сохранён.";
             return true;
           }
           if (
+            at < pricingNow ||
             at < r.from ||
             (r.to && at >= r.to) ||
-            tariffActivations.some(
-              (a) => a.key === r.key && a.at === at && a.status !== "cancelled",
-            )
+            tariffActivations.some((a) => a.key === r.key && a.at === at)
           ) {
             document.querySelector("#dialog-error").textContent =
               "Момент вне разрешённого окна или уже занят.";
@@ -5385,7 +5764,19 @@
             period === "30" ? "2026-09-09T00:00:00Z" : "2026-10-02T00:00:00Z",
           to: "2026-10-09T00:00:00Z",
           currency: filterValues["currency-filter"] || "USD",
-          group_by: filterValues["group-by"] || null,
+          group_by:
+            filterValues.dimension === "model"
+              ? "virtual_model"
+              : filterValues.dimension || null,
+          timezone: filterValues["timezone-filter"] || "Asia/Novosibirsk",
+          project_binding: ns
+            ? trackerBinding(ns.id).tracker_instance_id +
+              "/" +
+              trackerBinding(ns.id).tracker_project_id
+            : null,
+          provider_id: null,
+          actual_model: null,
+          evaluation_run_id: null,
           client_id: null,
           connection_id: null,
           virtual_model_id: null,
@@ -5402,7 +5793,10 @@
         const facts = breakdownFacts.filter(
             (x) => scope === "all" || x.project === scope,
           ),
-          dimension = echo.group_by || "client",
+          dimension =
+            echo.group_by === "virtual_model"
+              ? "model"
+              : echo.group_by || "client",
           currency = echo.currency;
         const expense = (confirmed, estimated, unknown) => [
           {
@@ -5581,6 +5975,7 @@
           "estimated_amount",
           "held_reserve",
           "unknown_charge_count",
+          "filter_echo_json",
         ];
         const rows = payload.expenses
           .filter((x) => x.currency === payload.filter_echo.currency)
@@ -5596,6 +5991,7 @@
             x.estimated_amount,
             x.held_reserve,
             x.unknown_charge_count,
+            JSON.stringify(payload.filter_echo),
           ]);
         const quote = (v) =>
           v === null
@@ -7867,10 +8263,13 @@
                   select(
                     "client-cost",
                     [
-                      ["guaranteed", "Бюджет обязателен"],
-                      ["unknown", "Unknown-cost · только явное разрешение"],
+                      ["budget_guaranteed", "Бюджет обязателен"],
+                      [
+                        "cost_unknown_allowed",
+                        "Без денежной гарантии · явное разрешение",
+                      ],
                     ],
-                    "guaranteed",
+                    "budget_guaranteed",
                   ),
                 ),
                 `<div class="span-all"><label>Scopes ключа приложения</label><div class="checkrow"><input id="client-infer" type="checkbox" checked><label for="client-infer">infer · вызывать разрешённые профили</label></div><div class="checkrow"><input id="client-usage" type="checkbox" checked><label for="client-usage">read_own_usage · собственная статистика</label></div><div class="checkrow"><input id="client-result" type="checkbox"><label for="client-result">read_result · временное восстановление собственного результата</label></div></div>`,
@@ -8124,6 +8523,7 @@
                     ].includes(c.assertion_kind) ||
                     typeof c.expected !== "string" ||
                     c.expected.length > 32768 ||
+                    !validCaseAssertion(c) ||
                     (c.tools !== undefined &&
                       (!Array.isArray(c.tools) || c.tools.length > 64)) ||
                     Object.keys(c).some(
@@ -8159,7 +8559,7 @@
               );
             } catch {
               document.querySelector("#dialog-error").textContent =
-                "Нужен непустой JSON-массив случаев с уникальными case_id, input, assertion_kind и expected. Черновик сохранён.";
+                "Нужен непустой JSON-массив случаев с уникальными case_id, input, assertion_kind и expected. Для tool_args нужны name/arguments и объявленный function; JSON Schema — local 2020-12. Черновик сохранён.";
             }
             break;
           case "dataset-view": {
@@ -8741,6 +9141,7 @@
             "project-filter",
             "period",
             "currency-filter",
+            "timezone-filter",
             "dimension",
             "request-status",
             "audit-action",

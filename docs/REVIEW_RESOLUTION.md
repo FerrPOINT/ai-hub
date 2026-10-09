@@ -20,9 +20,9 @@
 | R12 | Canonical export                            | Raw decimal/UTC/null и полный typed filter_echo из тех же facts; группировки не дублируют CI.                                                 | export-canonical-decimal; export-full-scope-utc-echo; Statistics example schema                         |
 | R13 | Consumer revision identity                  | В примере opaque revision UUID, ordinal r12 только display label.                                                                             | check_semantics; service-contract negative ordinal vector                                               |
 | R14 | Fleet/Forge transport и publication cohorts | Signed internal adapter + Hub key, raw body binding, lease/fencing/revocation и recovery. Docs branches отделены от main/SDK/operator cohort. | check_service_contract 12 offline vectors; SERVICE_ADAPTER_V1; runtime/main integration planned         |
-| R15 | Метаданные/готовность                       | OpenAPI 0.4.0-design, 46 таблиц/408 полей, 16 operational + login; свежий source-bound evidence.                                              | check_docs; check_alignment; check_design; validate_contract                                            |
+| R15 | Метаданные/готовность                       | OpenAPI 0.5.0-design, 47 таблиц/420 полей, 16 operational + login; свежий source-bound evidence.                                              | check_docs; check_alignment; check_design; validate_contract                                            |
 
-Финальная IAB матрица: 230 geometry / 179 states / 123 flow assertions; 74 native PNG, пять просмотрены непосредственно.
+Финальная IAB матрица: 230 geometry / 179 states / 146 flow assertions; 74 native PNG, пять просмотрены непосредственно.
 [Evidence](design/evidence.json), [QA](design/QA.md), [OpenAPI](contracts/openapi.v1.json).
 Полный исходный script из IAB совпадает с локальным SHA 69ee74bbadef2f2ac26969c02f85b8762e9d2a369673829dfe6ab4f64e30c9b8.
 
@@ -44,3 +44,7 @@ Default 20% и ставки за 1M не создают выдуманный pro
 SSO, PostgreSQL и финансовая сверка требуют S1–S7. Dispatch/runtime_ready не включаются по offline vector.
 Реальный cutover требует backup, mappings, квалификации Hub/consumers, financial reconciliation
 и rollback; действующий Admin /ai сохраняется до этой вехи. После cutover ровно один config editor.
+
+## Финальное readiness closure
+
+[READINESS_AUDIT](READINESS_AUDIT.md) фиксирует READY-01–05: early financial prerequisites, unconfigured/late-receipt distinction, cancellation/CAS, canonical filters и protocol union. Числа и evidence текущего результата — [QA](design/QA.md). Actual application execution remains not_run.

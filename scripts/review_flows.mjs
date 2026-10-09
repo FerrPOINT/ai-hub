@@ -115,7 +115,20 @@ export async function verifyReview(tab, sourceScriptHash) {
         case_id: "a1",
         input: "code",
         assertion_kind: "tool_args",
-        expected: "{}",
+        expected: JSON.stringify({ name: "verify", arguments: {} }),
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "verify",
+              parameters: {
+                type: "object",
+                properties: {},
+                additionalProperties: false,
+              },
+            },
+          },
+        ],
       },
     ]),
   );

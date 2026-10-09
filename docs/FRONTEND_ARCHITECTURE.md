@@ -38,3 +38,5 @@ UI fixture не proof capability/billing. Компоненты sidebar/header н
 ## Канонический UI контракт
 
 [UI/UX Standard](https://github.com/FerrPOINT/services-base/blob/81decf7d9edd2c4218d8625a96e2e25c0617e9f1/docs/platform/UI_UX_STANDARD.md) и [UI Shell](https://github.com/FerrPOINT/services-base/blob/81decf7d9edd2c4218d8625a96e2e25c0617e9f1/docs/platform/UI_SHELL_STANDARD.md) — нормативные источники. NamespacePicker controlled, URL state tab-local. Общие provider/profile страницы отмечены «Установка». Notification polling: 30s только видимая active authenticated page, один in-flight request, остановка при logout/hidden; ошибка сохраняет last-success. Это target app behavior, не новый worker прототипа.
+
+StatisticsFilters используется generated client/query keys/echo/export без второй копии dimensions. UI labels model → wire virtual_model; timezone только display. Tariff cancellation использует current policy CAS и отдельный confirmation/reason; pending/412 сохраняет ввод, retry сохраняет original body/key. Current timeline status и draft publication отображаются отдельно.

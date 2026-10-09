@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AI Hub — проектный контракт v1",
-    "version": "0.4.0-design",
+    "version": "0.5.0-design",
     "description": "Design-only: API/handlers отсутствуют. Не generated runtime OpenAPI. Unknown/unsupported semantics fail closed."
   },
   "x-readiness": "design-only",
@@ -2748,7 +2748,7 @@
       "get": {
         "operationId": "readStatisticsSummary",
         "summary": "readStatisticsSummary",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected. Canonical StatisticsFilters drives authorised query normalization, echo and export. binding=namespace requires the exact UUID pair; unbound conflicts with the pair. A legacy all/default with a pair resolves to that narrower authorised Namespace. Resolve once and bind the complete filters to cursor/snapshot identity.",
         "x-requirements": ["FR-013", "FR-014", "FR-025"],
         "security": [
           {
@@ -2761,162 +2761,161 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/from"
+            },
+            "x-filter-field": "from"
           },
           {
             "name": "to",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/to"
+            },
+            "x-filter-field": "to"
           },
           {
             "name": "project",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/project_binding"
+            },
+            "x-filter-field": "project_binding"
           },
           {
             "name": "client",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/client_id"
+            },
+            "x-filter-field": "client_id"
           },
           {
             "name": "virtual_model",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/virtual_model_id"
+            },
+            "x-filter-field": "virtual_model_id"
           },
           {
             "name": "provider",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/provider_id"
+            },
+            "x-filter-field": "provider_id"
           },
           {
             "name": "actual_model",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/actual_model"
+            },
+            "x-filter-field": "actual_model"
           },
           {
             "name": "currency",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/currency"
+            },
+            "x-filter-field": "currency"
           },
           {
             "name": "timezone",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/timezone"
+            },
+            "x-filter-field": "timezone"
           },
           {
             "name": "group_by",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "day",
-                "project",
-                "client",
-                "user",
-                "virtual_model",
-                "revision",
-                "provider",
-                "actual_model",
-                "status",
-                "evaluation"
-              ]
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/group_by"
+            },
+            "x-filter-field": "group_by"
           },
           {
             "name": "status",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "completed",
-                "failed",
-                "cancelled",
-                "unknown",
-                "in_progress"
-              ]
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/status"
+            },
+            "x-filter-field": "status"
           },
           {
             "name": "evaluation_run",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/evaluation_run_id"
+            },
+            "x-filter-field": "evaluation_run_id"
           },
           {
             "name": "delegated_user",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/user_subject"
+            },
+            "x-filter-field": "user_subject"
           },
           {
             "name": "profile_revision",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/profile_revision_id"
+            },
+            "x-filter-field": "profile_revision_id"
           },
           {
             "name": "registry_instance_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/NamespaceRef/properties/registry_instance_id"
+            },
+            "x-filter-field": "namespace.registry_instance_id"
           },
           {
             "name": "namespace_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/NamespaceRef/properties/namespace_id"
+            },
+            "x-filter-field": "namespace.namespace_id"
           },
           {
             "name": "binding",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": ["all", "unbound"],
-              "default": "all"
+              "$ref": "#/components/schemas/StatisticsFilters/properties/binding"
+            },
+            "x-filter-field": "binding"
+          },
+          {
+            "name": "connection_id",
+            "in": "query",
+            "required": false,
+            "x-filter-field": "connection_id",
+            "schema": {
+              "$ref": "#/components/schemas/StatisticsFilters/properties/connection_id"
             }
           }
         ],
@@ -3188,7 +3187,7 @@
       "get": {
         "operationId": "readStatisticsBreakdown",
         "summary": "readStatisticsBreakdown",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected. Canonical StatisticsFilters drives authorised query normalization, echo and export. binding=namespace requires the exact UUID pair; unbound conflicts with the pair. A legacy all/default with a pair resolves to that narrower authorised Namespace. Resolve once and bind the complete filters to cursor/snapshot identity.",
         "x-requirements": ["FR-013", "FR-014", "FR-025"],
         "security": [
           {
@@ -3201,162 +3200,161 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/from"
+            },
+            "x-filter-field": "from"
           },
           {
             "name": "to",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/to"
+            },
+            "x-filter-field": "to"
           },
           {
             "name": "project",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/project_binding"
+            },
+            "x-filter-field": "project_binding"
           },
           {
             "name": "client",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/client_id"
+            },
+            "x-filter-field": "client_id"
           },
           {
             "name": "virtual_model",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/virtual_model_id"
+            },
+            "x-filter-field": "virtual_model_id"
           },
           {
             "name": "provider",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/provider_id"
+            },
+            "x-filter-field": "provider_id"
           },
           {
             "name": "actual_model",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/actual_model"
+            },
+            "x-filter-field": "actual_model"
           },
           {
             "name": "currency",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/currency"
+            },
+            "x-filter-field": "currency"
           },
           {
             "name": "timezone",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/timezone"
+            },
+            "x-filter-field": "timezone"
           },
           {
             "name": "group_by",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "day",
-                "project",
-                "client",
-                "user",
-                "virtual_model",
-                "revision",
-                "provider",
-                "actual_model",
-                "status",
-                "evaluation"
-              ]
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/group_by"
+            },
+            "x-filter-field": "group_by"
           },
           {
             "name": "status",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "completed",
-                "failed",
-                "cancelled",
-                "unknown",
-                "in_progress"
-              ]
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/status"
+            },
+            "x-filter-field": "status"
           },
           {
             "name": "evaluation_run",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/evaluation_run_id"
+            },
+            "x-filter-field": "evaluation_run_id"
           },
           {
             "name": "delegated_user",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/user_subject"
+            },
+            "x-filter-field": "user_subject"
           },
           {
             "name": "profile_revision",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/profile_revision_id"
+            },
+            "x-filter-field": "profile_revision_id"
           },
           {
             "name": "registry_instance_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/NamespaceRef/properties/registry_instance_id"
+            },
+            "x-filter-field": "namespace.registry_instance_id"
           },
           {
             "name": "namespace_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/NamespaceRef/properties/namespace_id"
+            },
+            "x-filter-field": "namespace.namespace_id"
           },
           {
             "name": "binding",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": ["all", "unbound"],
-              "default": "all"
+              "$ref": "#/components/schemas/StatisticsFilters/properties/binding"
+            },
+            "x-filter-field": "binding"
+          },
+          {
+            "name": "connection_id",
+            "in": "query",
+            "required": false,
+            "x-filter-field": "connection_id",
+            "schema": {
+              "$ref": "#/components/schemas/StatisticsFilters/properties/connection_id"
             }
           }
         ],
@@ -4767,7 +4765,7 @@
       "get": {
         "operationId": "exportStatistics",
         "summary": "exportStatistics",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected. Canonical StatisticsFilters drives authorised query normalization, echo and export. binding=namespace requires the exact UUID pair; unbound conflicts with the pair. A legacy all/default with a pair resolves to that narrower authorised Namespace. Resolve once and bind the complete filters to cursor/snapshot identity.",
         "x-requirements": ["FR-015"],
         "security": [
           {
@@ -4780,94 +4778,90 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/from"
+            },
+            "x-filter-field": "from"
           },
           {
             "name": "to",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/to"
+            },
+            "x-filter-field": "to"
           },
           {
             "name": "project",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/project_binding"
+            },
+            "x-filter-field": "project_binding"
           },
           {
             "name": "client",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/client_id"
+            },
+            "x-filter-field": "client_id"
           },
           {
             "name": "virtual_model",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/virtual_model_id"
+            },
+            "x-filter-field": "virtual_model_id"
           },
           {
             "name": "provider",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/provider_id"
+            },
+            "x-filter-field": "provider_id"
           },
           {
             "name": "actual_model",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/actual_model"
+            },
+            "x-filter-field": "actual_model"
           },
           {
             "name": "currency",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/currency"
+            },
+            "x-filter-field": "currency"
           },
           {
             "name": "timezone",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/timezone"
+            },
+            "x-filter-field": "timezone"
           },
           {
             "name": "group_by",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "day",
-                "project",
-                "client",
-                "user",
-                "virtual_model",
-                "revision",
-                "provider",
-                "actual_model",
-                "status",
-                "evaluation"
-              ]
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/group_by"
+            },
+            "x-filter-field": "group_by"
           },
           {
             "name": "format",
@@ -4883,68 +4877,71 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": [
-                "completed",
-                "failed",
-                "cancelled",
-                "unknown",
-                "in_progress"
-              ]
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/status"
+            },
+            "x-filter-field": "status"
           },
           {
             "name": "evaluation_run",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/evaluation_run_id"
+            },
+            "x-filter-field": "evaluation_run_id"
           },
           {
             "name": "delegated_user",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/user_subject"
+            },
+            "x-filter-field": "user_subject"
           },
           {
             "name": "profile_revision",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/StatisticsFilters/properties/profile_revision_id"
+            },
+            "x-filter-field": "profile_revision_id"
           },
           {
             "name": "registry_instance_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/NamespaceRef/properties/registry_instance_id"
+            },
+            "x-filter-field": "namespace.registry_instance_id"
           },
           {
             "name": "namespace_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+              "$ref": "#/components/schemas/NamespaceRef/properties/namespace_id"
+            },
+            "x-filter-field": "namespace.namespace_id"
           },
           {
             "name": "binding",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "enum": ["all", "unbound"],
-              "default": "all"
+              "$ref": "#/components/schemas/StatisticsFilters/properties/binding"
+            },
+            "x-filter-field": "binding"
+          },
+          {
+            "name": "connection_id",
+            "in": "query",
+            "required": false,
+            "x-filter-field": "connection_id",
+            "schema": {
+              "$ref": "#/components/schemas/StatisticsFilters/properties/connection_id"
             }
           }
         ],
@@ -6572,7 +6569,7 @@
           }
         ],
         "x-requirements": ["FR-030"],
-        "description": "Design-only. PROJECT_TARIFFS.md defines authorization, exact decimal arithmetic, snapshots and unknown handling. Namespace query pair validates identity/grants; conflicting or incomplete selectors are rejected.",
+        "description": "Create immutable draft with expected_version CAS on stable Namespace/profile/currency policy. Absence requires 0 and creates policy; every successful draft creation increments policy version, even without activation. Append revision sequence, audit/idempotency result atomically. Return policy_version for subsequent activation; stale 412 keeps user draft. Immutable draft allowed windows may overlap; saving never activates a price.",
         "parameters": [
           {
             "name": "Idempotency-Key",
@@ -7304,6 +7301,94 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ServiceRevocationInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project-tariff-activations/{activation_id}/cancel": {
+      "post": {
+        "operationId": "cancelTariffActivation",
+        "summary": "Отменить запланированный тариф",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-030"],
+        "parameters": [
+          {
+            "name": "activation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          }
+        ],
+        "description": "Synchronous own-DB transaction: verify control principal and exact Namespace scope, lock policy, compare expected_policy_version, require non-cancelled activate_at > database transaction time. Active/superseded/cancelled fresh intents are 409; stale CAS 412 preserves input. Append cancellation/audit/idempotency result and increment policy version atomically. Same key/body replays original cancellation even after scheduled time; key/body conflict is 409. No mutation of revision, activation bytes, old charges or request snapshots. Cancelled policy/time remains reserved for identity/dedupe; replacement uses a different future time.",
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          },
+          "200": {
+            "description": "Original cancellation witness and current activation projection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TariffActivation"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TariffCancellationInput"
               }
             }
           }
@@ -8624,7 +8709,8 @@
           "effective_from",
           "effective_to",
           "source"
-        ]
+        ],
+        "description": "Immutable quote with allowed window; quote windows may overlap. Binding through pricing_source_revisions derives effective nonoverlapping intervals without changing old quote bytes. Source/quote exact connection/model/current billing tier/currency/window checked before binding."
       },
       "PriceRevision": {
         "type": "object",
@@ -8934,115 +9020,7 @@
             }
           },
           "filter_echo": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "namespace": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/NamespaceRef"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "from": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "to": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "currency": {
-                "type": ["string", "null"]
-              },
-              "group_by": {
-                "type": ["string", "null"]
-              },
-              "binding": {
-                "type": "string",
-                "enum": ["all", "unbound", "namespace"]
-              },
-              "client_id": {
-                "oneOf": [
-                  {
-                    "type": "string",
-                    "format": "uuid",
-                    "not": {
-                      "const": "00000000-0000-0000-0000-000000000000"
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "connection_id": {
-                "oneOf": [
-                  {
-                    "type": "string",
-                    "format": "uuid",
-                    "not": {
-                      "const": "00000000-0000-0000-0000-000000000000"
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "virtual_model_id": {
-                "oneOf": [
-                  {
-                    "type": "string",
-                    "format": "uuid",
-                    "not": {
-                      "const": "00000000-0000-0000-0000-000000000000"
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "profile_revision_id": {
-                "oneOf": [
-                  {
-                    "type": "string",
-                    "format": "uuid",
-                    "not": {
-                      "const": "00000000-0000-0000-0000-000000000000"
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "user_subject": {
-                "type": ["string", "null"],
-                "maxLength": 120
-              },
-              "status": {
-                "type": ["string", "null"]
-              }
-            },
-            "required": [
-              "namespace",
-              "from",
-              "to",
-              "currency",
-              "group_by",
-              "binding",
-              "client_id",
-              "connection_id",
-              "virtual_model_id",
-              "profile_revision_id",
-              "user_subject",
-              "status"
-            ]
+            "$ref": "#/components/schemas/StatisticsFilters"
           },
           "source_basis": {
             "type": "object",
@@ -9241,7 +9219,8 @@
             "default": null
           }
         },
-        "required": ["name", "project_binding", "cases"]
+        "required": ["name", "project_binding", "cases"],
+        "description": "Case IDs unique. Expected is interpreted by assertion_kind using EVALUATIONS.md scorer-v1: tool_args JSON object {name,arguments} matching one declared function; json_schema a bounded local draft-2020-12 schema; malformed/remote schema rejected before storage, not ignored at run time."
       },
       "DatasetVersion": {
         "type": "object",
@@ -9307,7 +9286,8 @@
               "format": "uuid"
             },
             "minItems": 1,
-            "maxItems": 10
+            "maxItems": 10,
+            "uniqueItems": true
           },
           "repetitions": {
             "type": "integer",
@@ -9322,7 +9302,9 @@
             "default": 1
           },
           "scorer_revision": {
-            "type": "string"
+            "type": "string",
+            "enum": ["scorer-v1", "manual-v1"],
+            "description": "Frozen objective scorer suite or attributed manual review, specified in EVALUATIONS.md. Unsupported suite is rejected before run admission."
           },
           "budget_policy_id": {
             "type": "string",
@@ -10987,6 +10969,11 @@
           "publication_status": {
             "type": "string",
             "enum": ["draft", "published"]
+          },
+          "policy_version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Stable policy CAS version observed in this response; distinct from immutable revision sequence/config.expected_version. Fresh list read before new intent; replay preserves original."
           }
         },
         "required": [
@@ -10996,7 +10983,8 @@
           "created_at",
           "actor_subject",
           "policy_id",
-          "publication_status"
+          "publication_status",
+          "policy_version"
         ]
       },
       "ProjectCharge": {
@@ -11037,8 +11025,18 @@
             ]
           },
           "cost_source_revision_id": {
-            "type": "string",
-            "format": "uuid"
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "not": {
+                  "const": "00000000-0000-0000-0000-000000000000"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "currency": {
             "type": "string",
@@ -11102,6 +11100,16 @@
                 "type": "null"
               }
             ]
+          },
+          "cost_source_state": {
+            "type": "string",
+            "enum": ["configured", "unconfigured"],
+            "description": "Presence of the frozen source configuration, not cost confidence. Expired/unavailable configured source retains its real immutable ID."
+          },
+          "basis_source": {
+            "type": "string",
+            "enum": ["unavailable", "price_estimate", "provider_receipt"],
+            "description": "Trust basis of this event, independent of whether a price configuration existed at admission."
           }
         },
         "required": [
@@ -11119,8 +11127,126 @@
           "status",
           "occurred_at",
           "source_event_id",
-          "supersedes_id"
-        ]
+          "supersedes_id",
+          "cost_source_state",
+          "basis_source"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "cost_source_state": {
+                  "const": "unconfigured"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "cost_source_revision_id": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "cost_source_revision_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "not": {
+                    "const": "00000000-0000-0000-0000-000000000000"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "basis_source": {
+                  "const": "unavailable"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "cost_basis": {
+                  "type": "null"
+                },
+                "margin_amount": {
+                  "type": "null"
+                },
+                "basis_confidence": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "basis_source": {
+                  "const": "price_estimate"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "cost_source_state": {
+                  "const": "configured"
+                },
+                "cost_source_revision_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "not": {
+                    "const": "00000000-0000-0000-0000-000000000000"
+                  }
+                },
+                "cost_basis": {
+                  "type": "string"
+                },
+                "basis_confidence": {
+                  "const": "estimated"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "basis_source": {
+                  "const": "provider_receipt"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "cost_basis": {
+                  "type": "string"
+                },
+                "basis_confidence": {
+                  "const": "confirmed"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "project_amount": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "margin_amount": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Configuration presence and financial trust are independent. Unconfigured source keeps a null immutable configuration ID forever. Initial unavailable basis is null/unknown; a late trusted provider receipt may confirm basis with that same null configuration ID, using an append-only superseding event and the original tariff. No fabricated configuration/price row. Price estimate requires real configured snapshot. Application validates receipt/estimate source_event_id ownership, custom usage/currency and exact margin arithmetic."
       },
       "ManualScoreInput": {
         "type": "object",
@@ -11275,6 +11401,20 @@
           },
           "actor_subject": {
             "type": "string"
+          },
+          "cancellation": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TariffCancellation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "required": [
@@ -11284,8 +11424,11 @@
           "activate_at",
           "status",
           "policy_version",
-          "actor_subject"
-        ]
+          "actor_subject",
+          "cancellation",
+          "as_of"
+        ],
+        "description": "status is derived at as_of from immutable activation/cancellation facts. policy_version is the stable policy CAS version observed when this response snapshot was created; list read obtains a fresh version, while idempotent replay retains its original as_of/version. A cancelled activation does not close predecessor interval. Original activation/time and request snapshots never change."
       },
       "TaskRef": {
         "type": "object",
@@ -11368,28 +11511,46 @@
         ]
       },
       "ServiceInferenceInput": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "protocol": {
-            "type": "string",
-            "enum": ["chat", "responses"]
-          },
-          "execution_context": {
-            "$ref": "#/components/schemas/ExecutionContextV2"
-          },
-          "invocation": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ChatInput"
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "protocol": {
+                "type": "string",
+                "const": "chat"
               },
-              {
+              "execution_context": {
+                "$ref": "#/components/schemas/ExecutionContextV2"
+              },
+              "invocation": {
+                "$ref": "#/components/schemas/ChatInput"
+              }
+            },
+            "required": ["protocol", "execution_context", "invocation"]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "protocol": {
+                "type": "string",
+                "const": "responses"
+              },
+              "execution_context": {
+                "$ref": "#/components/schemas/ExecutionContextV2"
+              },
+              "invocation": {
                 "$ref": "#/components/schemas/ResponsesInput"
               }
-            ]
+            },
+            "required": ["protocol", "execution_context", "invocation"]
           }
+        ],
+        "discriminator": {
+          "propertyName": "protocol"
         },
-        "required": ["protocol", "execution_context", "invocation"]
+        "description": "Protocol discriminates the complete invocation shape. chat accepts only ChatInput, responses only ResponsesInput; mismatch is invalid before intent/external I/O."
       },
       "ServiceGrantEnvelope": {
         "type": "object",
@@ -11612,6 +11773,256 @@
           "machine_subject",
           "issued_at",
           "request_body_sha256"
+        ]
+      },
+      "StatisticsFilters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": ["string", "null"],
+            "pattern": "^[A-Z]{3}$"
+          },
+          "group_by": {
+            "oneOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "project",
+                  "client",
+                  "user",
+                  "virtual_model",
+                  "revision",
+                  "provider",
+                  "actual_model",
+                  "status",
+                  "evaluation"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "binding": {
+            "type": "string",
+            "enum": ["all", "unbound", "namespace"]
+          },
+          "client_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "not": {
+                  "const": "00000000-0000-0000-0000-000000000000"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "connection_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "not": {
+                  "const": "00000000-0000-0000-0000-000000000000"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "virtual_model_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "not": {
+                  "const": "00000000-0000-0000-0000-000000000000"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "profile_revision_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "not": {
+                  "const": "00000000-0000-0000-0000-000000000000"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "user_subject": {
+            "type": ["string", "null"],
+            "maxLength": 120
+          },
+          "status": {
+            "type": ["string", "null"]
+          },
+          "actual_model": {
+            "type": ["string", "null"],
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "evaluation_run_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "not": {
+                  "const": "00000000-0000-0000-0000-000000000000"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provider_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "not": {
+                  "const": "00000000-0000-0000-0000-000000000000"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "project_binding": {
+            "type": ["string", "null"],
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "default": "UTC",
+            "description": "Validated IANA display timezone. Canonical period/ledger/bucket boundaries remain UTC; unsupported timezone is 422."
+          }
+        },
+        "required": [
+          "namespace",
+          "from",
+          "to",
+          "currency",
+          "group_by",
+          "binding",
+          "client_id",
+          "connection_id",
+          "virtual_model_id",
+          "profile_revision_id",
+          "user_subject",
+          "status",
+          "actual_model",
+          "evaluation_run_id",
+          "provider_id",
+          "project_binding",
+          "timezone"
+        ],
+        "description": "Canonical resolved filters shared by summary, breakdown, cursor identity and exports. Every omitted optional selector resolves to explicit null; namespace UUID pair is flattened only for HTTP query. No-null query serialization: omit null filters, never send literal null. Provider identity and connection identity are separate. Labels/legacy project strings resolve through authorised exact owner bindings, never name lookup."
+      },
+      "TariffCancellationInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expected_policy_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": ["expected_policy_version", "reason"]
+      },
+      "TariffCancellation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "activation_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "policy_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "policy_version": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "cancelled_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor_subject": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "id",
+          "activation_id",
+          "policy_id",
+          "policy_version",
+          "cancelled_at",
+          "actor_subject",
+          "reason"
         ]
       }
     },

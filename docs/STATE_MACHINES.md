@@ -74,3 +74,11 @@ connection qualification не восстанавливает profile proof. TTL 
 Tariff draft → scheduled activation → active → superseded; revision неизменна.
 Policy CAS и unique activation time сериализуют конкурентов. Новые запросы фиксируют
 active tuple; старые и reconciliation не читают сегодняшнюю цену.
+
+## Cancellation и unconfigured witness
+
+scheduled → cancelled только отдельным own cancellation fact до activate_at, с CAS,
+scope, actor/reason и original replay result. Current status derived; cancelled time
+не переиспользуется и не supersedes predecessor. Draft publication и activation status
+различны. Unconfigured source — explicit null FK/unknown basis; настройка поздней цены
+не меняет старое admission. Protocol/body mismatch rejected до dispatch intent.

@@ -158,6 +158,10 @@ if (process.argv.includes("--write-vector"))
 const stored = JSON.parse(readFileSync(path, "utf8"));
 const checks = [
   [
+    !accepts(signed(claims), bytes, { clientNamespace: null }),
+    "unbound key is not namespace wildcard",
+  ],
+  [
     accepts(stored.envelope, Buffer.from(stored.raw_body_utf8)),
     "valid exact body",
   ],

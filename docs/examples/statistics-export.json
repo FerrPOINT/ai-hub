@@ -9,7 +9,12 @@
     "from": "2026-10-02T00:00:00Z",
     "to": "2026-10-09T00:00:00Z",
     "currency": "USD",
-    "group_by": null,
+    "group_by": "virtual_model",
+    "timezone": "UTC",
+    "project_binding": null,
+    "provider_id": null,
+    "actual_model": null,
+    "evaluation_run_id": null,
     "client_id": null,
     "connection_id": null,
     "virtual_model_id": null,
@@ -57,41 +62,27 @@
     "ttft_p95_ms": 740,
     "buckets": [
       {
-        "key": "Fleet Control",
-        "count": 870,
+        "key": "main-dev",
+        "count": 1240,
         "expenses": [
           {
             "currency": "USD",
-            "confirmed_amount": "5.55",
-            "estimated_amount": "2.3",
+            "confirmed_amount": "9.85",
+            "estimated_amount": "3.6",
             "held_reserve": "0",
-            "unknown_charge_count": 1,
+            "unknown_charge_count": 2,
             "as_of": "2026-10-08T13:30:00Z"
           }
         ]
       },
       {
-        "key": "Forge CI/CD",
-        "count": 360,
-        "expenses": [
-          {
-            "currency": "USD",
-            "confirmed_amount": "4.2",
-            "estimated_amount": "1.25",
-            "held_reserve": "0",
-            "unknown_charge_count": 1,
-            "as_of": "2026-10-08T13:30:00Z"
-          }
-        ]
-      },
-      {
-        "key": "CI тесты",
-        "count": 144,
+        "key": "app-test",
+        "count": 120,
         "expenses": [
           {
             "currency": "USD",
             "confirmed_amount": "2.55",
-            "estimated_amount": "1.25",
+            "estimated_amount": "0.99",
             "held_reserve": "0",
             "unknown_charge_count": 1,
             "as_of": "2026-10-08T13:30:00Z"
@@ -99,13 +90,13 @@
         ]
       },
       {
-        "key": "Локальный тест",
-        "count": 10,
+        "key": "test-alt",
+        "count": 24,
         "expenses": [
           {
             "currency": "USD",
-            "confirmed_amount": "0.1",
-            "estimated_amount": "0.05",
+            "confirmed_amount": "0",
+            "estimated_amount": "0.26",
             "held_reserve": "0",
             "unknown_charge_count": 0,
             "as_of": "2026-10-08T13:30:00Z"
@@ -119,7 +110,12 @@
       "from": "2026-10-02T00:00:00Z",
       "to": "2026-10-09T00:00:00Z",
       "currency": "USD",
-      "group_by": null,
+      "group_by": "virtual_model",
+      "timezone": "UTC",
+      "project_binding": null,
+      "provider_id": null,
+      "actual_model": null,
+      "evaluation_run_id": null,
       "client_id": null,
       "connection_id": null,
       "virtual_model_id": null,

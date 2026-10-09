@@ -1,14 +1,17 @@
 # Текущее состояние
 
-Дата: 2026-10-09. Stage: DEVELOP_READY для пакета документов и дизайна.
+Дата: 2026-10-09. Stage: DEVELOP_READY для документации и дизайна перед реализацией.
 
-- Замечания R01–R15 обработаны в [реестре](REVIEW_RESOLUTION.md); ограничения main/runtime cohorts описаны отдельно.
-- OpenAPI 0.4.0-design; 46 typed таблиц/408 полей; 16 operational routes и /login.
-- Final IAB: 230 geometry / 179 states / 123 flow assertions; 74 native PNG, 5 просмотрены; 0 JS errors/реальных provider calls.
-- Тарифы: за 1M, default 20%, custom Namespace/profile/currency, automatic OpenRouter и manual Ollama Online/ChatGPT; separate activation, effective intervals и immutable history.
-- Fleet/Forge target adapter замкнут по identity, signed grant, exact V2/body, revision/request/idempotency, fencing/revocation/recovery. Offline vectors не runtime qualification.
-- SDK baseline, Namespace target и operator tooling независимы. Base/Admin docs публикуются на документационных branches; main integration и Namespace acceptance — отдельные gates.
-- Backend/API/SQL migrations/SSO/live adapter/финансовый runtime/cutover не реализованы; actual app acceptance not_run.
+- READY-01–05 закрыты в [READINESS_AUDIT](READINESS_AUDIT.md); R01–R15 предыдущего ревью сохранены в [реестре](REVIEW_RESOLUTION.md).
+- OpenAPI 0.5.0-design, 47 таблиц/420 полей; 38 requirements/40 planned actual-app tests; 16 operational routes и /login.
+- S2a вводит financial primitives до S2b proof, S3 переиспользует engine. Future-stage FK запрещён gate.
+- Unconfigured pricing source не создаёт fake row/ID. Financial basis/confidence отдельны; late receipt подтверждает расход с прежним tariff.
+- Scheduled cancellation авторизована/idempotent/CAS и append-only; current status/time, original readback, occupied time и history согласованы.
+- StatisticsFilters одна на query/echo/cursor/JSON/CSV; dimension/timezone URL и exact model buckets проверены. Service protocol строго выбирает invocation shape, unbound service key не wildcard.
+- Final IAB: 230 geometry / 179 states / 146 flow assertions, 77 native PNG; 7 просмотрены непосредственно, 15 contrast checks, 0 JS errors/provider calls.
+- Documentation/alignment/readiness/semantic/design, independent OpenAPI/schema и mutation/regression tests приняты по финальному пакету.
+- SDK baseline/Namespace cohort/operator tooling независимы; Base/Admin docs branches не main/runtime integration.
+- Backend/API/SQL migrations/SSO/live adapters/consumer/restore/cutover не реализованы, execution acceptance not_run.
 
-Следующая веха: S1 настоящего изолированного приложения. Действующий Admin /ai,
-данные, pins и установленный runtime не меняются этой поставкой.
+Следующая веха: S1 настоящего изолированного приложения, затем S2a → S2b → S3…S7.
+Действующий Admin /ai, данные, pins и установленный runtime сохраняются до accepted cutover.

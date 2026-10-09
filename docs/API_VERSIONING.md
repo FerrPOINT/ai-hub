@@ -1,6 +1,6 @@
 # Эволюция API и совместимость
 
-Текущий контракт 0.4.0-design — проектный, не опубликованная runtime-версия.
+Текущий контракт 0.5.0-design — проектный, не опубликованная runtime-версия.
 Контракт control API /api/v1 отделён от compatible /v1, profile revision и DB schema.
 Generated OpenAPI заменяет draft только через parity gate и semantic fixtures.
 

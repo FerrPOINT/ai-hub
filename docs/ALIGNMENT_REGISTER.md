@@ -18,3 +18,7 @@
 Трассировка требований: [TRACEABILITY](TRACEABILITY.md). Отдельные execution gates:
 SSO, own PostgreSQL, adapters, financial ledger, actual consumer, restore/load и
 реальный cutover не закрываются документационными и prototype проверками.
+
+## Финальное readiness closure
+
+[READINESS_AUDIT](READINESS_AUDIT.md) фиксирует READY-01–05: early financial prerequisites, unconfigured/late-receipt distinction, cancellation/CAS, canonical filters и protocol union. Числа и evidence текущего результата — [QA](design/QA.md). Actual application execution remains not_run.

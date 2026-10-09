@@ -70,9 +70,9 @@ class ReviewSemanticsTests(unittest.TestCase):
     def test_filter_echo_distinguishes_unbound(self):
         self.assertTrue(
             self.mutate(
-                lambda s: s["components"]["schemas"]["Statistics"]["properties"][
-                    "filter_echo"
-                ]["required"].remove("binding")
+                lambda s: s["components"]["schemas"]["StatisticsFilters"][
+                    "required"
+                ].remove("binding")
             )
         )
 

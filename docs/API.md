@@ -3,7 +3,7 @@
 [openapi.v1.json](contracts/openapi.v1.json) — проектный OpenAPI 3.1 контракт.
 Handlers/runtime отсутствуют. `openapi/openapi.json` после реализации генерируется
 из Rust DTO/handlers; draft сохраняется как исходная design revision, parity migration
-не расширяет capabilities автоматически. Версия 0.4.0-design — не release приложения.
+не расширяет capabilities автоматически. Версия 0.5.0-design — не release приложения.
 
 ## Поверхности
 
@@ -210,9 +210,9 @@ Control one-time key replay при недоступном output:409 one_time_ou
 | POST  | /api/v1/project-tariffs | createProjectTariffRevision |
 | GET   | /api/v1/project-charges | listProjectCharges          |
 
-[PROJECT_TARIFFS](PROJECT_TARIFFS.md) определяет режимы, Namespace/CAS и decimal scale. Новые DTO входят в 0.4.0-design. Actual runtime not_run.
+[PROJECT_TARIFFS](PROJECT_TARIFFS.md) определяет режимы, Namespace/CAS и decimal scale. Новые DTO входят в 0.5.0-design. Actual runtime not_run.
 
-## Закрытие semantic review — 0.4.0-design
+## Закрытие semantic review — 0.5.0-design
 
 | Метод | Путь                                       | Operation               |
 | ----- | ------------------------------------------ | ----------------------- |
@@ -233,3 +233,17 @@ Idempotency-Key дедуплицирует side effect/proof invalidation. Curso
 Manual scores проверяют существующий frozen candidate/case/repetition, own scope,
 CAS и actor/time; финансы не изменяются. Новые typed errors входят в общий envelope.
 Signed service wire: [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md).
+
+## Готовность реализации — 0.5.0-design
+
+| Метод | Путь                                                      | Operation              |
+| ----- | --------------------------------------------------------- | ---------------------- |
+| POST  | /api/v1/project-tariff-activations/{activation_id}/cancel | cancelTariffActivation |
+
+POST /api/v1/project-tariff-activations/{activation_id}/cancel — cancelTariffActivation,
+control auth/UUID key/CAS/reason, sync 200 TariffActivation с cancellation witness.
+Семантика 409/412/replay и timeline — [PROJECT_TARIFFS](PROJECT_TARIFFS.md).
+ProjectCharge имеет cost_source_state и guarded nullable source UUID: unconfigured
+не создаёт fake revision. StatisticsFilters общая для всех statistics/export paths,
+с full dimensions/timezone и opaque IDs. ServiceInferenceInput discriminated по protocol;
+ChatInput/ResponsesInput mismatch отклоняется до I/O. Runtime API пока отсутствует.

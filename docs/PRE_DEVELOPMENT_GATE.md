@@ -26,7 +26,7 @@
 ## Статус
 
 DEVELOP_READY для начала S1. Offline, semantic и rendered design gates завершены.
-Проверены root matrix, owner boundaries/transition, 38 requirements и их 39
+Проверены root matrix, owner boundaries/transition, 38 requirements и их 40
 planned behavioral tests, stage DAG, 16 operational + 1 auth UI routes и соответствующие API actions.
 Согласованы draft-before-proof, publication TTL/runtime qualification, streaming
 readback/own result grants, financial precision и static platform capability paths.
@@ -42,4 +42,8 @@ source-bound design evidence. Недостаточно одного source map �
 
 ## Актуализация 2026-10-09
 
-Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 230 geometry / 179 states / 123 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.
+Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 230 geometry / 179 states / 146 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.
+
+## Финальное readiness closure
+
+[READINESS_AUDIT](READINESS_AUDIT.md) фиксирует READY-01–05: early financial prerequisites, unconfigured/late-receipt distinction, cancellation/CAS, canonical filters и protocol union. Числа и evidence текущего результата — [QA](design/QA.md). Actual application execution remains not_run.

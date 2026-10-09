@@ -15,8 +15,11 @@ Different currencies выдаются отдельными totals. В v1 нет 
 
 Все цены synthetic в примерах. Реальные rates оператор вводит с evidence/source,
 currency, unit=per_million_tokens, effective interval и immutable revision.
-Подмена тарифов в code/defaults запрещена. Price interval не перекрывается для
-одного provider/account/model/tier/currency. Admission фиксирует используемый snapshot.
+Подмена тарифов в code/defaults запрещена. Effective interval опубликованного source binding не перекрывается для
+одного connection/model/current tier/currency. Immutable PriceRevision содержит allowed
+window и может пересекаться с другими quotes. Timeline closing происходит по следующему
+source effective_from или собственному effective_to, без UPDATE старой quote. Admission
+фиксирует exact quote/source snapshot.
 
 ## Cost status
 
@@ -107,3 +110,25 @@ PriceInput.request_fee — известный fixed per-attempt amount38/18 ли
 ## Цена проекта
 
 [PROJECT_TARIFFS](PROJECT_TARIFFS.md) отделяет account expense от project charge и margin. Default markup=2000 bps; manually allocated subscription token cost не создаёт provider receipt. Project amounts NUMERIC(50,24); неизвестный basis не обнуляет reserve. Existing monetary budgets используют provider cost.
+
+## Отсутствующая цена: допустимый unknown path
+
+При explicit cost_unknown_allowed и bounded token/request/concurrency grants admission
+может зафиксировать отсутствие pricing source. Frozen snapshot содержит
+cost_source_state=unconfigured и cost_source_revision_id=null; ID/ставка не создаются
+для заполнения отчёта. ProjectCharge: basis_confidence=unknown, cost_basis=null,
+margin_amount=null. Default markup даёт project_amount=null/status=pending.
+Custom rates могут дать известный project_amount только из qualified disjoint usage
+в явно разрешённой валюте; margin остаётся null до доверенного basis. Без usage — pending/null.
+Expired/unavailable source, если он существовал, сохраняет настоящий snapshot ID и
+state=configured: наличие настройки не повышает confidence. Новая ручная цена не
+переоценивает старый unconfigured snapshot. Trusted late receipt даёт append-only
+correction с прежним tariff; receipt provenance хранится отдельно от pricing configuration.
+Нет денежного upper bound — нет fabricated zero reserve: отсутствие monetary guarantee
+явно показано, token/concurrency caps действуют. Ранее созданные uncertain reserves удерживаются.
+
+Для unconfigured source валюта берётся из independently qualified account billing_currency с statement/receipt provenance (runtime_qualifications), не из имени провайдера, UI default или caller metadata. Нет квалифицированной валюты — currency_unqualified до I/O. cost_unknown_allowed не отменяет применимые hard monetary budgets: без upper bound такой budget блокирует dispatch; разрешённый unknown path требует отсутствия guaranteed monetary bounds и явно ограниченного token/request/concurrency grant.
+
+Configuration presence и financial trust независимы: basis_source=unavailable/price_estimate/provider_receipt. Первый unconfigured event имеет null/unknown basis; поздний trusted receipt может подтвердить basis, сохраняя cost_source_state=unconfigured и null configuration ID. Append-only supersedes event использует исходный tariff и настоящий receipt event identity; новую price row не создавать. Effective sums заменяют previous pending/provisional, не прибавляют его второй раз.
+
+Provider NUMERIC(38,18) может использовать checked i128 scaled units; project NUMERIC(50,24) требует bounded arbitrary-precision decimal/integer codec, не reused i128. Limits/overflow проверяются до I/O и DB cast. Manual score JSON numeric lexeme также проверяется exact decimal для scale .001, не по float remainder.

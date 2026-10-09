@@ -582,6 +582,18 @@
           "type": "text",
           "nullable": true,
           "rule": "safe reason"
+        },
+        {
+          "name": "billing_currency",
+          "type": "char(3)",
+          "nullable": true,
+          "rule": "qualified currency from account statement/receipt; null unqualified, never inferred from provider name"
+        },
+        {
+          "name": "billing_currency_origin",
+          "type": "text",
+          "nullable": true,
+          "rule": "trusted statement/receipt witness linked through proof_id; required iff currency known"
         }
       ]
     },
@@ -941,7 +953,7 @@
     },
     {
       "name": "requests",
-      "phase": "S3",
+      "phase": "S2",
       "owner": "AI Hub",
       "columns": [
         {
@@ -1050,7 +1062,7 @@
     },
     {
       "name": "replay_payloads",
-      "phase": "S3",
+      "phase": "S2",
       "owner": "AI Hub",
       "columns": [
         {
@@ -1087,7 +1099,7 @@
     },
     {
       "name": "attempts",
-      "phase": "S3",
+      "phase": "S2",
       "owner": "AI Hub",
       "columns": [
         {
@@ -1172,7 +1184,7 @@
     },
     {
       "name": "usage_facts",
-      "phase": "S3",
+      "phase": "S2",
       "owner": "AI Hub",
       "columns": [
         {
@@ -1221,7 +1233,7 @@
     },
     {
       "name": "price_revisions",
-      "phase": "S3",
+      "phase": "S2",
       "owner": "AI Hub",
       "columns": [
         {
@@ -1300,7 +1312,7 @@
     },
     {
       "name": "ledger_entries",
-      "phase": "S3",
+      "phase": "S2",
       "owner": "AI Hub",
       "columns": [
         {
@@ -1385,7 +1397,7 @@
     },
     {
       "name": "budget_policies",
-      "phase": "S3",
+      "phase": "S2",
       "owner": "AI Hub",
       "columns": [
         {
@@ -1458,7 +1470,7 @@
     },
     {
       "name": "budget_periods",
-      "phase": "S3",
+      "phase": "S2",
       "owner": "AI Hub",
       "columns": [
         {
@@ -1507,7 +1519,7 @@
     },
     {
       "name": "reservations",
-      "phase": "S3",
+      "phase": "S2",
       "owner": "AI Hub",
       "columns": [
         {
@@ -2495,8 +2507,8 @@
         {
           "name": "cost_source_revision_id",
           "type": "uuid",
-          "nullable": false,
-          "rule": "own source snapshot FK"
+          "nullable": true,
+          "rule": "real immutable source FK when configured; null only unconfigured frozen source, never fake identity"
         },
         {
           "name": "currency",
@@ -2551,6 +2563,18 @@
           "type": "timestamptz",
           "nullable": false,
           "rule": "UTC"
+        },
+        {
+          "name": "cost_source_state",
+          "type": "text",
+          "nullable": false,
+          "rule": "configured iff real configuration FK non-null; independent of financial confidence. Unconfigured remains null across late receipt."
+        },
+        {
+          "name": "basis_source",
+          "type": "text",
+          "nullable": false,
+          "rule": "unavailable -> null/unknown basis; price_estimate -> real source snapshot/estimated basis; provider_receipt -> trusted own event/confirmed basis even without pricing configuration"
         }
       ]
     },
@@ -2624,7 +2648,7 @@
           "name": "status",
           "type": "text",
           "nullable": false,
-          "rule": "scheduled active superseded cancelled"
+          "rule": "initial scheduled/active acceptance state; current wire status derives from time, next non-cancelled activation and cancellation witness; no canonical row overwrite"
         },
         {
           "name": "policy_version",
@@ -2771,6 +2795,61 @@
           "type": "jsonb",
           "nullable": true,
           "rule": "verified Base v2 context; no prompt/secret"
+        }
+      ]
+    },
+    {
+      "name": "project_tariff_cancellations",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "activation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own activation FK; unique one cancellation per activation"
+        },
+        {
+          "name": "policy_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "same policy as activation; own FK"
+        },
+        {
+          "name": "policy_version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "CAS increment serialized with activation; immutable"
+        },
+        {
+          "name": "cancelled_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "database transaction UTC time strictly before activate_at"
+        },
+        {
+          "name": "actor_subject",
+          "type": "text",
+          "nullable": false,
+          "rule": "verified control principal"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "rule": "bounded 1..500"
+        },
+        {
+          "name": "operation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own idempotent operation FK, original result retained"
         }
       ]
     }
@@ -3158,6 +3237,24 @@
       "column": "supersedes_id",
       "target_table": "project_charge_events",
       "target_column": "id"
+    },
+    {
+      "table": "project_tariff_cancellations",
+      "column": "activation_id",
+      "target_table": "project_tariff_activations",
+      "target_column": "id"
+    },
+    {
+      "table": "project_tariff_cancellations",
+      "column": "policy_id",
+      "target_table": "project_tariff_policies",
+      "target_column": "id"
+    },
+    {
+      "table": "project_tariff_cancellations",
+      "column": "operation_id",
+      "target_table": "operations",
+      "target_column": "id"
     }
   ],
   "composite_invariants": [
@@ -3168,7 +3265,7 @@
     "unique installation/client/idempotency intent; control operation separate principal namespace",
     "unknown charge amount null, confirmed/estimated amount exact; correction linked and append-only",
     "effective charge confirmed replaces linked estimate; aggregates not financial authority",
-    "price intervals non-overlapping per connection/model/tier/currency",
+    "effective source-bound price intervals non-overlapping per connection/model/current tier/currency; immutable quote allowed windows may overlap",
     "reservations unique attempt/budget period; sorted multi-scope locks",
     "evaluation case unique run/candidate/repetition/case; restart no replay unknown I/O",
     "operation safe_result never stores plaintext client/provider keys or model output",
@@ -3182,6 +3279,14 @@
     "manual subscription allocation never counted as a second provider cash charge; budget policy remains provider cost",
     "tariff draft windows may overlap; activation timeline CAS derives nonoverlapping intervals, supersession never changes revision bytes",
     "service delegation raw body SHA256 and exact issuer/client/Namespace/context/profile binding required; revocation tombstone and fence checked before each attempt",
-    "manual score unique run/candidate/case/repetition version and verified actor; no financial mutation"
+    "manual score unique run/candidate/case/repetition version and verified actor; no financial mutation",
+    "S2 proof uses the same early request/attempt/usage/price/ledger/budget primitives; no future-stage FK or unaccounted synthetic probe",
+    "unconfigured cost source is null FK plus explicit state/unknown basis, never a generated source identity",
+    "scheduled tariff cancellation appends one same-policy witness before activation time, increments policy CAS and preserves cancelled time identity",
+    "StatisticsFilters is the single canonical query/echo/cursor/export shape; protocol selects exactly one service invocation schema",
+    "unconfigured rate admission requires independently qualified billing currency and explicit bounded unknown-cost grant; active hard monetary budgets still fail closed",
+    "configuration absence does not prevent trusted late receipt confirmation; source_event identity and original tariff retained, no invented price row or double effective charge",
+    "all project policy mutations including draft creation/activation/cancellation serialize and increment stable policy CAS, distinct from immutable revision sequence",
+    "cancellation composite FK (activation_id,policy_id) references activation(id,policy_id); unique activation_id; no canonical activation update"
   ]
 }

@@ -607,7 +607,8 @@
         "Cost / project charge / margin",
         "Profile/currency/window",
         "Draft and explicit activation",
-        "Frozen request price trace"
+        "Frozen request price trace",
+        "Scheduled/active/superseded/cancelled timeline with exact activation UTC and readback"
       ],
       "operations": [
         "listPricingSources",
@@ -618,7 +619,8 @@
         "createPriceRevision",
         "listProjectCharges",
         "activateProjectTariff",
-        "listTariffActivations"
+        "listTariffActivations",
+        "cancelTariffActivation"
       ],
       "purpose": "Настроить цены проектов отдельно от себестоимости.",
       "states": [
@@ -915,6 +917,17 @@
       ],
       "derived": ["Verified actor and reviewed_at"],
       "result": "Own evaluation case score with CAS and audit"
+    },
+    "tariffCancellation": {
+      "schema": "TariffCancellationInput",
+      "operation": "cancelTariffActivation",
+      "fields": ["expected_policy_version", "reason"],
+      "derived": [
+        "activation_id from exact row",
+        "current policy version/readback",
+        "verified actor and original cancellation witness"
+      ],
+      "result": "Only scheduled activation cancelled; original snapshots and occupied time retained"
     }
   },
   "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",

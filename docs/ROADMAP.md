@@ -5,7 +5,7 @@
 | Stage                                         | Зависит от             | Observable checkpoint                                                                                                   |
 | --------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | S1 Own foundation и trusted access            | Documentation baseline | Изолированное приложение принимает trusted principal, имеет own schema/audit и живые readiness/SSO проверки.            |
-| S2 Connection и virtual model lifecycle       | S1                     | Synthetic provider подключён, capabilities проверены; draft публикует immutable revision через UI/API.                  |
+| S2 Connection и virtual model lifecycle       | S1                     | Early financial primitives учли bounded probes; synthetic connection/draft публикует immutable revision через UI/API.   |
 | S3 Inference с financial ledger               | S2                     | Реальный controlled upstream отвечает full/stream/tools через scoped Hub key, retries/fallback/budget/restart доказаны. |
 | S4 Нужные внешние providers и subscriptions   | S3                     | Каждый выбранный account/adapter qualified live; own auth и subscription/quota receipts проверены.                      |
 | S5 Статистика, расходы и operational UI       | S3, S4                 | Сводки/разрезы/export совпадают с ledger; late facts, partial failures, multi-currency и thresholds проверены.          |
@@ -25,3 +25,5 @@ Media/embeddings, provider-specific features, pricing import automation/FX,
 LLM judges, traffic experiments и client-facing billing — отдельные requirements.
 Не добавлять заранее реализации или заглушки. Даты/оценки фиксируются после S1
 feedback/actual capability qualification; roadmap не обещает неизмеренные сроки.
+
+S2 выполняется S2a financial prerequisites → S2b qualification/publication. S3 переиспользует этот engine для public inference; [пакеты](IMPLEMENTATION_PACKETS.md) и [schema increments](MIGRATION_PLAN.md) задают точный порядок.

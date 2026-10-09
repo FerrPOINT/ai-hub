@@ -21,7 +21,7 @@ Scope: FR-018, FR-019, FR-023, NFR-004.
 Зависимости: S1.
 Компоненты: `backend/crates/application/{connections,profiles}`, `frontend/src/pages/{providers,models}`.
 
-Результат: Synthetic provider подключён, capabilities проверены; draft публикует immutable revision через UI/API.
+Результат: Ранние financial primitives учитывают bounded synthetic probes; затем connection/draft публикует immutable revision через UI/API.
 Scope: FR-001, FR-002, FR-003, FR-004, FR-020, FR-024.
 Проверки: TC-001, TC-002, TC-003, TC-004, TC-020, TC-024.
 Каждая slice включает contract/schema/UI state changes и targeted checks; старые acceptance receipts не переносятся.
@@ -95,3 +95,15 @@ Code prep ready не требует действующей подписки/prod
 S4/S7 actual access/account receipts являются обязательными future gates.
 Evidence: exact source/Base/config/schema/image, tests/DB, served identity/URL,
 provider and browser outcomes, limits/known residual risks.
+
+## S2a → S2b: обязательный порядок
+
+S2a создаёт price/source, budget/period/reservation и request/attempt/usage/ledger/replay
+records до первого probe. Минимальные control API/form для бюджета и цены работают
+в S2; нет unlimited seed и bypass финансового учёта. Один transaction/admission/settlement
+engine применяется к verification и затем обычному inference. S2b реализует qualified
+connection → saved draft → proof → publication поверх этих primitives.
+S3 добавляет public full/stream/tools/fallback и project charge/tariff/service records;
+не переносит уже созданные tables и не создаёт второй financial engine. Прежние
+proof calls сохраняют provider ledger; начисления проектам вводятся явно в S3 для
+новых запросов, история не дополняется выдуманными начислениями задним числом.

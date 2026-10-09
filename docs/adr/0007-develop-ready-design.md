@@ -12,7 +12,7 @@ Scope: документация/design; application runtime не реализу�
 ## Решение
 
 Хранить self-contained interactive prototype в docs/design, Base token snapshot
-по exact .base-revision, design contract с15 routes/forms/states/API mapping.
+по exact .base-revision, design contract с полным operational/auth route/form/state/API mapping.
 Проверять финальный source hash через Codex in-app browser; сохранять geometry/
 theme/state/keyboard evidence и изображения с kind prototype.
 Дополнить typed DD, access/error/state/use-case/migration/implementation packets.

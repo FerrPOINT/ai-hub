@@ -392,7 +392,8 @@
         "createPriceRevision",
         "listProjectCharges",
         "activateProjectTariff",
-        "listTariffActivations"
+        "listTariffActivations",
+        "cancelTariffActivation"
       ],
       "auth": "central_verified_with_product_grants",
       "states": [

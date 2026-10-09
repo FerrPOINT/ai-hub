@@ -3,6 +3,7 @@
 
 import argparse
 import json
+from decimal import Decimal
 from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
@@ -22,8 +23,10 @@ def main():
     for schema in spec["components"]["schemas"].values():
         Draft202012Validator.check_schema(schema)
     uri = "urn:aihub:openapi"
+    # Validate JSON decimal numbers as their wire lexemes, not binary float approximations.
+    validation_spec = json.loads(json.dumps(spec), parse_float=Decimal)
     registry = Registry().with_resource(
-        uri, Resource.from_contents(spec, default_specification=DRAFT202012)
+        uri, Resource.from_contents(validation_spec, default_specification=DRAFT202012)
     )
 
     def accepts(name, value):
@@ -32,7 +35,7 @@ def main():
             registry=registry,
             format_checker=FormatChecker(),
         )
-        return checker.is_valid(value)
+        return checker.is_valid(json.loads(json.dumps(value), parse_float=Decimal))
 
     money = {
         "amount": None,
@@ -217,6 +220,14 @@ def main():
     )
     body = json.loads(vector["raw_body_utf8"])
     assert accepts("ServiceInferenceInput", body)
+    response_body = {
+        **body,
+        "protocol": "responses",
+        "invocation": {"model": "main-dev", "input": "synthetic", "store": False},
+    }
+    assert accepts("ServiceInferenceInput", response_body)
+    assert not accepts("ServiceInferenceInput", {**response_body, "protocol": "chat"})
+    assert not accepts("ServiceInferenceInput", {**body, "protocol": "responses"})
     assert accepts("ServiceInferenceClaims", vector["claims"])
     assert accepts("ExecutionContextV2", body["execution_context"])
     assert not accepts("ServiceInferenceInput", {**body, "task_id": "legacy"})
@@ -247,12 +258,84 @@ def main():
         "expected_version": 0,
     }
     assert accepts("ManualScoreInput", score)
+    assert accepts("ManualScoreInput", {**score, "score": 0.29})
     assert not accepts("ManualScoreInput", {**score, "score": 0.1255})
     assert not accepts("ManualScoreInput", {**score, "repetition": 0})
     exported = json.loads(
         (root / "docs/examples/statistics-export.json").read_text(encoding="utf-8")
     )
     assert accepts("Statistics", exported["payload"])
+    full_filters = {
+        **exported["payload"]["filter_echo"],
+        "provider_id": vector["claims"]["client_id"],
+        "actual_model": "model-a",
+        "evaluation_run_id": vector["claims"]["request_id"],
+        "timezone": "UTC",
+    }
+    assert accepts("StatisticsFilters", full_filters)
+    assert not accepts("StatisticsFilters", {**full_filters, "group_by": "model"})
+    assert not accepts("StatisticsFilters", {**full_filters, "actual_model": 12})
+    assert not accepts("StatisticsFilters", {**full_filters, "provider_id": "name"})
+    cancellation = {
+        "expected_policy_version": 1,
+        "reason": "Synthetic cancelled schedule",
+    }
+    assert accepts("TariffCancellationInput", cancellation)
+    assert not accepts("TariffCancellationInput", {**cancellation, "reason": ""})
+    assert not accepts(
+        "TariffCancellationInput", {**cancellation, "expected_policy_version": 0}
+    )
+    unknown_charge = {
+        "id": vector["claims"]["request_id"],
+        "request_id": vector["claims"]["request_id"],
+        "attempt_id": vector["claims"]["request_id"],
+        "namespace": None,
+        "tariff_revision_id": None,
+        "cost_source_revision_id": None,
+        "cost_source_state": "unconfigured",
+        "basis_source": "unavailable",
+        "currency": "USD",
+        "cost_basis": None,
+        "project_amount": None,
+        "margin_amount": None,
+        "basis_confidence": "unknown",
+        "status": "pending",
+        "occurred_at": "2026-10-09T13:30:00Z",
+        "source_event_id": "synthetic-unpriced",
+        "supersedes_id": None,
+    }
+    assert accepts("ProjectCharge", unknown_charge)
+    late_receipt = {
+        **unknown_charge,
+        "basis_source": "provider_receipt",
+        "basis_confidence": "confirmed",
+        "cost_basis": "0.05",
+        "project_amount": "0.06",
+        "margin_amount": "0.01",
+        "status": "final",
+        "source_event_id": "synthetic-trusted-late-receipt",
+        "supersedes_id": vector["claims"]["client_id"],
+    }
+    assert accepts("ProjectCharge", late_receipt)
+    assert not accepts(
+        "ProjectCharge", {**late_receipt, "basis_source": "price_estimate"}
+    )
+    assert not accepts("ProjectCharge", {**unknown_charge, "cost_basis": "0"})
+    assert not accepts(
+        "ProjectCharge",
+        {**unknown_charge, "cost_source_revision_id": vector["claims"]["client_id"]},
+    )
+    assert not accepts(
+        "ProjectCharge", {**unknown_charge, "cost_source_state": "configured"}
+    )
+    assert accepts(
+        "ProjectCharge",
+        {
+            **unknown_charge,
+            "cost_source_state": "configured",
+            "cost_source_revision_id": vector["claims"]["client_id"],
+        },
+    )
     assert not accepts(
         "Statistics", {**exported["payload"], "filter_echo": {"binding": "all"}}
     )

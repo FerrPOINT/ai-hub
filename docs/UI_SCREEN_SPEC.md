@@ -161,3 +161,5 @@ Operational, wide. Tabs «Проекты» / «Себестоимость под
 ## Полный pricing и scoring flow
 
 /tariffs показывает все текущие connections/model/currency, shared PriceRevision history, profile/currency/UTC selectors и отдельную draft/activate timeline. /expenses ссылается на тот же справочник ставок; второго editor/store нет. Dataset/run читает frozen IDs/scorer/budget; readEvaluation и manual score показывают actor/time/case/candidate. Archive history сохраняет immutable records и не предлагает новые admissions.
+
+В /tariffs таблица timeline показывает activation UTC, scheduled/active/superseded/cancelled, отдельно draft/published, actor/reason отмены. Scheduled row даёт «Отменить расписание»; активная/expired/cancelled не даёт такой mutation. Confirmation CAS/readback сохраняет историю. Statistics/export echo имеет полный StatisticsFilters; wire virtual_model соответствует UI «Модель».

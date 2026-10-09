@@ -107,3 +107,5 @@ Typed DD34 tables/294 fields и execution packets позволяют начат�
 ## Тарифы проектов
 
 [PROJECT_TARIFFS](docs/PROJECT_TARIFFS.md): 1M input/output, default 20% markup, свои проектные цены, OpenRouter auto и manual Ollama Online/ChatGPT. В [прототипе](docs/design/prototype.html) добавлен /tariffs. Реальный billing/provider/runtime not_run.
+
+[READINESS_AUDIT](docs/READINESS_AUDIT.md): OpenAPI 0.5.0-design, S2a prerequisites, unknown/receipt accounting, cancellation and canonical query/export/protocol. Полный documentation/design gate завершён; start frontier S1, actual app/runtime not_run.

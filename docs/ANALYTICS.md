@@ -63,3 +63,15 @@ Namespace UUID pair и binding=unbound входят в filter echo и cursor ide
 ## Canonical export и echo
 
 Statistics.filter_echo включает all/unbound/namespace, exact UUID pair, range/currency/group_by и все фильтры dimensions/status. CSV/JSON сериализуют canonical statistics snapshot; display strings, валютные glyph и локальные даты не источник данных. Sample request/receipt таблицы явно неполные; агрегаты не превращаются в выдуманную историю. Разрезы profile/client используют одну synthetic matrix.
+
+## Единственный filter contract
+
+StatisticsFilters — canonical resolved shape для summary/breakdown/export/cursor.
+Все поддерживаемые query selectors имеют x-filter-field и $ref на его property.
+provider → provider_id; connection_id отдельный scope; actual_model и evaluation_run_id
+не теряются. project → verified project_binding, client/model/revision → opaque UUID,
+delegated_user → user_subject. Namespace UUID pair flatten только на HTTP boundary.
+Missing selector — explicit null в echo; при query serialization null опускается.
+Timezone — validated IANA label zone, UTC half-open filter/bucket boundaries сохраняются.
+UI group label model маппится в API virtual_model; display label не wire enum.
+Unsupported/malformed/foreign selectors отвергаются, не расширяют выборку.

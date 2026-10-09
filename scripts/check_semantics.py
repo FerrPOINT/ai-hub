@@ -70,7 +70,7 @@ def validate(root=ROOT):
         "/api/v1/project-tariff-activations" in spec["paths"],
         "Tariff save is not explicit activation",
     )
-    echo = schemas["Statistics"]["properties"]["filter_echo"]
+    echo = schemas["StatisticsFilters"]
     need(
         {
             "binding",

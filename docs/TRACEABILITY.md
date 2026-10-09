@@ -59,3 +59,5 @@ No missing test автоматически не означает implementation 
 FR-030 → TC-038 → S5: [тарифы](PROJECT_TARIFFS.md), OpenAPI PricingSourceInput/ProjectTariffInput/ProjectCharge, own typed dictionary и /tariffs prototype. Admission/ledger snapshots S3, provider qualification S4, UI S5. [Machine traceability](traceability.json).
 
 TC-039 дополняет FR-004/017/021/027/030/NFR-007: [machine traceability](traceability.json), [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md), pricing/prototype adversarial checks. Старые критерии сохранены; проверки усиливают varied-ID/name и recovery coverage.
+
+TC-040 дополняет FR-002/004/009/012/013/021/030/NFR-007: stage prerequisites, unknown source, canonical filters, cancellation and protocol boundary. Machine traceability сохраняет предыдущие criteria; actual app acceptance planned.

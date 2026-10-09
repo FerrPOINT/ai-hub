@@ -121,3 +121,29 @@ Catalog quotes, provider cash и manually allocated subscription cost остаю
 даже если каталог/quotes настроены вручную. JSON decimal lexeme читается без f64.
 
 PricingSourceInput и pricing_source_revisions имеют currency/effective_from/effective_to. CAS policy key = connection/model/currency, unique start и half-open interval. Manual PriceRevision сначала создаётся отдельно, затем exact tuple/interval связывается с source; при 412/422 новая несвязанная revision остаётся draft и не меняет действующие расходы. Native auto currency проверяется qualification, FX отсутствует.
+
+## Отмена и состояние расписания — v1
+
+POST /api/v1/project-tariff-activations/{activation_id}/cancel: Idempotency-Key,
+expected_policy_version и bounded reason. Own transaction проверяет central scope,
+блокирует policy, сверяет CAS и activate_at > database transaction time. Active,
+superseded и уже cancelled для нового intent →409; stale policy →412, ввод сохраняется.
+Append-only cancellation/audit/idempotency result и policy increment атомарны.
+Original key/body replay возвращает тот же witness даже после запланированного времени.
+Cancelled запись не завершает предыдущий интервал. Занятое policy/time остаётся занятым
+для identity/dedupe; replacement использует другое время. Время, revision и исторические
+request/charge snapshots не меняются. Нет внешнего действия, отдельный worker не нужен.
+TariffActivation.status вычисляется по timeline, cancellations и server as_of:
+scheduled/active/superseded/cancelled; revision publication status хранится отдельно.
+UI показывает точный activate_at, оба статуса, reason/actor/time отмены, available action
+только для scheduled и readback после ambiguous response.
+
+Unconfigured себестоимость хранит null source ID с явным state и unknown basis/margin.
+Default charge pending; custom charge требует qualified usage/matching currency.
+Реальные IDs/цены не выдумываются и новая настройка не меняет старый snapshot.
+
+Configuration presence и financial trust независимы: basis_source=unavailable/price_estimate/provider_receipt. Первый unconfigured event имеет null/unknown basis; поздний trusted receipt может подтвердить basis, сохраняя cost_source_state=unconfigured и null configuration ID. Append-only supersedes event использует исходный tariff и настоящий receipt event identity; новую price row не создавать. Effective sums заменяют previous pending/provisional, не прибавляют его второй раз.
+
+TariffActivation.as_of и policy_version относятся к моменту response snapshot. Idempotent replay возвращает первоначальные значения; новый intent сначала читает свежий policy version. Client clock/выбранное время quote не заменяют database transaction time cancellation guard.
+
+Stable policy version увеличивается при каждом draft creation, activation и cancellation; revision.version — отдельный immutable sequence. Create возвращает policy_version; activation/cancellation берут свежую stable version при открытии intent, не config.expected_version или revision ordinal. Source-bound price timeline также отделён от immutable quote allowed windows; current billing tier/currency/window должны совпадать. Latest expired source retains its actual identity with unknown quote, не unconfigured или older fallback.

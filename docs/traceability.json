@@ -16,7 +16,7 @@
       "name": "Секреты и managed authorization",
       "acceptance": "Write-only ключ/authorization, own encrypted key, generation; API/log/export/browser storage не раскрывают secrets.",
       "owner": "AI Hub",
-      "tests": ["TC-002"],
+      "tests": ["TC-002", "TC-040"],
       "phase": "S2",
       "document": "docs/SECURITY.md",
       "status": "planned"
@@ -36,7 +36,7 @@
       "name": "Версии виртуальных моделей",
       "acceptance": "Создание slug/draft, CAS save, immutable revision, publication/rollback/archive; active runs не меняют snapshot.",
       "owner": "AI Hub",
-      "tests": ["TC-004", "TC-039"],
+      "tests": ["TC-004", "TC-039", "TC-040"],
       "phase": "S2",
       "document": "docs/ROUTING.md",
       "status": "planned"
@@ -86,7 +86,7 @@
       "name": "Фактическая модель и trace",
       "acceptance": "Request связывает frozen profile и все attempts; actual model confidence виден; provider alias substitution не hidden.",
       "owner": "AI Hub",
-      "tests": ["TC-009"],
+      "tests": ["TC-009", "TC-040"],
       "phase": "S3",
       "document": "docs/ROUTING.md",
       "status": "planned"
@@ -116,7 +116,7 @@
       "name": "Бюджет и предупреждения",
       "acceptance": "Atomic reserve по всем scopes до I/O, unknown удерживает reserve; thresholds уведомляют один раз; actual overrun не обрезается.",
       "owner": "AI Hub",
-      "tests": ["TC-012"],
+      "tests": ["TC-012", "TC-040"],
       "phase": "S3",
       "document": "docs/ACCOUNTING.md",
       "status": "planned"
@@ -126,7 +126,7 @@
       "name": "Статистика по разрезам",
       "acceptance": "UTC range + timezone, dimensions/client/project/user/model/provider, known/unknown counts, snapshot freshness и rebuild.",
       "owner": "AI Hub",
-      "tests": ["TC-013"],
+      "tests": ["TC-013", "TC-040"],
       "phase": "S5",
       "document": "docs/ANALYTICS.md",
       "status": "planned"
@@ -206,7 +206,7 @@
       "name": "Интеграция Base и Admin",
       "acceptance": "Один AI config owner; transition contracts/rollback, own auth/catalog/nav; прежний runtime не переключается по docs.",
       "owner": "AI Hub",
-      "tests": ["TC-021", "TC-039"],
+      "tests": ["TC-021", "TC-039", "TC-040"],
       "phase": "S7",
       "document": "docs/contracts/ADMIN_HANDOFF_V1.md",
       "status": "planned"
@@ -326,7 +326,7 @@
       "name": "Contract compatibility",
       "acceptance": "Versioned contracts, old clients tested; destructive schema/transport change требует version/migration; no unsupported field dropping.",
       "owner": "AI Hub",
-      "tests": ["TC-033", "TC-039"],
+      "tests": ["TC-033", "TC-039", "TC-040"],
       "phase": "S7",
       "document": "docs/API.md",
       "status": "planned"
@@ -376,7 +376,7 @@
       "name": "Тарифы проектов и источники себестоимости",
       "acceptance": "Per-million input/output rates; default cost markup 20%; exact Namespace overrides; OpenRouter automatic costs and manual subscription/Ollama rates remain separate from provider cash; frozen snapshots, decimal arithmetic and unknown are preserved.",
       "owner": "AI Hub",
-      "tests": ["TC-038", "TC-039"],
+      "tests": ["TC-038", "TC-039", "TC-040"],
       "phase": "S5",
       "document": "docs/PROJECT_TARIFFS.md",
       "status": "planned"
@@ -623,6 +623,21 @@
       ],
       "scenario": "Adversarial stable-ID Namespace rows, saved-draft/history/proof fences, schema parity, tariff activation timelines and signed service envelope/revocation recovery.",
       "status": "not_run"
+    },
+    {
+      "id": "TC-040",
+      "requirements": [
+        "FR-002",
+        "FR-004",
+        "FR-009",
+        "FR-012",
+        "FR-013",
+        "FR-021",
+        "FR-030",
+        "NFR-007"
+      ],
+      "scenario": "Readiness prerequisites precede proof; missing source produces truthful pending accounting; cancel scheduled tariff with CAS/replay and active boundary; complete filter echo/export and protocol-discriminated signed invocation. Negative and neighbouring cases cross the real API/SQL/IAB boundaries.",
+      "status": "not_run"
     }
   ],
   "phases": [
@@ -645,7 +660,7 @@
         "backend/crates/application/{connections,profiles}",
         "frontend/src/pages/{providers,models}"
       ],
-      "outcome": "Synthetic provider подключён, capabilities проверены; draft публикует immutable revision через UI/API."
+      "outcome": "Early financial primitives account bounded synthetic probes; connection/draft then publish immutable revision through UI/API."
     },
     {
       "id": "S3",

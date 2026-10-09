@@ -47,8 +47,10 @@ execution_id — Fleet execution; Hub не создаёт его и не вед�
 До записи dispatch intent проверяются:
 
 1. Signature/trusted key/issuer/subject/audience и raw body digest.
-2. Client key active, exact signed client_id; nonnull client Namespace равен
-   claim Namespace и body.execution_context.namespace по двум UUID.
+2. Client key active, exact signed client_id. Для service path client Namespace
+   обязателен и равен claim Namespace и body.execution_context.namespace по двум UUID.
+   Unbound key не wildcard и не может получить Namespace от одного envelope.
+   Public SDK сохраняет разрешённый unbound path без Task/run.
 3. Idempotency-Key=request_id; body context operation совпадает с claim.
    Task/Repository owner references проверены через bounded fixed-owner readers.
 4. Signed profile_revision_id принадлежит invocation.model и allowlist клиента;
@@ -88,3 +90,5 @@ trusted Forge issuer с теми же gates. RepositoryRef не даёт inferen
 S7 проверяет packed SDK, signatures/body mutation, UUID/ordinal mismatch,
 Namespace/issuer/client mismatch, expired lease/revocation/fence и restart/readback.
 Примеры и offline cryptographic vectors не заменяют live consumer qualification.
+
+ServiceInferenceInput — discriminated union: protocol=chat принимает только ChatInput, protocol=responses только ResponsesInput. Подпись не заменяет эту проверку; смешанный shape rejected до intent/I/O. Stable raw body/key recovery сохраняются.

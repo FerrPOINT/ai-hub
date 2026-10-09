@@ -17,3 +17,5 @@ Accepted здесь означает проектное решение для п
 - [ADR0007: development-ready design](adr/0007-develop-ready-design.md) — принято.
 
 - [ADR-0008: выделение AI и Namespace](adr/0008-admin-extraction-namespace.md)
+
+- [ADR-0009 — implementation readiness](adr/0009-implementation-readiness.md): S2a prerequisites, unknown source, cancellation, canonical filters/protocol.

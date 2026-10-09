@@ -1,6 +1,7 @@
 # Словарь данных AI Hub
 
-Проектная схема. SQL migrations и runtime не реализованы. Канонический typed dictionary: [data-dictionary](contracts/data-dictionary.v1.json).
+Проектная схема; SQL migrations/runtime не реализованы. Canonical typed source: [data-dictionary](contracts/data-dictionary.v1.json).
+47 таблиц / 420 полей. Phase — первая schema introduction; S2a prerequisites предшествуют S2b proof.
 
 ## installations — S1
 
@@ -128,18 +129,20 @@
 
 ## runtime_qualifications — S2
 
-| Поле                 | Тип    | Nullable | Правило                  |
-| -------------------- | ------ | -------- | ------------------------ |
-| id                   | uuid   | нет      | PK                       |
-| connection_id        | uuid   | нет      | exact account            |
-| generation           | bigint | нет      | immutable generation     |
-| provider_model_id    | text   | нет      | exact model              |
-| adapter_revision     | text   | нет      | exact code               |
-| endpoint_policy_hash | text   | нет      | scope                    |
-| proof_id             | uuid   | нет      | trusted evidence         |
-| capabilities         | jsonb  | нет      | qualified set and bounds |
-| state                | text   | нет      | active invalidated       |
-| invalidated_reason   | text   | да       | safe reason              |
+| Поле                    | Тип     | Nullable | Правило                                                                                                |
+| ----------------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------ |
+| id                      | uuid    | нет      | PK                                                                                                     |
+| connection_id           | uuid    | нет      | exact account                                                                                          |
+| generation              | bigint  | нет      | immutable generation                                                                                   |
+| provider_model_id       | text    | нет      | exact model                                                                                            |
+| adapter_revision        | text    | нет      | exact code                                                                                             |
+| endpoint_policy_hash    | text    | нет      | scope                                                                                                  |
+| proof_id                | uuid    | нет      | trusted evidence                                                                                       |
+| capabilities            | jsonb   | нет      | qualified set and bounds                                                                               |
+| state                   | text    | нет      | active invalidated                                                                                     |
+| invalidated_reason      | text    | да       | safe reason                                                                                            |
+| billing_currency        | char(3) | да       | qualified currency from account statement/receipt; null unqualified, never inferred from provider name |
+| billing_currency_origin | text    | да       | trusted statement/receipt witness linked through proof_id; required iff currency known                 |
 
 ## virtual_models — S2
 
@@ -223,28 +226,29 @@
 | expires_at       | timestamptz | нет      | validity                       |
 | revoked_at       | timestamptz | да       | deny new access                |
 
-## requests — S3
+## requests — S2
 
-| Поле                 | Тип         | Nullable | Правило                                                           |
-| -------------------- | ----------- | -------- | ----------------------------------------------------------------- |
-| id                   | uuid        | нет      | PK                                                                |
-| installation_id      | uuid        | нет      | own scope                                                         |
-| client_id            | uuid        | нет      | own normal/internal client                                        |
-| principal_id         | text        | нет      | trusted actor                                                     |
-| project_binding      | text        | нет      | frozen grant                                                      |
-| request_kind         | text        | нет      | inference verification evaluation                                 |
-| profile_revision_id  | uuid        | да       | required non-verification                                         |
-| probe_snapshot_id    | uuid        | да       | required verification                                             |
-| idempotency_key      | uuid        | нет      | client key or generated own ID                                    |
-| payload_hmac         | bytea       | нет      | semantic intent binding                                           |
-| state                | text        | нет      | admitted dispatching streaming completed failed cancelled unknown |
-| cancel_requested     | boolean     | нет      | default false separate from terminal                              |
-| admitted_at          | timestamptz | нет      | UTC                                                               |
-| finished_at          | timestamptz | да       | transport terminal                                                |
-| version              | bigint      | нет      | CAS fence                                                         |
-| namespace_binding_id | uuid        | да       | own verified binding FK; null explicitly unbound                  |
+| Поле                    | Тип         | Nullable | Правило                                                                               |
+| ----------------------- | ----------- | -------- | ------------------------------------------------------------------------------------- |
+| id                      | uuid        | нет      | PK                                                                                    |
+| installation_id         | uuid        | нет      | own scope                                                                             |
+| client_id               | uuid        | нет      | own normal/internal client                                                            |
+| principal_id            | text        | нет      | trusted actor                                                                         |
+| project_binding         | text        | нет      | frozen grant                                                                          |
+| request_kind            | text        | нет      | inference verification evaluation                                                     |
+| profile_revision_id     | uuid        | да       | required non-verification                                                             |
+| probe_snapshot_id       | uuid        | да       | required verification                                                                 |
+| idempotency_key         | uuid        | нет      | client key or generated own ID                                                        |
+| payload_hmac            | bytea       | нет      | semantic intent binding                                                               |
+| state                   | text        | нет      | admitted dispatching streaming completed failed cancelled unknown                     |
+| cancel_requested        | boolean     | нет      | default false separate from terminal                                                  |
+| admitted_at             | timestamptz | нет      | UTC                                                                                   |
+| finished_at             | timestamptz | да       | transport terminal                                                                    |
+| version                 | bigint      | нет      | CAS fence                                                                             |
+| namespace_binding_id    | uuid        | да       | own verified binding FK; null explicitly unbound                                      |
+| project_tariff_snapshot | jsonb       | да       | immutable tariff/source/default 2000 bps and exact Namespace; null explicitly unbound |
 
-## replay_payloads — S3
+## replay_payloads — S2
 
 | Поле               | Тип         | Nullable | Правило                     |
 | ------------------ | ----------- | -------- | --------------------------- |
@@ -254,7 +258,7 @@
 | expires_at         | timestamptz | нет      | <=24h                       |
 | protocol           | text        | нет      | chat_completions responses  |
 
-## attempts — S3
+## attempts — S2
 
 | Поле                  | Тип         | Nullable | Правило                                                          |
 | --------------------- | ----------- | -------- | ---------------------------------------------------------------- |
@@ -272,7 +276,7 @@
 | actual_model          | text        | да       | not guessed                                                      |
 | actual_model_verified | boolean     | нет      | default false                                                    |
 
-## usage_facts — S3
+## usage_facts — S2
 
 | Поле            | Тип         | Nullable | Правило                                 |
 | --------------- | ----------- | -------- | --------------------------------------- |
@@ -284,7 +288,7 @@
 | provenance      | jsonb       | нет      | adapter receipt/category inclusion      |
 | observed_at     | timestamptz | нет      | UTC                                     |
 
-## price_revisions — S3
+## price_revisions — S2
 
 | Поле            | Тип            | Nullable | Правило                            |
 | --------------- | -------------- | -------- | ---------------------------------- |
@@ -301,7 +305,7 @@
 | effective_to    | timestamptz    | да       | exclusive > from                   |
 | source          | text           | нет      | price provenance                   |
 
-## ledger_entries — S3
+## ledger_entries — S2
 
 | Поле              | Тип            | Nullable | Правило                                               |
 | ----------------- | -------------- | -------- | ----------------------------------------------------- |
@@ -319,7 +323,7 @@
 | price_revision_id | uuid           | да       | estimate provenance                                   |
 | occurred_at       | timestamptz    | нет      | cash basis                                            |
 
-## budget_policies — S3
+## budget_policies — S2
 
 | Поле                 | Тип            | Nullable | Правило                                          |
 | -------------------- | -------------- | -------- | ------------------------------------------------ |
@@ -335,7 +339,7 @@
 | status               | text           | нет      | active disabled                                  |
 | namespace_binding_id | uuid           | да       | own verified binding FK; null explicitly unbound |
 
-## budget_periods — S3
+## budget_periods — S2
 
 | Поле         | Тип            | Nullable | Правило                     |
 | ------------ | -------------- | -------- | --------------------------- |
@@ -347,7 +351,7 @@
 | reserved     | numeric(38,18) | нет      | held >=0                    |
 | version      | bigint         | нет      | row lock/CAS                |
 
-## reservations — S3
+## reservations — S2
 
 | Поле             | Тип            | Nullable | Правило               |
 | ---------------- | -------------- | -------- | --------------------- |
@@ -533,7 +537,194 @@
 | target_id          | uuid | нет      | own identity                                                |
 | status             | text | нет      | staged verified rejected; duplicate different digest denied |
 
-## Составные инварианты
+## pricing_source_revisions — S2
+
+| Поле              | Тип         | Nullable | Правило                                                                                      |
+| ----------------- | ----------- | -------- | -------------------------------------------------------------------------------------------- |
+| id                | uuid        | нет      | PK                                                                                           |
+| connection_id     | uuid        | нет      | own connection FK                                                                            |
+| model_id          | text        | нет      | exact upstream model                                                                         |
+| mode              | text        | нет      | provider_auto manual                                                                         |
+| price_revision_id | uuid        | да       | required manual; own immutable price                                                         |
+| version           | bigint      | нет      | CAS per connection_id/model_id/currency; immutable increasing revision                       |
+| actor_subject     | text        | нет      | verified actor                                                                               |
+| created_at        | timestamptz | нет      | UTC                                                                                          |
+| currency          | char(3)     | нет      | ISO uppercase; part of exact connection/model/currency policy key                            |
+| effective_from    | timestamptz | нет      | UTC; unique started interval per policy key; cannot backdate changed receipts                |
+| effective_to      | timestamptz | да       | half-open UTC interval; later than from; expiry preserves unknown, not older source fallback |
+
+## project_tariff_revisions — S3
+
+| Поле                 | Тип         | Nullable | Правило                                                                 |
+| -------------------- | ----------- | -------- | ----------------------------------------------------------------------- |
+| id                   | uuid        | нет      | PK                                                                      |
+| namespace_binding_id | uuid        | нет      | own verified binding FK                                                 |
+| virtual_model_id     | uuid        | да       | null project-wide; own model                                            |
+| currency             | char(3)     | нет      | no FX                                                                   |
+| mode                 | text        | нет      | default_markup custom_rates                                             |
+| markup_bps           | integer     | да       | 2000 default; 0..1000000 for markup                                     |
+| rates                | jsonb       | да       | exact per-million decimal strings, custom only                          |
+| effective_from       | timestamptz | нет      | inclusive                                                               |
+| effective_to         | timestamptz | да       | exclusive; no overlap                                                   |
+| version              | bigint      | нет      | logical key CAS                                                         |
+| actor_subject        | text        | нет      | verified actor                                                          |
+| created_at           | timestamptz | нет      | UTC                                                                     |
+| policy_id            | uuid        | нет      | own stable policy FK; draft revision window, not mutable active pointer |
+
+## project_charge_events — S3
+
+| Поле                    | Тип            | Nullable | Правило                                                                                                                                                                             |
+| ----------------------- | -------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id                      | uuid           | нет      | PK                                                                                                                                                                                  |
+| request_id              | uuid           | нет      | own request FK                                                                                                                                                                      |
+| attempt_id              | uuid           | нет      | own attempt FK                                                                                                                                                                      |
+| namespace_binding_id    | uuid           | да       | frozen own binding; null explicitly unbound installation default                                                                                                                    |
+| tariff_revision_id      | uuid           | да       | null immutable installation default snapshot                                                                                                                                        |
+| cost_source_revision_id | uuid           | да       | real immutable source FK when configured; null only unconfigured frozen source, never fake identity                                                                                 |
+| currency                | char(3)        | нет      | no FX                                                                                                                                                                               |
+| cost_basis              | numeric(50,24) | да       | null unknown; confidence separate                                                                                                                                                   |
+| project_amount          | numeric(50,24) | да       | null unknown; no float or per-request rounding                                                                                                                                      |
+| margin_amount           | numeric(50,24) | да       | charge minus basis; may be negative                                                                                                                                                 |
+| basis_confidence        | text           | нет      | confirmed estimated unknown                                                                                                                                                         |
+| status                  | text           | нет      | final provisional pending                                                                                                                                                           |
+| source_event_id         | text           | нет      | unique attempt/event semantic identity                                                                                                                                              |
+| supersedes_id           | uuid           | да       | append-only correction FK                                                                                                                                                           |
+| occurred_at             | timestamptz    | нет      | UTC                                                                                                                                                                                 |
+| cost_source_state       | text           | нет      | configured iff real configuration FK non-null; independent of financial confidence. Unconfigured remains null across late receipt.                                                  |
+| basis_source            | text           | нет      | unavailable -> null/unknown basis; price_estimate -> real source snapshot/estimated basis; provider_receipt -> trusted own event/confirmed basis even without pricing configuration |
+
+## project_tariff_policies — S3
+
+| Поле                 | Тип     | Nullable | Правило                                                  |
+| -------------------- | ------- | -------- | -------------------------------------------------------- |
+| id                   | uuid    | нет      | PK                                                       |
+| namespace_binding_id | uuid    | нет      | own binding FK                                           |
+| virtual_model_id     | uuid    | да       | own model; null project default                          |
+| currency             | char(3) | нет      | logical key part                                         |
+| version              | bigint  | нет      | CAS stable policy row; unique Namespace/profile/currency |
+
+## project_tariff_activations — S3
+
+| Поле               | Тип         | Nullable | Правило                                                                                                                                                              |
+| ------------------ | ----------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id                 | uuid        | нет      | PK                                                                                                                                                                   |
+| policy_id          | uuid        | нет      | own policy FK                                                                                                                                                        |
+| tariff_revision_id | uuid        | нет      | immutable own revision FK                                                                                                                                            |
+| activate_at        | timestamptz | нет      | unique policy/time; inclusive                                                                                                                                        |
+| status             | text        | нет      | initial scheduled/active acceptance state; current wire status derives from time, next non-cancelled activation and cancellation witness; no canonical row overwrite |
+| policy_version     | bigint      | нет      | monotonic policy CAS                                                                                                                                                 |
+| actor_subject      | text        | нет      | verified actor                                                                                                                                                       |
+
+## evaluation_manual_scores — S6
+
+| Поле                | Тип          | Nullable | Правило                               |
+| ------------------- | ------------ | -------- | ------------------------------------- |
+| id                  | uuid         | нет      | PK                                    |
+| evaluation_id       | uuid         | нет      | own evaluation FK                     |
+| case_id             | text         | нет      | existing case                         |
+| profile_revision_id | uuid         | нет      | frozen candidate                      |
+| repetition          | integer      | нет      | 1..10                                 |
+| score               | numeric(4,3) | нет      | 0..1                                  |
+| reason              | text         | нет      | bounded 500                           |
+| actor_subject       | text         | нет      | verified scorer                       |
+| reviewed_at         | timestamptz  | нет      | UTC                                   |
+| version             | bigint       | нет      | CAS per run/candidate/case/repetition |
+
+## service_delegations — S3
+
+| Поле               | Тип           | Nullable | Правило                                     |
+| ------------------ | ------------- | -------- | ------------------------------------------- |
+| grant_id           | uuid          | нет      | PK; tombstones may precede inference        |
+| issuer_instance_id | uuid          | нет      | trusted configured signer                   |
+| client_id          | uuid          | да       | own client FK; absent tombstone only        |
+| request_id         | uuid          | да       | original request; absent tombstone only     |
+| execution_id       | uuid          | да       | Fleet execution; no ownership transfer      |
+| fencing_token      | numeric(20,0) | да       | u64 checked; monotonic per issuer/execution |
+| body_digest        | text          | да       | SHA256 raw request bytes                    |
+| valid_until        | timestamptz   | да       | minimum grant and lease expiry              |
+| revoked_at         | timestamptz   | да       | trusted issuer event                        |
+| context_snapshot   | jsonb         | да       | verified Base v2 context; no prompt/secret  |
+
+## project_tariff_cancellations — S3
+
+| Поле           | Тип         | Nullable | Правило                                                   |
+| -------------- | ----------- | -------- | --------------------------------------------------------- |
+| id             | uuid        | нет      | PK                                                        |
+| activation_id  | uuid        | нет      | own activation FK; unique one cancellation per activation |
+| policy_id      | uuid        | нет      | same policy as activation; own FK                         |
+| policy_version | bigint      | нет      | CAS increment serialized with activation; immutable       |
+| cancelled_at   | timestamptz | нет      | database transaction UTC time strictly before activate_at |
+| actor_subject  | text        | нет      | verified control principal                                |
+| reason         | text        | нет      | bounded 1..500                                            |
+| operation_id   | uuid        | нет      | own idempotent operation FK, original result retained     |
+
+## Own relationships
+
+| Таблица.поле                                  | Собственная цель              |
+| --------------------------------------------- | ----------------------------- |
+| providers.installation_id                     | installations.id              |
+| connections.provider_id                       | providers.id                  |
+| connection_generations.connection_id          | connections.id                |
+| upstream_models.connection_id                 | connections.id                |
+| operations.installation_id                    | installations.id              |
+| login_attempts.connection_id                  | connections.id                |
+| probe_snapshots.operation_id                  | operations.id                 |
+| verification_evidence.probe_snapshot_id       | probe_snapshots.id            |
+| runtime_qualifications.proof_id               | verification_evidence.id      |
+| virtual_models.installation_id                | installations.id              |
+| profile_revisions.virtual_model_id            | virtual_models.id             |
+| profile_deployments.revision_id               | profile_revisions.id          |
+| clients.installation_id                       | installations.id              |
+| client_keys.client_id                         | clients.id                    |
+| grants.client_id                              | clients.id                    |
+| requests.client_id                            | clients.id                    |
+| requests.profile_revision_id                  | profile_revisions.id          |
+| requests.probe_snapshot_id                    | probe_snapshots.id            |
+| replay_payloads.request_id                    | requests.id                   |
+| attempts.request_id                           | requests.id                   |
+| usage_facts.attempt_id                        | attempts.id                   |
+| price_revisions.connection_id                 | connections.id                |
+| ledger_entries.attempt_id                     | attempts.id                   |
+| ledger_entries.original_entry_id              | ledger_entries.id             |
+| ledger_entries.price_revision_id              | price_revisions.id            |
+| budget_periods.policy_id                      | budget_policies.id            |
+| reservations.budget_period_id                 | budget_periods.id             |
+| reservations.attempt_id                       | attempts.id                   |
+| subscriptions.connection_id                   | connections.id                |
+| quota_observations.connection_id              | connections.id                |
+| evaluation_runs.dataset_version_id            | dataset_versions.id           |
+| evaluation_runs.budget_policy_id              | budget_policies.id            |
+| evaluation_cases.run_id                       | evaluation_runs.id            |
+| evaluation_cases.request_id                   | requests.id                   |
+| evaluation_cases.candidate_revision_id        | profile_revisions.id          |
+| clients.namespace_binding_id                  | namespace_bindings.id         |
+| requests.namespace_binding_id                 | namespace_bindings.id         |
+| budget_policies.namespace_binding_id          | namespace_bindings.id         |
+| dataset_versions.namespace_binding_id         | namespace_bindings.id         |
+| audit_events.namespace_binding_id             | namespace_bindings.id         |
+| model_context_preferences.connection_id       | connections.id                |
+| notifications.namespace_binding_id            | namespace_bindings.id         |
+| notification_acknowledgements.notification_id | notifications.id              |
+| pricing_source_revisions.connection_id        | connections.id                |
+| pricing_source_revisions.price_revision_id    | price_revisions.id            |
+| project_tariff_revisions.namespace_binding_id | namespace_bindings.id         |
+| project_tariff_revisions.virtual_model_id     | virtual_models.id             |
+| project_charge_events.request_id              | requests.id                   |
+| project_charge_events.attempt_id              | attempts.id                   |
+| project_charge_events.namespace_binding_id    | namespace_bindings.id         |
+| project_charge_events.tariff_revision_id      | project_tariff_revisions.id   |
+| project_charge_events.cost_source_revision_id | pricing_source_revisions.id   |
+| project_tariff_policies.namespace_binding_id  | namespace_bindings.id         |
+| project_tariff_revisions.policy_id            | project_tariff_policies.id    |
+| project_tariff_activations.policy_id          | project_tariff_policies.id    |
+| project_tariff_activations.tariff_revision_id | project_tariff_revisions.id   |
+| evaluation_manual_scores.evaluation_id        | evaluation_runs.id            |
+| project_charge_events.supersedes_id           | project_charge_events.id      |
+| project_tariff_cancellations.activation_id    | project_tariff_activations.id |
+| project_tariff_cancellations.policy_id        | project_tariff_policies.id    |
+| project_tariff_cancellations.operation_id     | operations.id                 |
+
+## Composite invariants
 
 - credential_versions(connection_id,generation) references connection_generations; no absent local auth credential requirement
 - runtime qualification binds connection/generation/model/adapter/endpoint and immutable proof
@@ -542,7 +733,7 @@
 - unique installation/client/idempotency intent; control operation separate principal namespace
 - unknown charge amount null, confirmed/estimated amount exact; correction linked and append-only
 - effective charge confirmed replaces linked estimate; aggregates not financial authority
-- price intervals non-overlapping per connection/model/tier/currency
+- effective source-bound price intervals non-overlapping per connection/model/current tier/currency; immutable quote allowed windows may overlap
 - reservations unique attempt/budget period; sorted multi-scope locks
 - evaluation case unique run/candidate/repetition/case; restart no replay unknown I/O
 - operation safe_result never stores plaintext client/provider keys or model output
@@ -551,13 +742,17 @@
 - unique connection_id/model_id preference; CAS; no unknown physical-bound default
 - notification outbox delivery acknowledgement differs from actor read/ACK; no financial effect
 - unique source_instance_id/source_kind/source_record_id import identity with digest conflict protection
-
-## Тарифы и начисления — S2/S3
-
-Канонические поля pricing_source_revisions, project_tariff_revisions и project_charge_events описаны в [typed dictionary](contracts/data-dictionary.v1.json). Request получает immutable project_tariff_snapshot. Project amount/margin — NUMERIC(50,24); provider expense сохраняет прежний тип. [Правила](PROJECT_TARIFFS.md).
-
-## Semantic review schema increments
-
-Канонические поля новых policy/activation/score/delegation таблиц — [typed dictionary](contracts/data-dictionary.v1.json). Activation interval derived, revision window immutable. UUID project scope связан с exact registry/Namespace; label не FK. Cryptographic envelope и v2 refs — [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md).
-
-pricing_source_revisions: currency CHAR(3) NOT NULL, effective_from TIMESTAMPTZ NOT NULL, effective_to TIMESTAMPTZ nullable; CAS key connection_id/model_id/currency и unique effective_from. Manual referenced PriceRevision должен иметь тот же tuple/window; latest expired source означает unknown, не older fallback.
+- project tariff precedence exact namespace/profile then namespace default then installation 2000 bps; currency-qualified nonoverlapping intervals
+- project charge events append-only and deduped by attempt/source event; unknown amount null; old snapshot used for late receipt
+- manual subscription allocation never counted as a second provider cash charge; budget policy remains provider cost
+- tariff draft windows may overlap; activation timeline CAS derives nonoverlapping intervals, supersession never changes revision bytes
+- service delegation raw body SHA256 and exact issuer/client/Namespace/context/profile binding required; revocation tombstone and fence checked before each attempt
+- manual score unique run/candidate/case/repetition version and verified actor; no financial mutation
+- S2 proof uses the same early request/attempt/usage/price/ledger/budget primitives; no future-stage FK or unaccounted synthetic probe
+- unconfigured cost source is null FK plus explicit state/unknown basis, never a generated source identity
+- scheduled tariff cancellation appends one same-policy witness before activation time, increments policy CAS and preserves cancelled time identity
+- StatisticsFilters is the single canonical query/echo/cursor/export shape; protocol selects exactly one service invocation schema
+- unconfigured rate admission requires independently qualified billing currency and explicit bounded unknown-cost grant; active hard monetary budgets still fail closed
+- configuration absence does not prevent trusted late receipt confirmation; source_event identity and original tariff retained, no invented price row or double effective charge
+- all project policy mutations including draft creation/activation/cancellation serialize and increment stable policy CAS, distinct from immutable revision sequence
+- cancellation composite FK (activation_id,policy_id) references activation(id,policy_id); unique activation_id; no canonical activation update

@@ -29,4 +29,8 @@ those are execution checkpoints and do not become prerequisites for documentatio
 
 ## Актуализация 2026-10-09
 
-Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 230 geometry / 179 states / 123 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.
+Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 230 geometry / 179 states / 146 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.
+
+## Финальное readiness closure
+
+[READINESS_AUDIT](READINESS_AUDIT.md) фиксирует READY-01–05: early financial prerequisites, unconfigured/late-receipt distinction, cancellation/CAS, canonical filters и protocol union. Числа и evidence текущего результата — [QA](design/QA.md). Actual application execution remains not_run.

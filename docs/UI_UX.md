@@ -35,3 +35,5 @@ Picker содержит all/active/unbound и unavailable/archived/invalid. Вы
 ## Состояние и контекст
 
 Все tab families provider/expense/tariff используют allowlisted URL и native history. Несохранённые model fields/version живут отдельно от saved snapshot; native Back/Forward получает stay/discard guard. Namespace disabled state запрещает writes/admissions, сохраняет authorised history. Dataset project выводится из Namespace readback; второго editable selector нет. Rows/cursors/queries используют resource ID, никогда display text.
+
+Scheduled tariff cancellation — отдельное подтверждение с причиной и current CAS; отменённая запись остаётся в timeline. Source unconfigured отображается «Не задана», cost/basis/margin unknown, ID не выдумывается. Export показывает canonical group_by/timezone и explicit null для невыбранных API selectors.

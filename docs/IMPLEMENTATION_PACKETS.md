@@ -44,3 +44,13 @@ S2 cost-source settings и manual price snapshots; S3 immutable tariff admission
 ## TC-039
 
 Пакеты S2/S3/S5/S6 используют сохранённый draft/config proof, typed Namespace budget, price policy timeline и schema-derived dataset/run/score DTO. S7 потребляет [SERVICE_ADAPTER_V1](contracts/SERVICE_ADAPTER_V1.md), packed SDK и cross-owner negative/recovery fixtures. Prototype/crypto vectors — design evidence; actual consumer/runtime acceptance отдельна.
+
+## READY-01 — ранние prerequisites
+
+S2a: requests/replay/attempts/usage, price revisions, budgets/periods/reservations и
+ledger вводятся до S2b verification. Qualification control path использует тот же
+purpose-scoped grant, intent-before-I/O и settlement, что public S3, а не mock bypass.
+Dictionary.phase обозначает первое schema introduction; FR-009/010/012 завершаются
+после общего S3 gate. Basic budget/price forms доступны S2; полный dashboard — S5.
+S3 вводит проектные тарифы/cancellation/charges и service delegation; S5 отображает
+canonical StatisticsFilters. S7 проверяет protocol-discriminated service wire.
