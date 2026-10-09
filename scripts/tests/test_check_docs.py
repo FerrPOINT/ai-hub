@@ -59,6 +59,15 @@ class DocumentationGateTests(unittest.TestCase):
         )
         self.assertTrue(any("Unresolved OpenAPI ref" in e for e in validate(self.root)))
 
+    def test_duplicate_required_field_fails(self):
+        self.mutate(
+            "docs/contracts/openapi.v1.json",
+            lambda d: d["components"]["schemas"]["Statistics"]["required"].append(
+                "filter_echo"
+            ),
+        )
+        self.assertTrue(any("Duplicate required" in e for e in validate(self.root)))
+
     def test_missing_route_operation_fails(self):
         self.mutate(
             "docs/ui-routes.json",

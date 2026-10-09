@@ -19,3 +19,7 @@ Runtime-реализации и выпущенной версии пока не�
 - Полный UI design/prototype и source-bound IAB geometry/state/theme/flow evidence.
 - Fields/access/errors/state/reconciliation, DD и migration/implementation packets.
 - Отдельная выдача ключей, точный lookup, preserved draft/CAS, nullable fixed fees.
+
+## Документация и дизайн — 2026-10-09
+
+Добавлены Namespace, уведомления, per-model context, Admin field/storage mapping, потребительские примеры, совместимость и runbooks. Прототип сохраняет текущий стиль, моделирует новые действия и общий dataset. Backend/runtime/data не переносились.

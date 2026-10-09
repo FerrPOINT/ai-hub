@@ -27,3 +27,7 @@ Scope: rendered static prototype through Codex in-app browser, not real auth/bil
 Evidence manifest records actual routes/states/viewport/theme, h1/readiness, geometry,
 screenshot file/hash and scenario result. Screenshot itself inspected after capture.
 Image baseline is only design; production screenshots under actual UI acceptance later.
+
+## Актуализация 2026-10-09
+
+Namespace: UUID identity/foreign registry, tab isolation, URL Back/Forward/reload, unbound, archived/unavailable и dirty guard. Admin parity: model context switching, OpenRouter, managed operation readback/no duplicate, unknown physical bounds, history/rollback, multiple client profiles и notifications no financial mutation. Матрица включает 375/1440/1920/2560 и auth route.

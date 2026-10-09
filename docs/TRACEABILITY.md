@@ -2,7 +2,7 @@
 
 [traceability.json](traceability.json) — machine-readable planned requirements,
 stage DAG и behavioral test definitions; текст и JSON проверяются вместе.
-Все requirements принадлежат AI Hub; cross-product участники указаны в handoff.
+Все 37 requirements принадлежат AI Hub; cross-product участники указаны в handoff.
 Status planned/not_run, code coverage не заявлен.
 
 | Requirement | Owner specification                                        | Stage | Behavioral oracle |
@@ -42,7 +42,13 @@ Status planned/not_run, code coverage не заявлен.
 | NFR-007     | [Contract compatibility](API.md)                           | S7    | TC-033            |
 | NFR-008     | [Evidence integrity](QUALITY_GATE.md)                      | S7    | TC-034            |
 
-[UI map](ui-routes.json) связывает все 15 operational routes с target operation IDs,
+[UI map](ui-routes.json) связывает 15 operational routes и auth /login с target operation IDs,
 TC-024 и TC-032; draft OpenAPI покрывает весь перечисленный API.
 No missing test автоматически не означает implementation acceptance:
 код/DB/target evidence собирается по TESTING/QUALITY_GATE после разработки.
+
+| FR-027 | [Спецификация](contracts/NAMESPACE_V1.md) | S1 | TC-035 |
+
+| FR-028 | [Спецификация](contracts/ADMIN_HANDOFF_V1.md) | S7 | TC-036 |
+
+| FR-029 | [Спецификация](OPERATIONS.md) | S5 | TC-037 |

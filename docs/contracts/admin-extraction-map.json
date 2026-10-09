@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "status": "target-approved",
+  "source_repository": "admin-panel",
+  "source_revision": "7c4240a2154478b4866661cbc45dbd06d3e855e2",
+  "runtime_migration": "not_run",
+  "records": [
+    {
+      "id": "UI-01",
+      "section": "Активный AI-профиль",
+      "source_surface": "/ai",
+      "source_fields": "profile.provider/model/context_window_tokens/revision",
+      "target_surface": "models",
+      "target_operations": "readVirtualModel",
+      "target_store": "profile_revisions",
+      "preservation": "Неизменяемый снимок; начатый execution сохраняет старую версию"
+    },
+    {
+      "id": "UI-02",
+      "section": "Бюджет платной приёмки",
+      "source_surface": "/ai",
+      "source_fields": "limit/settled/reserved/uncertain/available_microdollars; unsettled/uncertain_requests; blocked_reason",
+      "target_surface": "budgets/expenses",
+      "target_operations": "readStatisticsExpenses",
+      "target_store": "budget_periods",
+      "preservation": "Точный decimal; неизвестный резерв удерживается"
+    },
+    {
+      "id": "UI-03",
+      "section": "Подключения",
+      "source_surface": "/ai?provider=chatgpt|openrouter",
+      "source_fields": "provider/model/context_window_tokens; connected/runtime_available/capabilities_verified",
+      "target_surface": "providers",
+      "target_operations": "listProviders",
+      "target_store": "connections",
+      "preservation": "OpenRouter остаётся явным preset; каталог не является proof"
+    },
+    {
+      "id": "UI-04",
+      "section": "Подключение",
+      "source_surface": "/ai",
+      "source_fields": "OpenRouter credential; ChatGPT operation_id/login_id/user_code/verification_url/expires_at/status",
+      "target_surface": "provider authorisation",
+      "target_operations": "writeCredential/startManagedLogin/cancelOperation",
+      "target_store": "credential_versions",
+      "preservation": "Write-only; собственная авторизация; повторный вход по умолчанию"
+    },
+    {
+      "id": "UI-05",
+      "section": "Модель и контекст",
+      "source_surface": "/ai",
+      "source_fields": "catalog model id/name/context_limit_tokens/max_output_tokens; model_contexts",
+      "target_surface": "catalog/model preferences",
+      "target_operations": "readModelCatalog/listModelContextPreferences/saveModelContextPreference",
+      "target_store": "model_context_preferences",
+      "preservation": "Точный model ID; тысячи ×1000; null limit не заменяется 256K"
+    },
+    {
+      "id": "UI-06",
+      "section": "Сохранить черновик",
+      "source_surface": "/ai",
+      "source_fields": "draft_revision; model/context_window_tokens; If-Match",
+      "target_surface": "model draft",
+      "target_operations": "updateVirtualModelDraft",
+      "target_store": "virtual_models",
+      "preservation": "CAS; изменение draft инвалидирует proof, даже при возврате значений"
+    },
+    {
+      "id": "UI-07",
+      "section": "Проверить модель / Сделать активным",
+      "source_surface": "/ai",
+      "source_fields": "verification_id; draft binding/generation/TTL; publication operation",
+      "target_surface": "model verify/publish",
+      "target_operations": "verifyVirtualModelDraft/publishRevision/readOperation",
+      "target_store": "verification_evidence",
+      "preservation": "В текущем Admin UI недоступно; qualification не наследуется"
+    },
+    {
+      "id": "UI-08",
+      "section": "Незавершённая операция",
+      "source_surface": "/ai",
+      "source_fields": "operation_id/provider/kind/status; pending login operation",
+      "target_surface": "operation readback",
+      "target_operations": "readOperation",
+      "target_store": "operations",
+      "preservation": "Тот же ID; запись, logout и потенциально платный вызов не дублируются"
+    },
+    {
+      "id": "DB-01",
+      "section": "Provider settings",
+      "source_surface": "0007_ai_profiles.sql",
+      "source_fields": "ai_provider_settings(workspace,provider,model,context_window_tokens,draft_revision,updated_at)",
+      "target_surface": "connections/drafts",
+      "target_operations": "createConnection/updateVirtualModelDraft",
+      "target_store": "virtual_models",
+      "preservation": "Явный mapping workspace → installation"
+    },
+    {
+      "id": "DB-02",
+      "section": "Immutable publications",
+      "source_surface": "0007_ai_profiles.sql",
+      "source_fields": "ai_profile_revisions(profile,credential_generation,operation_id,published_by,published_at); ai_active_profile",
+      "target_surface": "profile history",
+      "target_operations": "listRevisions",
+      "target_store": "profile_revisions",
+      "preservation": "Исходная revision связана с новым собственным ID; активация после target proof"
+    },
+    {
+      "id": "DB-03",
+      "section": "Publication outbox",
+      "source_surface": "0009_ai_publication_outbox.sql",
+      "source_fields": "ai_publication_outbox; pending candidate; registration readback",
+      "target_surface": "control operation journal",
+      "target_operations": "readOperation",
+      "target_store": "operations",
+      "preservation": "Исходный pending завершается или уточняется до cutover"
+    },
+    {
+      "id": "DB-04",
+      "section": "Per-model budgets",
+      "source_surface": "0010_ai_model_contexts.sql",
+      "source_fields": "ai_model_contexts(workspace,provider,model,context_window_tokens,updated_at)",
+      "target_surface": "context preferences",
+      "target_operations": "saveModelContextPreference",
+      "target_store": "model_context_preferences",
+      "preservation": "Уникальная source tuple; Namespace не ищется по имени"
+    },
+    {
+      "id": "RT-01",
+      "section": "Encrypted vault/managed login",
+      "source_surface": "backend/ai-runtime",
+      "source_fields": "encrypted state; generation; auth checkpoint; own key/CODEX_HOME",
+      "target_surface": "own vault/managed adapter",
+      "target_operations": "writeCredential/startManagedLogin",
+      "target_store": "credential_versions",
+      "preservation": "Global HOME не импортируется; ciphertext не включён в обычный export"
+    },
+    {
+      "id": "RT-02",
+      "section": "Acceptance ledger",
+      "source_surface": "backend/ai-runtime/src/budget.rs",
+      "source_fields": "limit/settled/reserved/uncertain counters; blocked reason; original charge/request identities",
+      "target_surface": "financial import",
+      "target_operations": "requestLedgerCorrection",
+      "target_store": "legacy_import_provenance",
+      "preservation": "Агрегат не создаёт историю receipt"
+    },
+    {
+      "id": "RT-03",
+      "section": "Execution journal",
+      "source_surface": "backend/ai-runtime/src/inference_journal.rs",
+      "source_fields": "intent; attempt; sequence/readback; scoped grant binding; sidecar retention",
+      "target_surface": "requests/attempts",
+      "target_operations": "readRequest/readRequestResult",
+      "target_store": "attempts",
+      "preservation": "Исходные IDs и dedupe; reasoning остаётся закрытым; повторного dispatch нет"
+    },
+    {
+      "id": "RT-04",
+      "section": "Provider transport/policies",
+      "source_surface": "backend/ai-runtime",
+      "source_fields": "OpenRouter endpoint/max_price; native binary/version/tool policy; cached/reasoning/tool continuation",
+      "target_surface": "qualified adapters",
+      "target_operations": "startVerification",
+      "target_store": "runtime_qualifications",
+      "preservation": "Переиспользуются требования и fixtures; target adapter квалифицируется отдельно"
+    },
+    {
+      "id": "KEEP-01",
+      "section": "Identity/PAT",
+      "source_surface": "/users /tokens",
+      "source_fields": "central identity/session/PAT grants",
+      "target_surface": "Central Auth/Admin",
+      "target_operations": "retained",
+      "target_store": "retained",
+      "preservation": "Hub не владеет паролями и central sessions"
+    },
+    {
+      "id": "KEEP-02",
+      "section": "Namespace registry",
+      "source_surface": "/namespaces",
+      "source_fields": "Namespace lifecycle/owner ACK",
+      "target_surface": "Admin",
+      "target_operations": "retained",
+      "target_store": "retained",
+      "preservation": "Hub владеет только verified binding; нового ResourceKind нет"
+    },
+    {
+      "id": "KEEP-03",
+      "section": "Branding/service catalogue",
+      "source_surface": "/branding /services /runtime",
+      "source_fields": "published branding/service metadata/integration health",
+      "target_surface": "Admin",
+      "target_operations": "retained",
+      "target_store": "retained",
+      "preservation": "После cutover только состояние и переход"
+    },
+    {
+      "id": "KEEP-04",
+      "section": "Agent roles/Task/tools",
+      "source_surface": "Fleet/Tracker/Workflow",
+      "source_fields": "grant issuer/lease/agent role/Task transitions/tool executor",
+      "target_surface": "original owners",
+      "target_operations": "retained",
+      "target_store": "retained",
+      "preservation": "Hub проверяет binding; Fleet grant не превращается в общий Hub key"
+    }
+  ],
+  "rules": {
+    "workspace_is_namespace": false,
+    "old_proof_active": false,
+    "credential_default": "reauthorize",
+    "money_divisor": "1000000",
+    "source_amount_type": "uint64_string",
+    "aggregate_creates_receipts": false
+  }
+}

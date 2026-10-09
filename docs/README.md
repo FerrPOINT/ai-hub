@@ -69,3 +69,9 @@ Single owner specification каждой нормы указан в TRACEABILITY.
 - [Typed data dictionary](DATA_DICTIONARY.md), [migration plan](MIGRATION_PLAN.md)
 - [Implementation packets](IMPLEMENTATION_PACKETS.md), [design acceptance](DESIGN_ACCEPTANCE.md)
 - [Rendered QA](design/QA.md), [галерея](design/gallery.html)
+
+## Актуализация и выделение из Admin
+
+[Namespace](contracts/NAMESPACE_V1.md), [Consumer](contracts/CONSUMER_V1.md), [версии API](API_VERSIONING.md), [руководство](USER_GUIDE.md). Typed OpenAPI, DD и UI обновляются вместе; operational acceptance остаётся not_run.
+
+[Реестр актуализации](ALIGNMENT_REGISTER.md) связывает источники, устранённые пробелы и проверки.

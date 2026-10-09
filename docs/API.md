@@ -189,3 +189,13 @@ all source/derived fields/actions. PriceInput.request_fee хранит nullable 
 не actual списание; DatasetInput case.tools фиксирует caller schemas для проверки.
 Control one-time key replay при недоступном output:409 one_time_output_unavailable,
 метаданные операции сохраняются; explicit rotation, no new implicit issue.
+
+## Дополнительные target operations
+
+| listModelContextPreferences | `GET /api/v1/connections/{connection_id}/model-contexts` |
+| saveModelContextPreference | `PUT /api/v1/connections/{connection_id}/model-contexts` |
+| listNamespaceBindings | `GET /api/v1/namespaces` |
+| listNotifications | `GET /api/v1/notifications` |
+| ackNotification | `POST /api/v1/notifications/{notification_id}/ack` |
+
+[Версионирование](API_VERSIONING.md); [Namespace](contracts/NAMESPACE_V1.md). Query q/status/mode/action bounded и allowlisted. Namespace query pair validates grants, malformed input не сбрасывает фильтр. ACK actor-local и идемпотентен.

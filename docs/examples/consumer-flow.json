@@ -1,0 +1,45 @@
+{
+  "kind": "synthetic-design-example",
+  "runtime_acceptance": "not_run",
+  "namespace": {
+    "registry_instance_id": "10000000-0000-4000-8000-000000000001",
+    "namespace_id": "20000000-0000-4000-8000-000000000001"
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "headers": {
+      "Idempotency-Key": "30000000-0000-4000-8000-000000000001"
+    },
+    "body": {
+      "model": "main-dev",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Синтетическая проверка"
+        }
+      ],
+      "stream": false
+    }
+  },
+  "response_headers": {
+    "X-AIHub-Request-Id": "40000000-0000-4000-8000-000000000001",
+    "X-AIHub-Profile-Revision": "12"
+  },
+  "unknown": {
+    "state": "unknown",
+    "amount": null,
+    "reserved": "0.240000000000000000",
+    "action": "read_original_request_no_redispatch"
+  },
+  "migration_money_cases": [
+    {
+      "microdollars": "1",
+      "decimal": "0.000001"
+    },
+    {
+      "microdollars": "18446744073709551615",
+      "decimal": "18446744073709.551615"
+    }
+  ]
+}

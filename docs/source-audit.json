@@ -1,48 +1,48 @@
 {
   "schema_version": 1,
-  "review_date": "2026-10-08",
+  "review_date": "2026-10-09",
   "sources": [
     {
       "repository": "services-base",
-      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",
       "path": "docs/REPO_STANDARDS.md",
-      "sha256": "551e926d88d3c668ffc59969fe42f6a0c25f4d29d373d14494fa18ad359f5804"
+      "sha256": "0d4979b74592d3c51eeb419b1efad252da4df6565120f0261e04b7c60e9d1c23"
     },
     {
       "repository": "services-base",
-      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",
       "path": "docs/README_SYSTEM.md",
-      "sha256": "47f5ec3cc5f533a4012ed25cb1ec000eaf89876ea0fe5606f4da0691319a12a1"
+      "sha256": "c53d7b74a323044efbad6cf108e56712a46db5507bfaa81a7bd23a73818b55a4"
     },
     {
       "repository": "services-base",
-      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",
       "path": "docs/DOCUMENTATION_HUB.md",
-      "sha256": "eb4e2e241d8b236fd01602af35be1bee9132481d7b03fab688f1811e612edd1f"
+      "sha256": "8baf8fc87c79e005a76533d9a30b3c8be1a0fed4dc770733b5d70ef8938fc5c0"
     },
     {
       "repository": "services-base",
-      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",
       "path": "docs/BASE_COMPATIBILITY.md",
-      "sha256": "1c5515cbf5058e6adf2178204c3cf300db2a82f187b217ab154cd28268afbed4"
+      "sha256": "958ff79559773c8adec304a7041f1e22439e66c539b5feccd71160c3c0f1af35"
     },
     {
       "repository": "services-base",
-      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",
       "path": "docs/AUTH.md",
-      "sha256": "2fefc4fa84218eed70e6c6e559fbfbc2024c79c72541e9e2bec1232dcfa8bcc1"
+      "sha256": "c102c89a0afad90d024f79029e3d1bd39216641ec5cf5589429bafd4c40250cc"
     },
     {
       "repository": "services-base",
-      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",
       "path": "docs/platform/UI_UX_STANDARD.md",
-      "sha256": "5e0e577e9d8b0a8439b40e17205f7ae0cc8e9d7d2d2f97eca7ecead487bff395"
+      "sha256": "48ad3ab46bab5f3a6629521885567377e4c35b7328a3c34eba74c959cebd1b26"
     },
     {
       "repository": "services-base",
-      "revision": "3a48de8c5696dd20b78c94205d9feb7dbb69c8e0",
+      "revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",
       "path": "docs/platform/UI_SHELL_STANDARD.md",
-      "sha256": "00734febc81f6b0472b7b73965657ad3707b4ca0bea5df62d73171e3faf77062"
+      "sha256": "1844d7c68b7a28eb7fa9feee60b35eba1e84e58a2a2fb68453d9805a6e05afe7"
     },
     {
       "repository": "fleet-control",
@@ -52,19 +52,19 @@
     },
     {
       "repository": "admin-panel",
-      "revision": "237a697f4e3eef9ff95e8cf6082932e5a182e6ae",
+      "revision": "7c4240a2154478b4866661cbc45dbd06d3e855e2",
       "path": "docs/adr/0018-ai-providers-runtime.md",
       "sha256": "5fc45df0eb0487c1acdd84eb2b1deeeb9f2175f95dda102ae00a24b1d5fdfd4a"
     },
     {
       "repository": "admin-panel",
-      "revision": "237a697f4e3eef9ff95e8cf6082932e5a182e6ae",
+      "revision": "7c4240a2154478b4866661cbc45dbd06d3e855e2",
       "path": "docs/contracts/AI_PROFILE_V1.md",
       "sha256": "29ea903717bbc2ae42976490b9119ae3f4ac99459a513a62d13914d436da6ee7"
     },
     {
       "repository": "admin-panel",
-      "revision": "237a697f4e3eef9ff95e8cf6082932e5a182e6ae",
+      "revision": "7c4240a2154478b4866661cbc45dbd06d3e855e2",
       "path": "backend/ai-runtime/README.md",
       "sha256": "8780d9fbacd8ec8cb8d553fc00c9d9ac8edd46dc93fbb25fd61b1be56f20553c"
     },
@@ -96,11 +96,13 @@
     },
     {
       "repository": "admin-panel",
-      "revision": "237a697f4e3eef9ff95e8cf6082932e5a182e6ae",
+      "revision": "7c4240a2154478b4866661cbc45dbd06d3e855e2",
       "path": "backend/domain/src/lib.rs",
-      "sha256": "016e7ed841ac603125bf8dda8fb5d5547e6edd036b0119b17b503de389ce2cac"
+      "sha256": "904fb93595dc25c39308fb482ae9909e31b24aae950fe591bbff7f1cbab6ef1b"
     }
   ],
   "live_octo_verified": false,
-  "provider_calls": 0
+  "provider_calls": 0,
+  "sdk_baseline_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
+  "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
 }

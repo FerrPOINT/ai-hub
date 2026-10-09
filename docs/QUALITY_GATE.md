@@ -49,3 +49,7 @@ Documentation prepared, source implemented, local gate, hosted checks, image run
 Before release: all requirements tested, blockers resolved/explicit accepted,
 served source identity and config verified, backup/rollback/load checks attached.
 Hosted CI optional mirror; локальные обязательные gates не заменяются его отсутствием.
+
+## Актуализация 2026-10-09
+
+Дополнительный действующий gate: `python scripts/check_alignment.py`. Он проверяет source mapping, namespaces, filters и exact legacy decimal conversion. IAB regression runner `scripts/design_flows.mjs` принимает существующий IAB tab; отдельный браузер не запускает.

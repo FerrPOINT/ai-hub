@@ -34,3 +34,7 @@ Typed DTO/schema drift, React Query stale-data/invalidations, focus/pending/dirt
 draft и keyboard, supported themes и реальные SSO/logout flows.
 UI fixture не proof capability/billing. Компоненты sidebar/header не дублируются;
 геометрия из Base UI Shell, route-specific exception отсутствует.
+
+## Канонический UI контракт
+
+[UI/UX Standard](https://github.com/FerrPOINT/services-base/blob/81decf7d9edd2c4218d8625a96e2e25c0617e9f1/docs/platform/UI_UX_STANDARD.md) и [UI Shell](https://github.com/FerrPOINT/services-base/blob/81decf7d9edd2c4218d8625a96e2e25c0617e9f1/docs/platform/UI_SHELL_STANDARD.md) — нормативные источники. NamespacePicker controlled, URL state tab-local. Общие provider/profile страницы отмечены «Установка». Notification polling: 30s только видимая active authenticated page, один in-flight request, остановка при logout/hidden; ошибка сохраняет last-success. Это target app behavior, не новый worker прототипа.

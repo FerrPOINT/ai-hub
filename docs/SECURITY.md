@@ -55,3 +55,7 @@ Evaluation artifacts opt-in own dataset owner, default TTL=7 дней.
 ledger archival сохраняет audit digest и restore-compatible dedupe.
 TTL worker не вызывает model/provider endpoints. Privacy export scope enforcement
 на сервере; CSV formula injection neutralized.
+
+## Актуализация 2026-10-09
+
+NamespaceRef, verified project projection и machine bindings описаны в [NAMESPACE_V1](contracts/NAMESPACE_V1.md). Непривязанные записи не получают права любого Namespace. Notification ACK actor-local; credentials не переносятся обычным export.

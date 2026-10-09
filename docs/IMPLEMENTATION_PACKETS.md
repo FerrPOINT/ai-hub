@@ -32,3 +32,7 @@ request-scoped fields, or copied provider policy in pages.
 - Before delivery: minimality/owner review, clean source, exact source evidence.
 - Current UI design screenshots are prototype evidence; replace with actual served
   app receipts at UI implementation checkpoints.
+
+## Актуализация 2026-10-09
+
+FR-027/TC-035: S1 namespace projection + S3 frozen admission context. FR-028/TC-036: S2 model preferences и S7 extraction. FR-029/TC-037: S5 polling notification projection/actor ACK. До кодирования packets используют актуальные OpenAPI/DD/design; docs+prototype gates не подменяют live acceptance.

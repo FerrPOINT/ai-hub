@@ -33,3 +33,7 @@ origins и encrypted state. Missing state/key — error, не fresh empty replac
 Settings API выдаёт только allowed effective config+revision, no env dump.
 Secrets rotation не требует rewriting source; advertised limits correspond to
 applied config revision and are verified via runtime readback.
+
+## Актуализация 2026-10-09
+
+Namespace owner readers получают fixed origins и private token files отдельной конфигурацией S1; не принимают endpoint/token из UI. Source AI_RUNTIME_* mapping описан в [ADMIN_HANDOFF_V1](contracts/ADMIN_HANDOFF_V1.md); реальный export секретов не выполнялся.

@@ -33,3 +33,11 @@ Exact SDK clean source + feature-isolated domain dependencies, OpenAPI transport
 central session/PAT/logout, UI package consumer/effective themes и no-cross-DB tests.
 Перенос нового продукта в Base docs mirror идёт owner sync tool, не ручной правкой
 docs/products и не изменением соседних repo в рамках этого baseline.
+
+## Namespace и потребители
+
+[Namespace v1](contracts/NAMESPACE_V1.md) и [Consumer v1](contracts/CONSUMER_V1.md) фиксируют adaptation. Base владеет техническими типами и UI/UX Standard; Admin владеет registry. Legacy SDK pin сохраняется, Namespace cohort проверяется отдельно при реализации. Hub не становится новым Admin ResourceKind и не участвует в трёх lifecycle ACK текущего registry.
+
+## Актуализация 2026-10-09
+
+AI Hub добавляется в documentation mirror явным onboarding; это не runtime service registration и не разрешение installation cutover. Admin transition сохраняет /ai до accepted S7, затем status/link и Namespace-aware UI redirect.

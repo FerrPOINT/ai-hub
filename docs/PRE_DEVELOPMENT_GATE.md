@@ -24,8 +24,8 @@
 ## Статус
 
 DEVELOP_READY для начала S1. Offline, semantic и rendered design gates завершены.
-Проверены root matrix, owner boundaries/transition, 34 requirements и их 34
-planned behavioral tests, stage DAG, 15 UI routes и соответствующие API actions.
+Проверены root matrix, owner boundaries/transition, 37 requirements и их 37
+planned behavioral tests, stage DAG, 15 operational + 1 auth UI routes и соответствующие API actions.
 Согласованы draft-before-proof, publication TTL/runtime qualification, streaming
 readback/own result grants, financial precision и static platform capability paths.
 Рабочие команды проверки в QUALITY_GATE воспроизводимы; independent OpenAPI
@@ -37,3 +37,7 @@ not_run. Пакет позволяет начать S1 без доступа к 
 
 Полный design handoff: DESIGN_SYSTEM/UI_SCREEN_SPEC/UI_FIELD_REFERENCE и
 source-bound design evidence. Недостаточно одного source map без rendered checks.
+
+## Актуализация 2026-10-09
+
+Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 219 geometry / 168 states / 73 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.

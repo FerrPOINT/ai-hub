@@ -34,3 +34,25 @@ Deletion/archival сверяется с independent replay/financial TTL и rest
 При подозрении на key leak revoke affected connection/client и сохранить safe
 evidence, не переписывать history. При cost overrun block new paid admission,
 показать real fact/held reserve и разблокировать только audited policy/reconciliation.
+
+## Уведомления v1
+
+listNotifications возвращает safe authorized projection, ACK сохраняет verified actor и
+original event/idempotency identity. Delivery ACK outbox не пользовательское прочтение.
+Read ai-hub:read, actor ACK ai-hub:write либо accepted central access с scoped grant.
+Polling 30s visible page; hidden/logout останавливает чтение. Ошибка не очищает данные.
+ACK не settlement, release reserve, re-enable connection или изменение финансов.
+
+## Runbook до появления runtime-команд
+
+| Симптом                        | Диагностика                                           | Действие                                                      | Подтверждение                                                         |
+| ------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Auth недоступен                | issuer/session validation health и request ID         | Закрыть новые protected admissions, сохранить UI draft        | Verified session восстановлена; denied requests не dispatch           |
+| Request завис                  | original ID, attempt intent, accepted/unknown, lease  | Readback/reconcile, без нового invocation                     | Тот же ID и receipt; no duplicate attempt                             |
+| Неизвестная стоимость          | trusted usage/price/receipt и reserve                 | Сохранить unknown, получить owner receipt                     | Settlement append-only, резерв освобождён только по evidence          |
+| Статистика отстаёт             | watermark/lag, canonical ledger snapshot              | Scoped rebuild без model calls                                | Суммы и unknown counts совпадают с canonical                          |
+| Graceful shutdown              | active attempts/streams и dispatch intents            | Запретить admission, bounded drain 120s; unresolved → unknown | Durable terminal/unknown записан, reserve сохранён; restart no resend |
+| Namespace unavailable/archived | Exact registry/Namespace pair и last verified binding | Закрыть scoped writes/admission, сохранить authorised history | Owner readback подтверждает active generation                         |
+
+Исполняемые commands добавляются после настоящего S1/S3 runtime. Не подставлять
+mock responses или healthy container вместо проверки перечисленных границ.

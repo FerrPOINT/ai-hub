@@ -1,26 +1,19 @@
 # Текущее состояние
 
-Дата: 2026-10-09. Stage: DEVELOP_READY — полный docs/design пакет, можно начинать S1.
+Дата: 2026-10-09. Stage: DEVELOP_READY — согласованный документационный/design пакет.
 
-- Документированы назначение/scope, stack/owner boundaries, providers и profiles.
-- Определены API/data/ledger/statistics/budgets/evaluations/security/UI scenarios.
-- Есть planned traceability и vertical implementation graph S1–S7.
-- Backend/frontend/SQL migrations/provider adapters/runtime пока отсутствуют.
-- Credentials не вводились, paid calls=0; Octo/Admin/PDLC deployment не изменялись.
-- Hosted application CI, SSO, provider/consumer/browser acceptance: not_run.
+- 37 FR/NFR и 37 planned behavioral tests; приложение и их runtime-приёмка не реализованы.
+- Typed draft OpenAPI 0.2.0-design, 39 таблиц / 336 полей в проектном dictionary.
+- 15 operational routes + auth /login; три темы, Namespace и миграционная карта Admin.
+- IAB: 219 geometry, 168 state, 73 flow assertions; 48 native viewport screenshots.
+- [Карта переноса](contracts/ADMIN_HANDOFF_V1.md) содержит 20 source UI/API/storage/retained-owner rows.
+- Backend/frontend manifests, SQL migrations, provider adapters и runtime отсутствуют.
+- Реальные credentials, authorization, данные, Admin /ai и установленный PDLC/Octo не переносились.
+- SDK .base-revision, skills pin и operator tooling сохранены; Namespace cohort — отдельная будущая квалификация.
 
-Смысловой audit и offline structural gate завершены: FR/NFR/test/stage/route
-coverage, local links, license parity и synthetic financial arithmetic проверены.
-Independent OpenAPI 3.1/schema checker проверяет compatible subset, сохранение
-unknown, draft-before-proof, stateless tools и pinned mode.
-Fault injection tests проверяют, что gate отвергает повреждённые входы.
-Publication exact-head readback фиксируется отдельно в handoff, не как runtime PASS.
-Следующий implementation frontier — S1 с собственными manifests/grants/schema.
+## Следующая веха
 
-Полный интерактивный дизайн:15 screens,12 states,3 themes; evidence kind prototype.
-102 geometry +165 state checks,54 behavioral assertions; typed DD34 tables/294 fields.
-Снимки/source hashes и handoff в design/QA, DEVELOP_READY; app acceptance not_run.
-
-Повторная UI/UX проверка устранила дублирование шапки, ложные сохранения,
-неработающие разрезы/фильтры и подмену нового запуска историческим.
-Причины, регрессии и ограничения — [UX_RECHECK](design/UX_RECHECK.md).
+S1 создаёт настоящее изолированное приложение, own schema, Base/Namespace bridge и
+trusted access. S2–S7 отдельно доказывают provider/inference/ledger/consumer/UI/restore.
+Документационный онбординг Base — discovery и provenance, не runtime registration.
+Publication exact heads и mirror owner commit проверяются после owner commits.

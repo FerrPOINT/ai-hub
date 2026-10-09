@@ -401,6 +401,59 @@
         --color-success: #166534;
         --color-warning: #92400e;
       }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      .platform-header-services {
+        flex-shrink: 0;
+      }
+      .platform-header-services .service-button {
+        white-space: nowrap;
+        min-width: 82px;
+      }
+      .platform-header-context {
+        margin-left: auto;
+        flex: 1;
+        min-width: 0;
+        justify-content: flex-end;
+        border-left: 0;
+      }
+      .platform-header .header-context {
+        display: block;
+        max-width: 200px;
+        min-width: 0;
+        min-height: 40px;
+        background: var(--color-surface);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+      }
+      @media (max-width: 767px) {
+        .platform-header-context {
+          display: flex;
+          padding: 0;
+        }
+        .platform-header .header-context {
+          display: block;
+          max-width: 120px;
+          min-height: 44px;
+        }
+        .platform-header {
+          gap: 4px;
+        }
+        .platform-header-services .service-button {
+          padding: 8px;
+          max-width: 90px;
+        }
+      }
     </style>
     <style>
       [hidden] {
@@ -1652,6 +1705,52 @@
           grid-template-columns: minmax(0, 1fr);
         }
       }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      .platform-header-context {
+        margin-left: auto;
+        flex: 1;
+        min-width: 0;
+        justify-content: flex-end;
+        border-left: 0;
+      }
+      .platform-header .header-context {
+        display: block;
+        max-width: 200px;
+        min-width: 0;
+        min-height: 40px;
+        background: var(--color-surface);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+      }
+      @media (max-width: 767px) {
+        .platform-header-context {
+          display: flex;
+          padding: 0;
+        }
+        .platform-header .header-context {
+          display: block;
+          max-width: 120px;
+          min-height: 44px;
+        }
+        .platform-header {
+          gap: 4px;
+        }
+        .platform-header-services .service-button {
+          padding: 8px;
+          max-width: 90px;
+        }
+      }
     </style>
   </head>
   <body class="base-app-shell">
@@ -1770,7 +1869,12 @@
         </button>
       </div>
       <div class="platform-header-context" data-platform-header-slot="context">
-        <span class="header-context">Рабочее пространство Base</span>
+        <label class="sr-only" for="namespace-select">Проект Namespace</label
+        ><select
+          id="namespace-select"
+          aria-label="Проект Namespace"
+          class="header-context"
+        ></select>
       </div>
       <div class="platform-header-actions" data-platform-header-slot="actions">
         <button
@@ -1842,6 +1946,19 @@
       </div>
     </dialog>
     <dialog id="modal" class="modal" aria-labelledby="modal-title"></dialog>
+    <dialog id="draft-guard" class="modal" aria-labelledby="draft-guard-title">
+      <div class="modal-head">
+        <h2 id="draft-guard-title">Есть несохранённый ввод</h2>
+      </div>
+      <div class="modal-body"><p>Отменить изменения этой формы?</p></div>
+      <div class="modal-actions">
+        <button class="btn" data-action="stay-dialog">
+          Продолжить редактирование</button
+        ><button class="btn danger" data-action="discard-dialog">
+          Отменить изменения
+        </button>
+      </div>
+    </dialog>
     <div id="toast" role="status" aria-live="polite" hidden></div>
     <script>
       "use strict";
@@ -2217,7 +2334,240 @@
         ]),
       );
       const clientMeta = {};
+      const registryInstance = "10000000-0000-4000-8000-000000000001";
+      const namespaceCatalog = [
+        {
+          id: "20000000-0000-4000-8000-000000000001",
+          label: "Платформа",
+          project: "platform",
+          state: "active",
+        },
+        {
+          id: "20000000-0000-4000-8000-000000000002",
+          label: "Тестирование",
+          project: "testing",
+          state: "active",
+        },
+        {
+          id: "20000000-0000-4000-8000-000000000003",
+          label: "Архивный проект",
+          project: null,
+          state: "archived",
+        },
+        {
+          id: "20000000-0000-4000-8000-000000000004",
+          label: "Недоступный проект",
+          project: null,
+          state: "unavailable",
+        },
+      ];
+      const clientNamespaces = {
+        fleet: namespaceCatalog[0].id,
+        forge: namespaceCatalog[0].id,
+        "ci-test": namespaceCatalog[1].id,
+      };
+      const requestClientIds = {
+        a17d: "fleet",
+        b82c: "ci-test",
+        c94e: "forge",
+        d05f: "ci-test",
+        e26a: "fleet",
+        f31b: "forge",
+      };
+      clients.find((c) => c[0] === "fleet")[4] = "870";
+      clients.find((c) => c[0] === "fleet")[5] = "5,55 $";
+      clients.push([
+        "local-demo",
+        "Локальный тест",
+        "Без привязки",
+        "main-dev",
+        "10",
+        "0,10 $",
+        "Без ключа",
+      ]);
+      requestClientIds.g42 = "ci-test";
+      requestClientIds.h53 = "local-demo";
+      clientNamespaces["local-demo"] = null;
+      requests.push(
+        [
+          "g42",
+          "13:25:10",
+          "app-test",
+          "CI тесты",
+          "Не подтверждена",
+          "Исход неизвестен",
+          "warn",
+          "—",
+          "Неизвестно",
+          1,
+        ],
+        [
+          "h53",
+          "13:24:12",
+          "main-dev",
+          "Локальный тест",
+          "model-a",
+          "Завершён",
+          "good",
+          "0,0100 $",
+          "Подтверждено",
+          1,
+        ],
+      );
+      clients.forEach((c) => (c[3] = [c[3]]));
+      let pendingNamespace = null,
+        modalDirty = false;
+      const modelContexts = {
+        "api-a/model-a": "128000",
+        "api-a/model-b-small": "64000",
+        "ollama/model-b": "128000",
+        "ollama/model-b-small": "64000",
+        "openrouter/model-a": "256000",
+        "openrouter/model-b-small": "64000",
+      };
+      const dailyFacts = {
+        platform: {
+          requests: [158, 162, 188, 155, 180, 205, 182],
+          usd: [90, 120, 130, 120, 160, 180, 175],
+          eur: [20, 30, 15, 25, 30, 40, 50],
+        },
+        testing: {
+          requests: [24, 19, 22, 13, 21, 19, 26],
+          usd: [44, 38, 33, 30, 44, 36, 30],
+          eur: [0, 0, 0, 0, 0, 0, 0],
+        },
+        unbound: {
+          requests: [10, 0, 0, 0, 0, 0, 0],
+          usd: [10, 0, 0, 0, 0, 0, 0],
+          eur: [0, 0, 0, 0, 0, 0, 0],
+        },
+      };
+      dailyFacts.all = Object.fromEntries(
+        ["requests", "usd", "eur"].map((key) => [
+          key,
+          [...Array(7)].map((_, i) =>
+            ["platform", "testing", "unbound"].reduce(
+              (sum, scope) => sum + dailyFacts[scope][key][i],
+              0,
+            ),
+          ),
+        ]),
+      );
+      const modelBounds = {
+        "api-a/model-a": { context: 128000, output: 8000 },
+        "api-a/model-b-small": { context: 64000, output: 4000 },
+        "ollama/model-b": { context: 128000, output: 8000 },
+        "ollama/model-b-small": { context: 64000, output: 4000 },
+      };
+      const modelContextDrafts = {},
+        revisionHistory = {},
+        connectionOperations = {};
+      const providerHistory = new Set(["api-a", "ollama"]);
+      const notificationRecords = [
+        {
+          id: "budget-ci",
+          namespace: namespaceCatalog[1].id,
+          title: "CI тесты · достигнут порог 80%",
+          message: "Лимит 5,00 USD. Доступно 0,85 USD с учётом резерва.",
+          route: "/budgets",
+          ack: false,
+        },
+        {
+          id: "unknown-platform",
+          namespace: namespaceCatalog[0].id,
+          title: "Стоимость уточняется",
+          message:
+            "2 попытки без полной стоимости. Резерв 0,37 USD удерживается.",
+          route: "/requests/c94e",
+          ack: false,
+        },
+        {
+          id: "installation-budget",
+          namespace: null,
+          title: "Установка · достигнут порог 95%",
+          message:
+            "Доступно 2,03 USD. Подтверждение уведомления не меняет бюджет.",
+          route: "/budgets",
+          ack: false,
+        },
+      ];
+      function namespaceContext() {
+        const q = new URLSearchParams(location.search),
+          registries = q.getAll("registry_instance_id"),
+          ids = q.getAll("namespace_id");
+        if (q.get("binding") === "unbound" && (registries.length || ids.length))
+          return { state: "invalid", label: "Конфликт контекста" };
+        if (!registries.length && !ids.length) return null;
+        if (
+          registries.length !== 1 ||
+          ids.length !== 1 ||
+          registries[0] !== registryInstance
+        )
+          return { state: "invalid", label: "Неверный контекст" };
+        return (
+          namespaceCatalog.find((n) => n.id === ids[0]) || {
+            state: "invalid",
+            label: "Неизвестный проект",
+          }
+        );
+      }
+      function readFilters() {
+        filterValues = Object.fromEntries(
+          [...new URLSearchParams(location.search)].filter(([key]) =>
+            [
+              "period",
+              "currency-filter",
+              "request-status",
+              "dimension",
+              "audit-action",
+              "audit-query",
+              "provider-query",
+              "provider-status",
+              "model-query",
+              "model-status",
+              "model-filter-mode",
+            ].includes(key),
+          ),
+        );
+        filterValues["project-filter"] =
+          new URLSearchParams(location.search).get("binding") === "unbound"
+            ? "unbound"
+            : namespaceContext()?.project || "all";
+      }
+      function setNamespace(value) {
+        const url = new URL(location.href);
+        [
+          "registry_instance_id",
+          "namespace_id",
+          "project-filter",
+          "cursor",
+        ].forEach((key) => url.searchParams.delete(key));
+        if (value && value !== "unbound") {
+          url.searchParams.set("registry_instance_id", registryInstance);
+          url.searchParams.set("namespace_id", value);
+        }
+        if (value === "unbound") url.searchParams.set("binding", "unbound");
+        else url.searchParams.delete("binding");
+        history.pushState(null, "", url);
+        pendingNamespace = null;
+        readFilters();
+        render();
+      }
+      function namespaceMatches(value) {
+        const ns = namespaceContext();
+        if (ns && ns.state !== "active") return false;
+        if (new URLSearchParams(location.search).get("binding") === "unbound")
+          return !value;
+        return !ns || value === ns.id;
+      }
+      function visibleNotifications() {
+        return notificationRecords.filter(
+          (n) => !n.namespace || namespaceMatches(n.namespace),
+        );
+      }
+
       const requestCancellations = new Set();
+      const requestReserves = { c94e: "0,24", g42: "0,35" };
       const profileRoutes = {};
       const modelOptions = (provider) => {
         const p = sources.find((p) => p[0] === provider);
@@ -2250,8 +2600,8 @@
           target: "ci-test",
           name: "CI тесты",
           currency: "USD",
-          limit: "10.00",
-          charged: "7.90",
+          limit: "5.00",
+          charged: "3.80",
           reserved: "0.35",
           period: "month",
           first: 80,
@@ -2306,11 +2656,12 @@
         const scope = document.querySelector("#budget-scope").value;
         const options = {
           installation: [["hub-demo", "Установка"]],
-          client: clients.map((c) => [c[0], c[1]]),
-          project: [
-            ["platform", "Платформа"],
-            ["testing", "Тестирование"],
-          ],
+          client: clients
+            .filter((c) => namespaceMatches(clientNamespaces[c[0]]))
+            .map((c) => [c[0], c[1]]),
+          project: namespaceCatalog
+            .filter((n) => n.state === "active" && namespaceMatches(n.id))
+            .map((n) => [n.project, n.label]),
           profile: profiles.map((p) => [p.id, p.id]),
         };
         document.querySelector("#budget-target").innerHTML = options[scope]
@@ -2323,12 +2674,12 @@
           project: "platform",
           model: "main-dev",
           provider: "API",
-          count: 880,
-          usd: 565,
-          estimate: 235,
+          count: 870,
+          usd: 555,
+          estimate: 230,
           eur: 140,
           eurEstimate: 20,
-          unknown: 2,
+          unknown: 1,
         },
         {
           client: "Forge CI/CD",
@@ -2350,6 +2701,18 @@
           count: 144,
           usd: 255,
           estimate: 125,
+          eur: 0,
+          eurEstimate: 0,
+          unknown: 1,
+        },
+        {
+          client: "Локальный тест",
+          project: "unbound",
+          model: "main-dev",
+          provider: "API",
+          count: 10,
+          usd: 10,
+          estimate: 5,
           eur: 0,
           eurEstimate: 0,
           unknown: 0,
@@ -2396,12 +2759,7 @@
           String(r.unknown),
         ]);
         if (dimension === "day") {
-          const counts =
-            {
-              all: [192, 181, 210, 168, 201, 224, 208],
-              platform: [168, 162, 188, 155, 180, 205, 182],
-              testing: [24, 19, 22, 13, 21, 19, 26],
-            }[project] || [];
+          const counts = (dailyFacts[project] || dailyFacts.all).requests;
           const totals = [...groups.values()].reduce(
             (a, r) => ({
               confirmed: a.confirmed + r.confirmed,
@@ -2414,17 +2772,9 @@
             `${i + 2} октября`,
             String(count),
             cents(
-              (currency === "EUR"
-                ? {
-                    all: [20, 30, 15, 25, 30, 40, 50],
-                    platform: [20, 30, 15, 25, 30, 40, 50],
-                    testing: [0, 0, 0, 0, 0, 0, 0],
-                  }
-                : {
-                    all: [144, 158, 163, 150, 204, 216, 205],
-                    platform: [100, 120, 130, 120, 160, 180, 175],
-                    testing: [44, 38, 33, 30, 44, 36, 30],
-                  })[project][i],
+              (dailyFacts[project] || dailyFacts.all)[
+                currency === "EUR" ? "eur" : "usd"
+              ][i],
               currency,
             ),
             cents(
@@ -2456,10 +2806,17 @@
           document.querySelectorAll("#main tbody tr").forEach((row, i) => {
             const record = requests[i];
             if (!record) return;
-            const client = clients.find((c) => c[1] === record[3]);
+            const client = clients.find(
+              (c) => c[0] === requestClientIds[record[0]],
+            );
             const recordProject =
-              client?.[2] === "Тестирование" ? "testing" : "platform";
+              namespaceCatalog.find(
+                (n) => n.id === clientNamespaces[requestClientIds[record[0]]],
+              )?.project || "unbound";
             row.hidden =
+              !namespaceMatches(
+                clientNamespaces[requestClientIds[record[0]]],
+              ) ||
               (project !== "all" && recordProject !== project) ||
               (current[0] === "/requests" &&
                 status !== "all" &&
@@ -2536,6 +2893,313 @@
           .filter(Boolean)
           .at(-1);
       }
+      function notificationsDialog() {
+        dialog(
+          "Уведомления",
+          visibleNotifications()
+            .map(
+              (n) =>
+                '<section class="panel"><div class="panel-body stack-tight"><strong>' +
+                esc(n.title) +
+                "</strong><p>" +
+                esc(n.message) +
+                '</p><div class="flex wrap">' +
+                btn(
+                  "Открыть",
+                  "notification-open",
+                  "",
+                  'data-route="' + n.route + '"',
+                ) +
+                btn(
+                  n.ack ? "Подтверждено" : "Подтвердить",
+                  "notification-ack",
+                  "",
+                  'data-notification="' +
+                    n.id +
+                    '" ' +
+                    (n.ack ? "disabled" : ""),
+                ) +
+                "</div></div></section>",
+            )
+            .join("") || "<p>Нет уведомлений для выбранного контекста.</p>",
+        );
+      }
+      function contextDialog() {
+        const connection = id(),
+          model = sources.find((p) => p[0] === connection)[3];
+        dataForm(
+          "Контекст модели",
+          [
+            field(
+              "context-search",
+              "Поиск модели",
+              input("context-search", "", "search"),
+            ),
+            field(
+              "context-model",
+              "Модель",
+              select("context-model", modelOptions(connection), model),
+            ),
+            field(
+              "context-budget",
+              "Настроенный контекст, токены",
+              input(
+                "context-budget",
+                modelContextDrafts[connection + "/" + model] ??
+                  modelContexts[connection + "/" + model] ??
+                  "",
+                "number",
+                'min="1" max="4294967295" required',
+              ),
+            ),
+            '<div class="span-all callout neutral"><p>Сохранённый бюджет относится к точной модели. Он не подтверждает физический предел. Для новой модели введите значение явно.</p></div>',
+          ],
+          "save-context",
+        );
+        modal.dataset.contextKey = connection + "/" + model;
+      }
+      function initialRevision(p) {
+        if (!revisionHistory[p.id])
+          revisionHistory[p.id] = p.rev
+            ? [
+                {
+                  rev: p.rev,
+                  name: p.name,
+                  mode: p.mode,
+                  model: p.model,
+                  fields: {},
+                  routes: JSON.parse(JSON.stringify(profileRoutes[p.id] || [])),
+                },
+              ]
+            : [];
+      }
+      function eligibleTargets(p) {
+        return (
+          (profileRoutes[p.id] || []).length > 0 &&
+          (profileRoutes[p.id] || []).every(
+            (r) =>
+              sources.find((source) => source[0] === r.provider)?.[5] ===
+              "good",
+          )
+        );
+      }
+      function captureRevision(p) {
+        return {
+          rev: p.rev,
+          name: p.name,
+          mode: p.mode,
+          model: p.model,
+          fields: JSON.parse(JSON.stringify(draftValues[p.id] || {})),
+          routes: JSON.parse(JSON.stringify(profileRoutes[p.id] || [])),
+        };
+      }
+      function loginDialog() {
+        const op = connectionOperations[id()];
+        dialog(
+          "Вход через собственную подписку",
+          "<p>Операция <code>" +
+            op.id +
+            "</code></p><p>Статус: <strong>" +
+            op.status +
+            "</strong></p>" +
+            (op.status === "pending"
+              ? '<div class="code-block">DEMO-ABCD · срок 13:40 UTC</div>'
+              : "") +
+            '<p class="muted">Синтетический сценарий. Внешняя авторизация не выполняется.</p>',
+          btn("Закрыть", "close-modal") +
+            btn("Прочитать состояние", "read-login") +
+            btn(
+              "Показать неопределённый исход",
+              "login-unknown",
+              "",
+              op.status === "pending" ? "" : "disabled",
+            ) +
+            btn(
+              "Подтвердить получение результата",
+              "login-success",
+              "primary",
+              ["pending", "unknown"].includes(op.status) ? "" : "disabled",
+            ) +
+            btn(
+              "Отменить вход",
+              "cancel-login",
+              "danger",
+              op.status === "pending" ? "" : "disabled",
+            ),
+        );
+      }
+      function applyNamespace() {
+        const ns = namespaceContext(),
+          q = new URLSearchParams(location.search),
+          picker = document.querySelector("#namespace-select");
+        picker.innerHTML =
+          '<option value="">Все проекты</option>' +
+          namespaceCatalog
+            .map(
+              (n) =>
+                '<option value="' + n.id + '">' + esc(n.label) + "</option>",
+            )
+            .join("") +
+          '<option value="unbound">Без привязки</option>';
+        if (ns?.state === "invalid")
+          picker.insertAdjacentHTML(
+            "beforeend",
+            '<option value="invalid">Неверный контекст</option>',
+          );
+        picker.value =
+          ns?.id ||
+          (ns ? "invalid" : q.get("binding") === "unbound" ? "unbound" : "");
+        document
+          .querySelectorAll("[data-namespace-status]")
+          .forEach((el) => el.remove());
+        const scoped = [
+          "overview",
+          "requests",
+          "statistics",
+          "expenses",
+          "budgets",
+          "clients",
+          "evaluations",
+          "audit",
+        ].includes(current[2]);
+        const namespaceFrame = document.querySelector("#main .page-frame");
+        if (namespaceFrame)
+          namespaceFrame.dataset.namespaceState =
+            ns?.state || (q.get("binding") === "unbound" ? "unbound" : "all");
+        const stack = document.querySelector("#main .page-frame > .stack");
+        if (stack)
+          stack.insertAdjacentHTML(
+            "afterbegin",
+            '<p class="label muted" data-namespace-status>' +
+              (scoped
+                ? ns
+                  ? esc(ns.label)
+                  : q.get("binding") === "unbound"
+                    ? "Записи без привязки"
+                    : "Все разрешённые проекты"
+                : "Общие настройки установки") +
+              "</p>",
+          );
+        if (ns && ns.state !== "active" && scoped) {
+          document.querySelector("#main .page-frame .stack").innerHTML =
+            "<h1>" +
+            esc(current[1]) +
+            "</h1>" +
+            callout(
+              ns.state === "archived"
+                ? "Проект архивирован"
+                : ns.state === "unavailable"
+                  ? "Проект недоступен"
+                  : "Неверный контекст",
+              "Выбранная identity сохранена. Новые действия закрыты; контекст не заменяется всеми проектами.",
+              "warn",
+            );
+          return;
+        }
+        if (current[0] === "/audit") {
+          const bindings = [
+            null,
+            namespaceCatalog[1].id,
+            namespaceCatalog[0].id,
+            namespaceCatalog[0].id,
+          ];
+          document.querySelectorAll("#main tbody tr").forEach((row, i) => {
+            if (bindings[i] && !namespaceMatches(bindings[i]))
+              row.hidden = true;
+          });
+        }
+        if (
+          current[0] === "/providers" &&
+          document.querySelectorAll("#main .provider-card").length === 0 &&
+          document.querySelector("#provider-query")
+        )
+          document.querySelector("#main .grid-3").innerHTML =
+            '<p class="muted">Подключения по выбранным фильтрам не найдены.</p>';
+        if (
+          current[0] === "/models" &&
+          document.querySelector("#model-query") &&
+          document.querySelectorAll("#main tbody tr").length === 0
+        )
+          document
+            .querySelector("#main .table-wrap")
+            .insertAdjacentHTML(
+              "afterend",
+              '<p class="panel-body muted">Профили по выбранным фильтрам не найдены.</p>',
+            );
+        if (current[0] === "/clients")
+          document.querySelectorAll("#main tbody tr").forEach((r, i) => {
+            if (clients[i])
+              r.hidden = !namespaceMatches(clientNamespaces[clients[i][0]]);
+          });
+        if (current[0] === "/budgets")
+          document
+            .querySelectorAll("#main .grid-3 > .panel")
+            .forEach((r, i) => {
+              const b = budgetRecords[i];
+              const nsid =
+                b.scope === "installation"
+                  ? null
+                  : b.scope === "client"
+                    ? clientNamespaces[b.target]
+                    : b.target === "platform"
+                      ? namespaceCatalog[0].id
+                      : b.target === "testing"
+                        ? namespaceCatalog[1].id
+                        : null;
+              r.hidden = !!ns && !(!nsid || namespaceMatches(nsid));
+            });
+        if (
+          current[0] === "/requests/:id" &&
+          !namespaceMatches(clientNamespaces[requestClientIds[id()]])
+        )
+          document.querySelector("#main .stack").innerHTML =
+            stateBody("forbidden");
+        if (current[0] === "/evaluations")
+          document.querySelectorAll("#main tbody tr").forEach((row) => {
+            const run = previewRuns.find((r) =>
+              row.textContent.includes(r.name),
+            );
+            row.hidden = !namespaceMatches(
+              run ? run.namespace : namespaceCatalog[1].id,
+            );
+          });
+        if (
+          current[0] === "/evaluations/:id" &&
+          !namespaceMatches(
+            previewRuns.some((r) => r.id === id())
+              ? previewRuns.find((r) => r.id === id()).namespace
+              : namespaceCatalog[1].id,
+          )
+        )
+          document.querySelector("#main .stack").innerHTML =
+            stateBody("forbidden");
+        if (document.querySelector("#model-form")) {
+          initialRevision(activeProfile);
+          if (activeProfile.state === "Архивирован")
+            document
+              .querySelectorAll(
+                "#model-form input,#model-form select,#model-form button",
+              )
+              .forEach((el) => {
+                if (el.dataset.action !== "revisions") el.disabled = true;
+              });
+        }
+      }
+      sources.push([
+        "openrouter",
+        "OpenRouter",
+        "OR",
+        "model-a",
+        "Не подключён",
+        "warn",
+        "Не проверено",
+        "Нет данных",
+      ]);
+      connectionMeta.openrouter = {
+        kind: "api",
+        endpoint: "openrouter",
+        billing: "metered",
+      };
       const scopeSnapshots = {
         all: {
           count: "1 384",
@@ -2555,33 +3219,50 @@
           unknownCost: "3",
         },
         platform: {
-          count: "1 240",
-          success: "1 160",
+          count: "1 230",
+          success: "1 151",
           failed: "60",
-          rate: "94,2%",
-          terminal: "1 232",
-          input: "7,6",
-          output: "1,5",
-          usd: "9,85",
-          usdMonth: "9,85",
-          estimate: "3,60",
-          reserve: "0,72",
+          rate: "94,1%",
+          terminal: "1 223",
+          input: "6,8",
+          output: "1,38",
+          usd: "9,75",
+          usdMonth: "9,75",
+          estimate: "3,55",
+          reserve: "0,37",
           eur: "2,10",
           eurEstimate: "0,35",
-          unknown: "8",
-          unknownCost: "3",
+          unknown: "7",
+          unknownCost: "2",
         },
         testing: {
           count: "144",
-          success: "140",
+          success: "139",
           failed: "2",
           rate: "97,2%",
-          terminal: "144",
-          input: "0,2",
-          output: "0,2",
+          terminal: "143",
+          input: "0,9",
+          output: "0,3",
           usd: "2,55",
           usdMonth: "2,55",
           estimate: "1,25",
+          reserve: "0,35",
+          eur: "0,00",
+          eurEstimate: "0,00",
+          unknown: "1",
+          unknownCost: "1",
+        },
+        unbound: {
+          count: "10",
+          success: "10",
+          failed: "0",
+          rate: "100%",
+          terminal: "10",
+          input: "0,1",
+          output: "0,02",
+          usd: "0,10",
+          usdMonth: "0,10",
+          estimate: "0,05",
           reserve: "0,00",
           eur: "0,00",
           eurEstimate: "0,00",
@@ -2590,7 +3271,7 @@
         },
       };
       function applyScopePreview() {
-        if (!document.querySelector("#project-filter")) return;
+        if (!document.querySelector("#period")) return;
         const project = filterValues["project-filter"] || "all",
           currency = filterValues["currency-filter"] || "USD",
           period = filterValues.period || "7",
@@ -2732,18 +3413,6 @@
             ],
             "7",
           ),
-        )}${field(
-          "project-filter",
-          "Проект",
-          select(
-            "project-filter",
-            [
-              ["all", "Все проекты"],
-              ["platform", "Платформа"],
-              ["testing", "Тестирование"],
-            ],
-            "all",
-          ),
         )}${
           showCurrency
             ? field(
@@ -2764,27 +3433,13 @@
       function chart(kind = "requests") {
         const scope = filterValues["project-filter"] || "all",
           cur = filterValues["currency-filter"] || "USD";
-        const requestSeries = {
-          all: [192, 181, 210, 168, 201, 224, 208],
-          platform: [168, 162, 188, 155, 180, 205, 182],
-          testing: [24, 19, 22, 13, 21, 19, 26],
-        };
-        const usdSeries = {
-          all: [144, 158, 163, 150, 204, 216, 205],
-          platform: [100, 120, 130, 120, 160, 180, 175],
-          testing: [44, 38, 33, 30, 44, 36, 30],
-        };
-        const eurSeries = {
-          all: [20, 30, 15, 25, 30, 40, 50],
-          platform: [20, 30, 15, 25, 30, 40, 50],
-          testing: [0, 0, 0, 0, 0, 0, 0],
-        };
+        const fact = dailyFacts[scope] || dailyFacts.all;
         const vals =
           kind === "requests"
-            ? requestSeries[scope] || requestSeries.all
+            ? fact.requests
             : cur === "EUR"
-              ? eurSeries[scope] || eurSeries.all
-              : usdSeries[scope] || usdSeries.all;
+              ? fact.eur
+              : fact.usd;
         const top = Math.max(10, Math.ceil(Math.max(...vals) / 50) * 50),
           labels = [top, top / 2, 0].map((x) =>
             kind === "requests"
@@ -2819,7 +3474,31 @@
         )}</div>${tablePanel("Последние запросы", ["Запрос", "Профиль", "Приложение", "Модель", "Статус", "Стоимость", "Попытки"], requestRows(), `<a class="btn quiet" href="#/requests">Все запросы</a>`, "<span>6 последних из 1 384</span><span>Синтетические данные</span>")}`;
       }
       function providers() {
-        return `<div class="grid-3">${sources
+        return `<div class="filter-bar">${field("provider-query", "Поиск подключения", input("provider-query", filterValues["provider-query"] || "", "search"))}${field(
+          "provider-status",
+          "Состояние",
+          select(
+            "provider-status",
+            [
+              ["all", "Все"],
+              ["good", "Проверен"],
+              ["warn", "Нужна авторизация/проверка"],
+              ["neutral", "Отключён/не проверен"],
+            ],
+            filterValues["provider-status"] || "all",
+          ),
+        )}</div><div class="grid-3">${sources
+          .filter(
+            (p) =>
+              p[1]
+                .toLowerCase()
+                .includes(
+                  (filterValues["provider-query"] || "").toLowerCase(),
+                ) &&
+              (!filterValues["provider-status"] ||
+                filterValues["provider-status"] === "all" ||
+                p[5] === filterValues["provider-status"]),
+          )
           .map(
             (p) =>
               `<section class="panel provider-card"><div class="flex align-start"><span class="provider-mark">${p[2]}</span><div class="grow"><h2>${esc(p[1])}</h2><p class="muted label">${connectionMeta[p[0]].kind === "ollama" ? "Локальное / облачное подключение" : connectionMeta[p[0]].kind === "chatgpt" ? "Вход через подписку" : "API-подключение"}</p></div></div><div>${badge(p[4], p[5])}</div>${kv(
@@ -2837,7 +3516,7 @@
       function providerDetail() {
         const p = sources.find((x) => x[0] === id()) || sources[0];
         const tt = tabChoice.provider || "catalog";
-        return `<div class="page-split"><div class="stack">${panel("Состояние подключения", `<div class="flex wrap space"><div class="flex"><span class="provider-mark">${p[2]}</span><div><h2>${esc(p[1])}</h2><p class="muted">Подключение conn_${p[0]} · generation 3</p></div></div>${badge(p[4], p[5])}</div>`)}<div class="tabs" role="tablist" aria-label="Подключение провайдера">${[
+        return `<div class="page-split"><div class="stack">${panel("Состояние подключения", `<div class="flex wrap space"><div class="flex"><span class="provider-mark">${p[2]}</span><div><h2>${esc(p[1])}</h2><p class="muted">Подключение conn_${p[0]} · поколение 3</p></div></div>${badge(p[4], p[5])}</div>`)}<div class="tabs" role="tablist" aria-label="Подключение провайдера">${[
           ["catalog", "Каталог"],
           ["connection", "Авторизация"],
           ["history", "Проверки"],
@@ -2854,13 +3533,19 @@
                 [
                   [
                     `<span class="mono">${p[3] === "Не выбран" ? "model-c" : p[3]}</span>`,
-                    "128k / ответ 8k",
+                    modelBounds[p[0] + "/" + p[3]]
+                      ? modelBounds[p[0] + "/" + p[3]].context +
+                        " / ответ " +
+                        modelBounds[p[0] + "/" + p[3]].output
+                      : "Предел не подтверждён",
                     "Текст · stream · tools · JSON",
                     badge(p[5] === "good" ? "Проверено" : "Не проверено", p[5]),
                   ],
                   [
                     "model-b-small",
-                    "64k / ответ 4k",
+                    modelBounds[p[0] + "/model-b-small"]
+                      ? "64000 / ответ 4000"
+                      : "Предел не подтверждён",
                     "Текст · stream",
                     badge("Не проверено", "neutral"),
                   ],
@@ -2885,19 +3570,21 @@
               : tablePanel(
                   "Последние проверки",
                   ["Когда", "Область", "Результат"],
-                  [
-                    [
-                      "13:26 UTC",
-                      "model-a · stream/tools/JSON",
-                      badge("Подтверждено", "good"),
-                    ],
-                    [
-                      "12:51 UTC",
-                      "Каталог моделей",
-                      badge("Прочитан", "neutral"),
-                    ],
-                    ["12:42 UTC", "Авторизация", "Generation 3"],
-                  ],
+                  providerHistory.has(p[0])
+                    ? [
+                        [
+                          "13:26 UTC",
+                          p[3] + " · stream/tools/JSON",
+                          badge("Подтверждено", "good"),
+                        ],
+                        [
+                          "12:51 UTC",
+                          "Каталог моделей",
+                          badge("Прочитан", "neutral"),
+                        ],
+                        ["12:42 UTC", "Авторизация", "Поколение 3"],
+                      ]
+                    : [],
                 )
         }</div><aside class="stack">${panel(
           "Параметры",
@@ -2911,10 +3598,36 @@
               p[5] === "good" ? "13:26 UTC" : "Нет актуальной проверки",
             ],
           ]),
-        )}${panel("Действия", `<div class="stack-tight">${btn("Изменить подключение", "edit-connection")}${btn("Отключить", "disable-connection", "danger")}<p class="muted label">История запросов и учёта сохраняется.</p></div>`)}</aside></div>`;
+        )}${panel("Действия", `<div class="stack-tight">${btn("Изменить подключение", "edit-connection")}${btn("Контекст модели", "context")}${btn("Отключить", "disable-connection", "danger")}<p class="muted label">История запросов и учёта сохраняется.</p></div>`)}</aside></div>`;
       }
       function models() {
-        return `${tablePanel(
+        return `<div class="filter-bar">${field("model-query", "Поиск профиля", input("model-query", filterValues["model-query"] || "", "search"))}${field(
+          "model-status",
+          "Статус",
+          select(
+            "model-status",
+            [
+              ["all", "Все"],
+              ["Опубликована", "Опубликован"],
+              ["Черновик", "Черновик"],
+              ["Отключён", "Отключён"],
+              ["Архивирован", "Архивирован"],
+            ],
+            filterValues["model-status"] || "all",
+          ),
+        )}${field(
+          "model-filter-mode",
+          "Режим",
+          select(
+            "model-filter-mode",
+            [
+              ["all", "Все режимы"],
+              ["development", "Разработка"],
+              ["pinned_test", "Закреплённый тест"],
+            ],
+            filterValues["model-filter-mode"] || "all",
+          ),
+        )}</div>${tablePanel(
           "Виртуальные профили",
           [
             "Профиль",
@@ -2925,16 +3638,34 @@
             "Подтверждено",
             "Оценка",
           ],
-          profiles.map((p) => [
-            link("/models/" + p.id, p.id) +
-              `<span class="muted">${scene === "long" ? "Профиль платформенной разработки и воспроизводимого нагрузочного тестирования" : p.name}</span>`,
-            p.mode === "pinned_test" ? "Закреплённый тест" : "Разработка",
-            p.rev ? "r" + p.rev : "—",
-            badge(p.state, p.tone),
-            p.calls,
-            p.cost,
-            p.estimate,
-          ]),
+          profiles
+            .filter(
+              (p) =>
+                (p.name + " " + p.id)
+                  .toLowerCase()
+                  .includes(
+                    (filterValues["model-query"] || "").toLowerCase(),
+                  ) &&
+                (!filterValues["model-status"] ||
+                  filterValues["model-status"] === "all" ||
+                  p.state === filterValues["model-status"]),
+            )
+            .filter(
+              (p) =>
+                !filterValues["model-filter-mode"] ||
+                filterValues["model-filter-mode"] === "all" ||
+                p.mode === filterValues["model-filter-mode"],
+            )
+            .map((p) => [
+              link("/models/" + p.id, p.id) +
+                `<span class="muted">${scene === "long" ? "Профиль платформенной разработки и воспроизводимого нагрузочного тестирования" : p.name}</span>`,
+              p.mode === "pinned_test" ? "Закреплённый тест" : "Разработка",
+              p.rev ? "r" + p.rev : "—",
+              badge(p.state, p.tone),
+              p.calls,
+              p.cost,
+              p.estimate,
+            ]),
           "",
           "<span>" +
             profiles.length +
@@ -2957,7 +3688,7 @@
             ],
             p.mode,
           ),
-        )}${field("model-timeout", "Общий таймаут, секунды", input("model-timeout", "120", "number", 'min="1" max="600" required')) + field("max-attempts", "Максимум внешних попыток", input("max-attempts", p.mode === "pinned_test" ? "1" : "3", "number", 'min="1" max="5" required ' + (p.mode === "pinned_test" ? "disabled" : "")), "В pinned_test строго одна попытка.")}</div></div><div class="form-section"><div class="flex wrap space"><div><h2>Маршрут</h2><p class="muted label">Порядок провайдеров фиксируется в опубликованной версии.</p></div>${btn(icon("plus") + "Добавить резерв", "add-deployment")}</div><div class="stack-tight" id="deployment-list" style="margin-top:16px">${deployments(effectiveMode, p.model)}</div></div><div class="form-section"><h2>Контекст и генерация</h2><p>Не превышают проверенные пределы выбранных моделей.</p><div class="form-grid">${field("input-limit", "Входной лимит, токены", input("input-limit", "100000", "number", 'min="1" required'))}${field("output-limit", "Лимит ответа, токены", input("output-limit", "8000", "number", 'min="1" required'))}${field("context-limit", "Общий контекст, токены", input("context-limit", "128000", "number", 'min="1" required'))}${field("temperature", "Temperature", input("temperature", "0.2", "number", 'min="0" max="2" step="0.1"'))}<div class="span-all">${
+        )}${field("model-timeout", "Общий таймаут, секунды", input("model-timeout", "120", "number", 'min="1" max="600" required')) + field("max-attempts", "Максимум внешних попыток", input("max-attempts", p.mode === "pinned_test" ? "1" : "3", "number", 'min="1" max="5" required ' + (p.mode === "pinned_test" ? "disabled" : "")), "В pinned_test строго одна попытка.")}</div></div><div class="form-section"><div class="flex wrap space"><div><h2>Маршрут</h2><p class="muted label">Порядок провайдеров фиксируется в опубликованной версии.</p></div>${btn(icon("plus") + "Добавить резерв", "add-deployment")}</div><div class="stack-tight" id="deployment-list" style="margin-top:16px">${deployments(effectiveMode, p.model)}</div></div><div class="form-section"><h2>Контекст и генерация</h2><p>Не превышают проверенные пределы выбранных моделей.</p><div class="form-grid">${field("input-limit", "Входной лимит, токены", input("input-limit", "100000", "number", 'min="1" required'))}${field("output-limit", "Лимит ответа, токены", input("output-limit", "8000", "number", 'min="1" required'))}${field("context-limit", "Общий контекст, токены", input("context-limit", "128000", "number", 'min="1" required'))}${field("temperature", "Temperature", input("temperature", "0.2", "number", 'min="0" max="2" step="any"'))}<div class="span-all">${
           field(
             "reasoning",
             "Reasoning effort",
@@ -2978,7 +3709,7 @@
             input("top-p", "", "number", 'min="0" max="1" step="any"'),
             "При указании: больше 0, не более 1.",
           )
-        }</div><div class="span-all"><h3>Переопределения клиента</h3><p class="muted label">По умолчанию запрещены. Публикация проверяет поддержку каждого разрешённого параметра.</p><div class="checkrow"><input type="checkbox" id="override-temperature"><label for="override-temperature">temperature</label></div><div class="checkrow"><input type="checkbox" id="override-top_p"><label for="override-top_p">top_p</label></div><div class="checkrow"><input type="checkbox" id="override-max_output_tokens"><label for="override-max_output_tokens">max_output_tokens</label></div><div class="checkrow"><input type="checkbox" id="override-reasoning_effort"><label for="override-reasoning_effort">reasoning_effort</label></div></div></div></div><div class="form-section"><h2>Обязательные возможности</h2>${["Потоковый ответ", "Function tools", "JSON Schema"].map((x, i) => `<div class="checkrow"><input type="checkbox" id="cap-${i}" checked><label for="cap-${i}">${x}</label></div>`).join("")}</div><div class="form-actions">${btn("История версий", "revisions")}${btn("Сохранить черновик", "save-model", "primary")}</div></section><div id="model-validation" aria-live="polite"></div><section class="panel"><div class="panel-body stack-tight"><div class="flex wrap space"><h2>Проверка и публикация</h2><span id="proof-badge">${badge(verified ? "Точный черновик проверен" : "Черновик изменён · нужна проверка", verified ? "good" : "warn")}</span></div><p class="muted">Публикация переключит активную версию только для новых запросов.</p><div class="flex wrap">${btn("Проверить черновик", "verify-profile")}${btn("Опубликовать", "publish-profile", "primary", verified ? "" : "disabled")}</div></div></section></div></form>`;
+        }</div><div class="span-all"><h3>Переопределения клиента</h3><p class="muted label">По умолчанию запрещены. Публикация проверяет поддержку каждого разрешённого параметра.</p><div class="checkrow"><input type="checkbox" id="override-temperature"><label for="override-temperature">temperature</label></div><div class="checkrow"><input type="checkbox" id="override-top_p"><label for="override-top_p">top_p</label></div><div class="checkrow"><input type="checkbox" id="override-max_output_tokens"><label for="override-max_output_tokens">max_output_tokens</label></div><div class="checkrow"><input type="checkbox" id="override-reasoning_effort"><label for="override-reasoning_effort">reasoning_effort</label></div></div></div></div><div class="form-section"><h2>Обязательные возможности</h2>${["Потоковый ответ", "Function tools", "JSON Schema"].map((x, i) => `<div class="checkrow"><input type="checkbox" id="cap-${i}" checked><label for="cap-${i}">${x}</label></div>`).join("")}</div><div class="form-actions">${btn("История версий", "revisions")}${btn(activeProfile.state === "Отключён" ? "Включить" : "Отключить", activeProfile.state === "Отключён" ? "model-enable" : "model-disable")}${btn("Архивировать", "model-archive", "danger", activeProfile.state === "Отключён" ? "" : "disabled")}${btn("Сохранить черновик", "save-model", "primary")}</div></section><div id="model-validation" aria-live="polite"></div><section class="panel"><div class="panel-body stack-tight"><div class="flex wrap space"><h2>Проверка и публикация</h2><span id="proof-badge">${badge(verified ? "Точный черновик проверен" : "Черновик изменён · нужна проверка", verified ? "good" : "warn")}</span></div><p class="muted">Публикация переключит активную версию только для новых запросов.</p><div class="flex wrap">${btn("Проверить черновик", "verify-profile")}${btn("Опубликовать", "publish-profile", "primary", verified ? "" : "disabled")}</div></div></section></div></form>`;
       }
       function deployments(mode, firstModel) {
         if (!profileRoutes[activeProfile.id]) {
@@ -3063,7 +3794,7 @@
                   badge(r[8], r[8] === "Оценка" ? "warn" : "good"),
                 ],
               ];
-        return `<div class="page-split"><div class="stack">${unknown ? callout("Исход внешнего вызова неизвестен", "Новый вызов не запускается. Удержанный резерв 0,24 $ сохраняется до readback.", "warn") : callout(r[5], `Профиль ${r[2]} r${rev}. Все ${r[9]} попытки учтены отдельно.`, "neutral")}${panel("Выполнение", steps)}${tablePanel("Попытки и стоимость", ["Попытка", "Результат", "Usage", "Стоимость", "Основание"], attemptRows)}${panel("Результат и приватность", `<p class="muted">Просмотр финансовой trace не даёт права read_result. Обычные ответы не входят в аналитику.</p><div class="flex wrap" style="margin-top:16px">${btn("Восстановить результат", "recover-result")}${btn("Уточнить статус", "reconcile")}</div>`)}</div><aside class="stack">${panel(
+        return `<div class="page-split"><div class="stack">${unknown ? callout("Исход внешнего вызова неизвестен", "Новый вызов не запускается. Удержанный резерв " + (requestReserves[id()] || "0,00") + " $ сохраняется до readback.", "warn") : callout(r[5], `Профиль ${r[2]} r${rev}. Все ${r[9]} попытки учтены отдельно.`, "neutral")}${panel("Выполнение", steps)}${tablePanel("Попытки и стоимость", ["Попытка", "Результат", "Usage", "Стоимость", "Основание"], attemptRows)}${panel("Результат и приватность", `<p class="muted">Просмотр финансовой trace не даёт права read_result. Обычные ответы не входят в аналитику.</p><div class="flex wrap" style="margin-top:16px">${btn("Восстановить результат", "recover-result")}${btn("Уточнить статус", "reconcile")}</div>`)}</div><aside class="stack">${panel(
           "Запрос " + esc(r[0]),
           kv([
             ["Статус", badge(r[5], r[6])],
@@ -3073,7 +3804,12 @@
             ["Попытки", String(r[9])],
             ["Известная сумма", r[7]],
             ["Основание", r[8]],
-            ["Резерв", unknown ? "0,24 $" : "Нет удержанного"],
+            [
+              "Резерв",
+              unknown
+                ? (requestReserves[id()] || "0,00") + " $"
+                : "Нет удержанного",
+            ],
             ["Idempotency", "Привязан к запросу"],
           ]),
         )}${panel("Действия", `<div class="stack-tight">${btn("Запросить отмену", "cancel-request", "danger", unknown && !requestCancellations.has(id()) ? "" : "disabled")}${btn("Скопировать ID", "copy-request")}<p class="muted label">${requestCancellations.has(id()) ? "Отмена запрошена. Резерв удерживается." : "Отмена после отправки не означает нулевой стоимости."}</p></div>`)}</aside></div>`;
@@ -3112,6 +3848,15 @@
           project = filterValues["project-filter"] || "all",
           period = filterValues.period || "7";
         const records = [
+          {
+            project: "unbound",
+            currency: "USD",
+            date: "8 окт · 13:24",
+            basis: "Запрос req_h53",
+            amount: "0,0100 $",
+            confidence: "Подтверждено",
+            source: "Демонстрационное подтверждение local-1",
+          },
           {
             project: "platform",
             currency: "USD",
@@ -3337,12 +4082,18 @@
           clients.map((c) => [
             `<strong>${esc(c[1])}</strong><span class="muted mono">${esc(c[0])}</span>`,
             c[2],
-            `<span class="mono">${c[3]}</span>`,
+            `<span class="mono">${esc(c[3].join(", "))}</span>`,
             c[4],
             c[5],
             badge(c[6], c[6] === "Активен" ? "good" : "neutral"),
             btn("Доступ", "client-access", "", `data-client="${esc(c[0])}"`) +
-              btn("Ключи", "client-keys", "", `data-client="${esc(c[0])}"`),
+              btn("Ключи", "client-keys", "", `data-client="${esc(c[0])}"`) +
+              btn(
+                c[6] === "Отключён" ? "Включить" : "Отключить",
+                c[6] === "Отключён" ? "client-enable" : "client-disable",
+                "",
+                `data-client="${esc(c[0])}"`,
+              ),
           ]),
         )}${callout("Ключ приложения — не ключ провайдера", "Приложение получает доступ только к разрешённым профилям и собственным запросам. Секрет провайдера ему не передаётся.", "neutral")}`;
       }
@@ -3352,7 +4103,7 @@
           `<div class="stack-tight">${kv([
             ["Coding smoke", "v3 · 24 случая"],
             ["JSON & tools", "v2 · 12 случаев"],
-            ["Dataset hash", "Зафиксирован в запуске"],
+            ["Хеш набора", "Зафиксирован в запуске"],
             ...previewDatasets.map((d) => [
               esc(d.name),
               "v1 · " + d.cases.length + " случаев",
@@ -3422,7 +4173,7 @@
           passed = partial ? 10 : 21,
           name = partial ? "JSON & tools" : "Coding smoke",
           cost = partial ? "0,1250" : "0,4820";
-        return `<div class="page-split"><div class="stack">${partial ? callout("Запуск завершён частично", "Одна attempt остаётся с неизвестным исходом. Резерв 0,08 USD не освобождён.", "warn") : ""}<div class="metrics metrics-three">${metric("app-test · пройдено", passed + ` <small>/ ${total}</small>`, "Результат основного кандидата")}${metric(partial ? "Исход неизвестен" : "Не сопоставимы", "1", partial ? "Удержанный резерв" : "Actual model не подтверждена", "warning")}${metric("Оценочные расходы", cost + " <small>$</small>", "Known cost · unknown отдельно")}</div>${tablePanel(
+        return `<div class="page-split"><div class="stack">${partial ? callout("Запуск завершён частично", "Одна attempt остаётся с неизвестным исходом. Резерв 0,08 USD не освобождён.", "warn") : ""}<div class="metrics metrics-three">${metric("app-test · пройдено", passed + ` <small>/ ${total}</small>`, "Результат основного кандидата")}${metric(partial ? "Исход неизвестен" : "Не сопоставимы", "1", partial ? "Удержанный резерв" : "Фактическая модель не подтверждена", "warning")}${metric("Оценочные расходы", cost + " <small>$</small>", "Известные расходы; неизвестные отдельно")}</div>${tablePanel(
           "Сравнение профилей",
           ["Профиль", "Качество", "p95", "Токены", "Стоимость"],
           partial
@@ -3469,13 +4220,13 @@
             ],
           ],
           btn("Посмотреть случай", "case-detail"),
-          "4 representative случая из " + total,
+          "4 примера из " + total,
         )}</div><aside class="stack">${panel(
           "Зафиксированный запуск",
           kv([
             ["Dataset", name + (partial ? " · v2" : " · v3")],
             ["Профили", partial ? "app-test r4" : "app-test r4 / test-alt r2"],
-            ["Режим", "Pinned test"],
+            ["Режим", "Закреплённый тест"],
             ["Повторы", "1"],
             ["Параллельность", "1"],
             ["Бюджет", "1,00 USD"],
@@ -3535,9 +4286,9 @@
         return `<div class="page-readable stack">${callout("Эффективная конфигурация", "Параметры задаются оператором окружения. На этой странице доступны только безопасные значения.", "neutral")}${panel(
           "Окружение",
           kv([
-            ["Installation", "hub-demo"],
+            ["Установка", "hub-demo"],
             ["Максимум одновременных запросов", "20"],
-            ["Общая deadline", "120 с"],
+            ["Общий таймаут", "120 с"],
             ["Попыток в маршруте", "Не более 3"],
             ["Внешние вызовы", "Отключены в макете"],
             ["Central Auth", "Внешняя identity, проверка сессии"],
@@ -3546,12 +4297,12 @@
         )}${panel(
           "Хранение",
           kv([
-            ["Обычные prompts и ответы", "Не входят в аналитику"],
+            ["Обычные запросы и ответы", "Не входят в аналитику"],
             ["Буфер восстановления", "Не более 24 часов"],
-            ["Request dedupe", "30 дней"],
+            ["Защита от повторного запроса", "30 дней"],
             ["Артефакты тестирования", "7 дней"],
             ["Метаданные", "90 дней"],
-            ["Financial ledger", "365 дней + архив"],
+            ["Финансовый журнал", "365 дней + архив"],
           ]),
         )}${panel(
           "Версии и готовность",
@@ -3694,6 +4445,7 @@
         document.querySelector("header").hidden = false;
         document.querySelector(".base-shell-sidebar").hidden = false;
         current = route();
+        readFilters();
         const entitySets = {
           providers: sources.map((x) => x[0]),
           models: profiles.map((x) => x.id),
@@ -3771,6 +4523,7 @@
             }
           }
         }
+        applyNamespace();
         if (scene === "conflict") {
           document
             .querySelector("#main .stack")
@@ -3819,8 +4572,23 @@
         document.querySelector(".base-shell-work").classList.add("auth-work");
         document.querySelector("header").hidden = true;
         document.querySelector(".base-shell-sidebar").hidden = true;
+        const state = ["loading", "error"].includes(scene) ? scene : "ready";
         document.querySelector("#main").innerHTML =
-          `<div class="login"><section class="panel login-card"><h1>Вход в платформу</h1><p>Продолжите через единый вход.</p>${btn("Войти через SSO", "login", "primary")}<div class="login-note muted">Состояние макета · вход не выполняется</div></section></div>`;
+          '<div class="login page-frame" data-route-pattern="/login" data-page-layout="reading" data-design-state="' +
+          state +
+          '"><section class="panel login-card"><h1>Вход в платформу</h1><p>Продолжите через единый вход.</p>' +
+          (state === "error"
+            ? '<p role="alert">Не удалось начать вход. Повторите безопасный переход.</p>'
+            : state === "loading"
+              ? '<p role="status">Начинаем переход…</p>'
+              : "") +
+          btn(
+            "Войти через SSO",
+            "login",
+            "primary",
+            state === "loading" ? "disabled" : "",
+          ) +
+          '<div class="login-note muted">Состояние макета · вход не выполняется</div></section></div>';
       }
       function toast(message) {
         clearTimeout(toastTimer);
@@ -3836,10 +4604,16 @@
         form = false,
       ) {
         modal.innerHTML = `<form id="dialog-form" novalidate><div class="modal-head"><h2 id="modal-title">${title}</h2>${btn(icon("close"), "close-modal", "quiet icon-only", 'aria-label="Закрыть диалог"')}</div><div class="modal-body">${body}</div><div class="modal-actions">${buttons}</div></form>`;
+        modalDirty = false;
         modal.showModal();
       }
       function closeModal() {
+        modalDirty = false;
         modal.close();
+      }
+      function requestCloseModal() {
+        if (modalDirty) document.querySelector("#draft-guard").showModal();
+        else closeModal();
       }
       function dataForm(title, fields, submit, text = "Сохранить") {
         dialog(
@@ -3868,6 +4642,12 @@
             e.pattern = "(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?";
           if (["budget-limit", "sub-amount", "price-fee"].includes(e.id))
             e.pattern = "(0|[1-9][0-9]{0,19})(\\.[0-9]{1,18})?";
+          if (e.id === "top-p")
+            e.setCustomValidity(
+              e.value !== "" && Number(e.value) <= 0
+                ? "Значение должно быть больше нуля."
+                : "",
+            );
           const invalid = !e.checkValidity();
           e.setAttribute("aria-invalid", String(invalid));
           if (invalid) {
@@ -3920,7 +4700,208 @@
           );
           return;
         }
+        if (
+          scene === "budget_exhausted" &&
+          ["verify-profile", "verify-provider", "start-evaluation"].includes(
+            action,
+          )
+        ) {
+          toast("Бюджет исчерпан. Новый платный вызов не выполняется.");
+          return;
+        }
         switch (action) {
+          case "stay-dialog":
+            document.querySelector("#draft-guard").close();
+            break;
+          case "discard-dialog":
+            document.querySelector("#draft-guard").close();
+            if (modal.dataset.contextKey) {
+              const prefix = modal.dataset.contextKey.split("/")[0] + "/";
+              for (const key of Object.keys(modelContextDrafts))
+                if (key.startsWith(prefix)) delete modelContextDrafts[key];
+            }
+            closeModal();
+            break;
+          case "namespace-stay":
+            pendingNamespace = null;
+            closeModal();
+            document.querySelector("#namespace-select").value =
+              namespaceContext()?.id || "";
+            break;
+          case "namespace-discard":
+            dirty = false;
+            closeModal();
+            setNamespace(pendingNamespace);
+            break;
+          case "notification-open":
+            closeModal();
+            location.hash = button.dataset.route;
+            break;
+          case "notification-ack":
+            notificationRecords.find(
+              (n) => n.id === button.dataset.notification,
+            ).ack = true;
+            closeModal();
+            notificationsDialog();
+            break;
+          case "context":
+            contextDialog();
+            break;
+          case "save-context": {
+            if (!validateFields(modal)) break;
+            const key = modal.dataset.contextKey;
+            const selectedConnection = key.split("/")[0];
+            for (const profile of profiles) {
+              const routes = profileRoutes[profile.id] || [
+                {
+                  provider: sources.find((p) => p[3] === profile.model)?.[0],
+                  model: profile.model,
+                },
+              ];
+              if (
+                routes.some(
+                  (r) =>
+                    r.provider === selectedConnection &&
+                    key === r.provider + "/" + r.model,
+                )
+              )
+                profile.verified = false;
+            }
+            modelContexts[key] =
+              document.querySelector("#context-budget").value;
+            delete modelContextDrafts[key];
+            const connection = key.split("/")[0];
+            for (const p of profiles)
+              if (
+                (profileRoutes[p.id] || []).some(
+                  (r) =>
+                    r.provider === connection && key.endsWith("/" + r.model),
+                )
+              )
+                p.verified = false;
+            closeModal();
+            render();
+            toast(
+              "Контекст точной модели сохранён. Профиль требует новой проверки.",
+            );
+            break;
+          }
+          case "read-login":
+            closeModal();
+            loginDialog();
+            break;
+          case "login-expired":
+            connectionOperations[id()].status = "expired";
+            closeModal();
+            loginDialog();
+            break;
+          case "login-unknown":
+            connectionOperations[id()].status = "unknown";
+            closeModal();
+            loginDialog();
+            break;
+          case "cancel-login":
+            connectionOperations[id()].status = "cancelled";
+            closeModal();
+            loginDialog();
+            break;
+          case "rollback-revision": {
+            const snapshot = revisionHistory[activeProfile.id].find(
+              (r) => r.rev === Number(button.dataset.revision),
+            );
+            if (!snapshot) break;
+            if (
+              !snapshot.routes.length ||
+              snapshot.routes.some(
+                (r) => sources.find((p) => p[0] === r.provider)?.[5] !== "good",
+              )
+            ) {
+              toast(
+                "Версия сейчас не квалифицирована. Проверьте подключение перед откатом.",
+              );
+              break;
+            }
+            activeProfile.rev = snapshot.rev;
+            activeProfile.name = snapshot.name;
+            activeProfile.mode = snapshot.mode;
+            activeProfile.model = snapshot.model;
+            profileRoutes[activeProfile.id] = JSON.parse(
+              JSON.stringify(snapshot.routes),
+            );
+            draftValues[activeProfile.id] = JSON.parse(
+              JSON.stringify(snapshot.fields),
+            );
+            dirty = false;
+            closeModal();
+            render();
+            toast(
+              "Активная версия переключена в макете. Исторические запросы сохранены.",
+            );
+            break;
+          }
+          case "model-disable":
+          case "model-enable":
+          case "model-archive": {
+            const mode = action.split("-")[1];
+            if (mode === "archive" && activeProfile.state !== "Отключён") {
+              toast("Сначала отключите профиль.");
+              break;
+            }
+            if (
+              mode === "enable" &&
+              (!activeProfile.rev ||
+                !activeProfile.verified ||
+                !eligibleTargets(activeProfile))
+            ) {
+              toast("Нужна опубликованная версия с действующей проверкой.");
+              break;
+            }
+            dialog(
+              mode === "disable"
+                ? "Отключить профиль?"
+                : mode === "archive"
+                  ? "Архивировать профиль?"
+                  : "Включить профиль?",
+              "<p>История запросов и расходов сохраняется.</p>",
+              btn("Отмена", "close-modal") +
+                btn(
+                  "Подтвердить",
+                  "model-lifecycle-confirm",
+                  "primary",
+                  'data-mode="' + mode + '"',
+                ),
+            );
+            break;
+          }
+          case "model-lifecycle-confirm": {
+            const mode = button.dataset.mode;
+            activeProfile.state =
+              mode === "archive"
+                ? "Архивирован"
+                : mode === "disable"
+                  ? "Отключён"
+                  : "Опубликована";
+            activeProfile.tone = mode === "enable" ? "good" : "neutral";
+            dirty = false;
+            closeModal();
+            render();
+            break;
+          }
+          case "client-disable":
+          case "client-enable": {
+            const c = clients.find((c) => c[0] === button.dataset.client);
+            if (
+              action === "client-enable" &&
+              ["Без ключа", "Ключ отозван"].includes(c[6])
+            ) {
+              toast("Выдайте отдельный ключ перед включением приложения.");
+              break;
+            }
+            c[6] = action === "client-disable" ? "Отключён" : "Активен";
+            render();
+            break;
+          }
+
           case "menu":
             drawer.showModal();
             break;
@@ -3932,10 +4913,7 @@
               !document.querySelector("#account-menu").hidden;
             break;
           case "notifications":
-            dialog(
-              "Уведомления",
-              `<div class="stack-tight">${callout("CI тесты · достигнуто 80%", "Лимит 10,00 USD, доступно 1,75 USD после резервов.", "warn")}${callout("3 попытки без полной стоимости", "Резерв 0,72 USD удерживается. Статус необходимо уточнить.", "warn")}</div>`,
-            );
+            notificationsDialog();
             break;
           case "services":
             dialog(
@@ -3978,7 +4956,7 @@
             toast("Переход в макете. Реальный SSO не выполнялся.");
             break;
           case "close-modal":
-            closeModal();
+            requestCloseModal();
             break;
           case "retry":
             scene = "ready";
@@ -4129,18 +5107,21 @@
             }
             break;
           case "managed-login":
-            dialog(
-              "Войти через собственную подписку",
-              `<p>Подключается собственный аккаунт. API key другого сервиса не используется.</p><div class="code-block">Демонстрационный код: DEMO-ABCD\nСтатус: ожидается подтверждение владельца</div><p class="modal-note">Это макет device login. Внешний сервис не открывается.</p>`,
-              btn("Отменить вход", "close-modal") +
-                btn(
-                  "Показать завершённое состояние",
-                  "login-success",
-                  "primary",
-                ),
-            );
+            if (
+              !connectionOperations[id()] ||
+              ["completed", "cancelled", "expired"].includes(
+                connectionOperations[id()].status,
+              )
+            )
+              connectionOperations[id()] = {
+                id: crypto.randomUUID(),
+                status: "pending",
+              };
+            loginDialog();
             break;
           case "login-success":
+            if (connectionOperations[id()])
+              connectionOperations[id()].status = "completed";
             {
               const p = sources.find((p) => p[0] === id());
               p[4] = "Авторизован · нужна проверка";
@@ -4156,7 +5137,7 @@
             dialog(
               "Проверить модель",
               `<div class="stack-tight">${kv([
-                ["Подключение", "Generation 3"],
+                ["Подключение", "Поколение 3"],
                 ["Модель", "model-a"],
                 ["Проверки", "Текст, stream, tools, JSON Schema"],
                 ["Лимит проверки", "До 0,05 USD"],
@@ -4169,6 +5150,17 @@
           case "provider-proof":
             {
               const p = sources.find((p) => p[0] === id());
+              if (!modelBounds[p[0] + "/" + p[3]]) {
+                closeModal();
+                toast(
+                  "Физические пределы модели не подтверждены. Проверка не принята.",
+                );
+                break;
+              }
+            }
+            {
+              const p = sources.find((p) => p[0] === id());
+              providerHistory.add(p[0]);
               p[4] = "Проверен";
               p[5] = "good";
               if (p[3] === "Не выбран") p[3] = "model-a";
@@ -4292,6 +5284,7 @@
             break;
           case "save-model": {
             const f = document.querySelector("#model-form");
+            applyNamespace();
             if (scene === "conflict") {
               document.querySelector("#model-validation").innerHTML = callout(
                 "Версия изменилась",
@@ -4332,6 +5325,41 @@
             break;
           }
           case "verify-profile":
+            if (!eligibleTargets(activeProfile)) {
+              document.querySelector("#model-validation").innerHTML = callout(
+                "Проверьте подключение",
+                "Авторизация или квалификация выбранного подключения недоступна.",
+                "warn",
+              );
+              break;
+            }
+            if (
+              profileRoutes[activeProfile.id].some((r) => {
+                const bound = modelBounds[r.provider + "/" + r.model];
+                return (
+                  !bound ||
+                  Number(document.querySelector("#context-limit").value) >
+                    bound.context ||
+                  Number(document.querySelector("#output-limit").value) >
+                    bound.output
+                );
+              })
+            ) {
+              document.querySelector("#model-validation").innerHTML = callout(
+                "Пределы модели не подтверждены",
+                "Проверьте точный deployment и согласуйте контекст и ответ с его пределами.",
+                "bad",
+              );
+              break;
+            }
+            if (dirty || modalDirty) {
+              document.querySelector("#model-validation").innerHTML = callout(
+                "Сохраните черновик",
+                "Проверка относится к сохранённой версии.",
+                "warn",
+              );
+              break;
+            }
             {
               const f = document.querySelector("#model-form");
               if (
@@ -4382,6 +5410,10 @@
             );
             break;
           case "publish-profile":
+            if (!activeProfile.verified || !eligibleTargets(activeProfile)) {
+              toast("Проверка профиля недействительна. Публикация закрыта.");
+              break;
+            }
             dialog(
               "Опубликовать новую версию?",
               `<p>Профиль <strong>${activeProfile.id}</strong> перейдёт на новую immutable revision.</p><p class="muted">Начатые запросы сохраняют прежнюю версию. Обновление не переносит credentials и не меняет расходы задним числом.</p>`,
@@ -4390,7 +5422,14 @@
             );
             break;
           case "publish-confirm":
-            activeProfile.rev = (activeProfile.rev || 0) + 1;
+            activeProfile.rev =
+              Math.max(
+                0,
+                ...revisionHistory[activeProfile.id].map((r) => r.rev),
+              ) + 1;
+            revisionHistory[activeProfile.id].push(
+              captureRevision(activeProfile),
+            );
             activeProfile.state = "Опубликована";
             activeProfile.tone = "good";
             closeModal();
@@ -4399,22 +5438,29 @@
             toast("Активная версия переключена в синтетическом состоянии.");
             break;
           case "revisions":
+            initialRevision(activeProfile);
             dialog(
               "История версий",
-              activeProfile?.rev
-                ? table(
-                    ["Версия", "Состояние", "Профиль"],
-                    [
-                      [
-                        "r" + activeProfile.rev,
-                        badge("Активная", "good"),
-                        esc(activeProfile.id),
-                      ],
-                    ],
-                    "История версий",
-                  ) +
-                    '<p class="modal-note">Исторические снимки конфигурации в макете не представлены. Откат доступен после их загрузки в приложении.</p>'
-                : "<p>Профиль ещё не опубликован.</p>",
+              table(
+                ["Версия", "Состояние", "Модель", "Действие"],
+                revisionHistory[activeProfile.id].map((r) => [
+                  "r" + r.rev,
+                  r.rev === activeProfile.rev
+                    ? badge("Активная", "good")
+                    : "История",
+                  esc(r.model),
+                  btn(
+                    "Откатить",
+                    "rollback-revision",
+                    "",
+                    'data-revision="' +
+                      r.rev +
+                      '" ' +
+                      (r.rev === activeProfile.rev ? "disabled" : ""),
+                  ),
+                ]),
+                "История версий",
+              ),
             );
             break;
           case "add-deployment":
@@ -4433,7 +5479,7 @@
                   select(
                     "reserve-provider",
                     [
-                      ["ollama", "Ollama · generation 3"],
+                      ["ollama", "Ollama · поколение 3"],
                       ["api-a", "API · поколение 3"],
                     ],
                     "ollama",
@@ -4604,6 +5650,13 @@
               as_of: "2026-10-08T13:30:00Z",
               route: location.hash,
               filters: filterValues,
+              namespace:
+                namespaceContext()?.state === "active"
+                  ? {
+                      registry_instance_id: registryInstance,
+                      namespace_id: namespaceContext().id,
+                    }
+                  : null,
               columns,
               rows,
             };
@@ -4645,8 +5698,8 @@
                   select(
                     "price-connection",
                     [
-                      ["api-a", "API · generation 3"],
-                      ["ollama", "Ollama · generation 3"],
+                      ["api-a", "API · поколение 3"],
+                      ["ollama", "Ollama · поколение 3"],
                     ],
                     "api-a",
                   ),
@@ -4960,7 +6013,7 @@
                 ),
                 field(
                   "client-profile",
-                  "Разрешённый профиль",
+                  "Разрешённые профили",
                   select(
                     "client-profile",
                     [
@@ -5016,13 +6069,71 @@
               ],
               "client-save",
             );
+            modal
+              .querySelector(".form-grid")
+              .insertAdjacentHTML(
+                "afterbegin",
+                field(
+                  "client-namespace",
+                  "Namespace",
+                  select(
+                    "client-namespace",
+                    [
+                      ["", "Без привязки"],
+                      ...namespaceCatalog
+                        .filter((n) => n.state === "active")
+                        .map((n) => [n.id, n.label]),
+                    ],
+                    editingClient
+                      ? clientNamespaces[editingClient] || ""
+                      : namespaceContext()?.id || "",
+                  ),
+                ),
+              );
+            const projectField = document
+              .querySelector("#client-project")
+              .closest(".field");
+            projectField.innerHTML = field(
+              "client-project",
+              "Привязка Tracker",
+              input(
+                "client-project",
+                namespaceCatalog.find(
+                  (n) =>
+                    n.id === document.querySelector("#client-namespace").value,
+                )?.label || "Без привязки",
+                "text",
+                "readonly",
+              ),
+              "Определяется проверенным Namespace.",
+            );
+
+            const profilesSelect = document.querySelector("#client-profile");
+            profilesSelect.multiple = true;
+            profilesSelect.size = 3;
+            profilesSelect.innerHTML = profiles
+              .filter((p) => p.state === "Опубликована")
+              .map(
+                (p) =>
+                  '<option value="' + p.id + '">' + esc(p.id) + "</option>",
+              )
+              .join("");
+            [...profilesSelect.options].forEach(
+              (o) =>
+                (o.selected = (
+                  editingClient
+                    ? clients.find((c) => c[0] === editingClient)[3]
+                    : ["main-dev"]
+                ).includes(o.value)),
+            );
             if (editingClient) {
               const c = clients.find((c) => c[0] === editingClient),
                 m = clientMeta[editingClient] || {};
               document.querySelector("#application-key").disabled = true;
-              document.querySelector("#client-project").value =
-                c[2] === "Тестирование" ? "testing" : "platform";
-              document.querySelector("#client-profile").value = c[3];
+              document.querySelector("#client-project").value = c[2];
+              [...document.querySelector("#client-profile").options].forEach(
+                (o) => (o.selected = c[3].includes(o.value)),
+              );
               for (const [key, value] of Object.entries(m)) {
                 const el = document.getElementById(key);
                 if (el) {
@@ -5054,17 +6165,55 @@
               const c = editingClient
                 ? clients.find((c) => c[0] === editingClient)
                 : [key, key, "", "", "0", "0,00 $", "Без ключа"];
+              const nextNamespace =
+                document.querySelector("#client-namespace").value || null;
+              if (
+                editingClient &&
+                nextNamespace !== (clientNamespaces[key] || null) &&
+                !["Без ключа", "Ключ отозван"].includes(c[6])
+              ) {
+                document.querySelector("#dialog-error").textContent =
+                  "Отзовите старый ключ перед сменой Namespace.";
+                break;
+              }
+              if (
+                document.querySelector("#client-infer").checked &&
+                !document.querySelector("#client-profile").selectedOptions
+                  .length
+              ) {
+                document.querySelector("#dialog-error").textContent =
+                  "Выберите разрешённый профиль для inference.";
+                break;
+              }
               c[2] =
-                document.querySelector(
-                  "#client-project",
-                ).selectedOptions[0].text;
-              c[3] = document.querySelector("#client-profile").value;
+                namespaceCatalog.find((n) => n.id === nextNamespace)?.label ||
+                "Без привязки";
+              c[3] = [
+                ...document.querySelector("#client-profile").selectedOptions,
+              ].map((o) => o.value);
+              if (
+                document.querySelector("#client-infer").checked &&
+                !c[3].length
+              ) {
+                document.querySelector("#dialog-error").textContent =
+                  "Выберите разрешённый профиль для inference.";
+                break;
+              }
+              const selected =
+                document.querySelector("#client-namespace").value;
+              clientNamespaces[key] = selected || null;
+              c[2] =
+                namespaceCatalog.find((n) => n.id === selected)?.label ||
+                "Без привязки";
               clientMeta[key] = Object.fromEntries(
                 [...modal.querySelectorAll("[id^='client-']")].map((el) => [
                   el.id,
                   el.type === "checkbox" ? el.checked : el.value,
                 ]),
               );
+              delete clientMeta[key]["client-profile"];
+              delete clientMeta[key]["client-namespace"];
+              delete clientMeta[key]["client-project"];
               if (!editingClient) clients.push(c);
               closeModal();
               scene = "ready";
@@ -5126,6 +6275,26 @@
               "dataset-save",
               "Сохранить версию",
             );
+            modal
+              .querySelector(".form-grid")
+              .insertAdjacentHTML(
+                "afterbegin",
+                field(
+                  "dataset-namespace",
+                  "Namespace",
+                  select(
+                    "dataset-namespace",
+                    [
+                      ["", "Без привязки"],
+                      ...namespaceCatalog
+                        .filter((n) => n.state === "active")
+                        .map((n) => [n.id, n.label]),
+                    ],
+                    namespaceContext()?.id || "",
+                  ),
+                ),
+              );
+            document.querySelector("#dataset-project").disabled = true;
             break;
           case "dataset-save":
             try {
@@ -5153,6 +6322,8 @@
               previewDatasets.push({
                 id: "dataset-" + (previewDatasets.length + 1),
                 name: document.querySelector("#dataset-name").value,
+                namespace:
+                  document.querySelector("#dataset-namespace").value || null,
                 cases,
               });
               closeModal();
@@ -5196,6 +6367,32 @@
             );
             break;
           case "evaluation":
+            const datasets = [
+              {
+                id: "coding",
+                name: "Coding smoke v3 · 24 случая",
+                namespace: namespaceCatalog[1].id,
+              },
+              {
+                id: "json",
+                name: "JSON & tools v2 · 12 случаев",
+                namespace: namespaceCatalog[1].id,
+              },
+              ...previewDatasets.map((d) => ({
+                id: d.id,
+                name: d.name + " v1 · " + d.cases.length + " случаев",
+                namespace: d.namespace,
+              })),
+            ].filter((d) => namespaceMatches(d.namespace));
+            if (!datasets.length) {
+              dialog(
+                "Нет наборов тестов",
+                "<p>Добавьте набор в выбранный Namespace перед запуском.</p>",
+                btn("Закрыть", "close-modal") +
+                  btn("Добавить набор", "dataset", "primary"),
+              );
+              break;
+            }
             dataForm(
               "Новый запуск сравнения",
               [
@@ -5204,15 +6401,8 @@
                   "Набор",
                   select(
                     "eval-dataset",
-                    [
-                      ["coding", "Coding smoke v3 · 24 случая"],
-                      ["json", "JSON & tools v2 · 12 случаев"],
-                      ...previewDatasets.map((d) => [
-                        d.id,
-                        d.name + " v1 · " + d.cases.length + " случаев",
-                      ]),
-                    ],
-                    "coding",
+                    datasets.map((d) => [d.id, d.name]),
+                    datasets[0].id,
                   ),
                 ),
                 field(
@@ -5252,8 +6442,8 @@
                   "Бюджет",
                   select(
                     "eval-budget",
-                    [["ci", "CI тесты · доступно 1,75 USD"]],
-                    "ci",
+                    [["installation", "Установка · доступно 2,03 USD"]],
+                    "installation",
                   ),
                 ),
                 field(
@@ -5287,6 +6477,16 @@
                 repetitions: document.querySelector("#eval-repetitions").value,
                 concurrency: document.querySelector("#eval-concurrency").value,
                 cancelled: false,
+                namespace:
+                  (["coding", "json"].includes(
+                    document.querySelector("#eval-dataset").value,
+                  )
+                    ? namespaceCatalog[1].id
+                    : previewDatasets.find(
+                        (d) =>
+                          d.id ===
+                          document.querySelector("#eval-dataset").value,
+                      )?.namespace) || null,
               };
               previewRuns.push(run);
               closeModal();
@@ -5450,6 +6650,31 @@
         }
       });
       document.addEventListener("change", (e) => {
+        if (e.target.id === "context-search") {
+          const options = modelOptions(id()).filter(([value]) =>
+            value.toLowerCase().includes(e.target.value.toLowerCase()),
+          );
+          const current = document.querySelector("#context-model").value;
+          const choices = options.some(([value]) => value === current)
+            ? options
+            : [[current, current + " · выбранная"], ...options];
+          document.querySelector("#context-model").innerHTML = choices
+            .map(
+              ([value, label]) =>
+                '<option value="' +
+                esc(value) +
+                '">' +
+                esc(label) +
+                "</option>",
+            )
+            .join("");
+          document.querySelector("#context-model").value = current;
+        }
+        if (
+          e.target.closest("#dialog-form") &&
+          e.target.id !== "context-search"
+        )
+          modalDirty = true;
         if (e.target.id === "scene-select") {
           scene = e.target.value;
           render();
@@ -5465,6 +6690,33 @@
           )
             .map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`)
             .join("");
+        if (e.target.id === "namespace-select") {
+          if (dirty || modalDirty) {
+            pendingNamespace = e.target.value;
+            dialog(
+              "Есть несохранённые изменения",
+              "<p>Смена Namespace изменит контекст страницы. Сохраните черновик или подтвердите переход.</p>",
+              btn("Остаться", "namespace-stay") +
+                btn("Перейти без сохранения", "namespace-discard", "danger"),
+            );
+          } else setNamespace(e.target.value);
+          return;
+        }
+        if (e.target.id === "context-model") {
+          const old = modal.dataset.contextKey;
+          modelContextDrafts[old] =
+            document.querySelector("#context-budget").value;
+          const next = id() + "/" + e.target.value;
+          modal.dataset.contextKey = next;
+          document.querySelector("#context-budget").value =
+            modelContextDrafts[next] ?? modelContexts[next] ?? "";
+          return;
+        }
+        if (e.target.id === "client-namespace") {
+          document.querySelector("#client-project").value =
+            namespaceCatalog.find((n) => n.id === e.target.value)?.label ||
+            "Без привязки";
+        }
         if (e.target.id === "budget-scope") refreshBudgetTarget();
         if (e.target.id === "model-mode") {
           document.querySelector("#deployment-list").innerHTML = deployments(
@@ -5486,19 +6738,63 @@
             "dimension",
             "request-status",
             "audit-action",
+            "provider-status",
+            "model-status",
+            "model-filter-mode",
           ].includes(e.target.id)
         ) {
           filterValues[e.target.id] = e.target.value;
           const url = new URL(location.href);
           url.searchParams.set(e.target.id, e.target.value);
-          history.replaceState(null, "", url);
+          history.pushState(null, "", url);
           render();
         }
       });
       document.addEventListener("input", (e) => {
+        if (e.target.id === "context-search") {
+          const options = modelOptions(id()).filter(([value]) =>
+            value.toLowerCase().includes(e.target.value.toLowerCase()),
+          );
+          const current = document.querySelector("#context-model").value;
+          const choices = options.some(([value]) => value === current)
+            ? options
+            : [[current, current + " · выбранная"], ...options];
+          document.querySelector("#context-model").innerHTML = choices
+            .map(
+              ([value, label]) =>
+                '<option value="' +
+                esc(value) +
+                '">' +
+                esc(label) +
+                "</option>",
+            )
+            .join("");
+          document.querySelector("#context-model").value = current;
+        }
+        if (
+          e.target.closest("#dialog-form") &&
+          e.target.id !== "context-search"
+        )
+          modalDirty = true;
         if (e.target.closest("#model-form")) updateProof();
+        if (["provider-query", "model-query"].includes(e.target.id)) {
+          const key = e.target.id,
+            position = e.target.selectionStart;
+          const url = new URL(location.href);
+          url.searchParams.set(key, e.target.value);
+          history.replaceState(null, "", url);
+          filterValues[key] = e.target.value;
+          render();
+          const next = document.getElementById(key);
+          next.focus();
+          next.setSelectionRange(position, position);
+          return;
+        }
         if (e.target.id === "audit-query") {
           filterValues["audit-query"] = e.target.value;
+          const queryUrl = new URL(location.href);
+          queryUrl.searchParams.set("audit-query", e.target.value);
+          history.replaceState(null, "", queryUrl);
           applyListFilters();
         }
       });
@@ -5547,11 +6843,27 @@
         if (!e.target.closest('#account-menu,[data-action="account"]'))
           document.querySelector("#account-menu").hidden = true;
       });
+      window.addEventListener("beforeunload", (e) => {
+        if (dirty || modalDirty) {
+          e.preventDefault();
+          e.returnValue = "";
+        }
+      });
+      window.addEventListener("popstate", () => {
+        readFilters();
+        render();
+      });
       window.addEventListener("hashchange", () => {
         dirty = false;
         render();
         document.querySelector("#main").focus({ preventScroll: true });
         window.scrollTo({ top: 0, behavior: "instant" });
+      });
+      modal.addEventListener("cancel", (e) => {
+        if (modalDirty) {
+          e.preventDefault();
+          requestCloseModal();
+        }
       });
       render();
     </script>

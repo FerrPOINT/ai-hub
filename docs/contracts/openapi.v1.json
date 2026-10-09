@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AI Hub — проектный контракт v1",
-    "version": "0.1.0-design",
+    "version": "0.2.0-design",
     "description": "Design-only: API/handlers отсутствуют. Не generated runtime OpenAPI. Unknown/unsupported semantics fail closed."
   },
   "x-readiness": "design-only",
@@ -196,6 +196,29 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "enabled",
+                "disabled",
+                "revoked",
+                "authorization_unknown"
+              ]
             }
           }
         ],
@@ -808,6 +831,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
           }
         ],
         "responses": {
@@ -1175,6 +1207,33 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["development", "pinned_test"]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["draft", "active", "disabled", "archived"]
             }
           }
         ],
@@ -1841,7 +1900,7 @@
       "get": {
         "operationId": "listClients",
         "summary": "listClients",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-018"],
         "security": [
           {
@@ -1866,6 +1925,34 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
             }
           }
         ],
@@ -2258,7 +2345,7 @@
       "get": {
         "operationId": "listRequests",
         "summary": "listRequests",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-009", "FR-013"],
         "security": [
           {
@@ -2421,6 +2508,34 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
             }
           }
         ],
@@ -2633,7 +2748,7 @@
       "get": {
         "operationId": "readStatisticsSummary",
         "summary": "readStatisticsSummary",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-013", "FR-014", "FR-025"],
         "security": [
           {
@@ -2774,6 +2889,34 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
             }
           }
         ],
@@ -2825,7 +2968,7 @@
       "get": {
         "operationId": "readStatisticsTimeseries",
         "summary": "readStatisticsTimeseries",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-013", "FR-014", "FR-025"],
         "security": [
           {
@@ -2966,6 +3109,34 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
             }
           }
         ],
@@ -3017,7 +3188,7 @@
       "get": {
         "operationId": "readStatisticsBreakdown",
         "summary": "readStatisticsBreakdown",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-013", "FR-014", "FR-025"],
         "security": [
           {
@@ -3158,6 +3329,34 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
             }
           }
         ],
@@ -3209,7 +3408,7 @@
       "get": {
         "operationId": "readStatisticsExpenses",
         "summary": "readStatisticsExpenses",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-013", "FR-014", "FR-025"],
         "security": [
           {
@@ -3350,6 +3549,34 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
             }
           }
         ],
@@ -4061,7 +4288,7 @@
       "get": {
         "operationId": "listDatasetVersions",
         "summary": "listDatasetVersions",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-017"],
         "security": [
           {
@@ -4086,6 +4313,34 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
             }
           }
         ],
@@ -4151,7 +4406,7 @@
       "get": {
         "operationId": "listEvaluations",
         "summary": "listEvaluations",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-017"],
         "security": [
           {
@@ -4176,6 +4431,34 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
             }
           }
         ],
@@ -4456,7 +4739,7 @@
       "get": {
         "operationId": "exportStatistics",
         "summary": "exportStatistics",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-015"],
         "security": [
           {
@@ -4607,6 +4890,34 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
+            }
           }
         ],
         "responses": {
@@ -4663,7 +4974,7 @@
       "get": {
         "operationId": "listAudit",
         "summary": "listAudit",
-        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md.",
+        "description": "Проектный endpoint v1; runtime пока отсутствует. Семантика/authorization в API.md. Namespace UUID pair must be supplied together and verified against grants; missing pair selects authorized unbound/all scope, never repairs malformed input. binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected.",
         "x-requirements": ["FR-023"],
         "security": [
           {
@@ -4688,6 +4999,52 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["publish", "access", "budget", "settlement"]
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
             }
           }
         ],
@@ -5542,6 +5899,300 @@
         },
         "x-requirements": ["FR-021"]
       }
+    },
+    "/api/v1/connections/{connection_id}/model-contexts": {
+      "get": {
+        "operationId": "listModelContextPreferences",
+        "summary": "listModelContextPreferences",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized bounded projection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ModelContextPreference"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "next_cursor"]
+                }
+              }
+            }
+          }
+        },
+        "x-requirements": ["FR-004", "FR-028"]
+      },
+      "put": {
+        "operationId": "saveModelContextPreference",
+        "summary": "Save exact connection/model preference; invalidate affected draft proof",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[^\"]+\"$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelContextPreferenceInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved preference",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelContextPreference"
+                }
+              }
+            }
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          }
+        },
+        "x-requirements": ["FR-004", "FR-028"]
+      }
+    },
+    "/api/v1/namespaces": {
+      "get": {
+        "operationId": "listNamespaceBindings",
+        "summary": "listNamespaceBindings",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized bounded projection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/NamespaceBinding"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "next_cursor"]
+                }
+              }
+            }
+          }
+        },
+        "x-requirements": ["FR-027"]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "operationId": "listNotifications",
+        "summary": "listNotifications",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unacknowledged",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized bounded projection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Notification"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "next_cursor"]
+                }
+              }
+            }
+          }
+        },
+        "x-requirements": ["FR-016", "FR-029"],
+        "description": " binding=unbound excludes a Namespace UUID pair; conflicting selectors are rejected."
+      }
+    },
+    "/api/v1/notifications/{notification_id}/ack": {
+      "post": {
+        "operationId": "ackNotification",
+        "summary": "Idempotent actor-local acknowledgement; no financial mutation",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notification_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Same acknowledged notification on repeat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            }
+          }
+        },
+        "x-requirements": ["FR-023", "FR-029"]
+      }
     }
   },
   "components": {
@@ -6375,6 +7026,17 @@
             "type": "string",
             "enum": ["budget_guaranteed", "cost_unknown_allowed"],
             "default": "budget_guaranteed"
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           }
         },
         "required": [
@@ -6404,9 +7066,19 @@
           "version": {
             "type": "integer",
             "minimum": 1
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
-        "required": ["id", "settings", "status", "version"]
+        "required": ["id", "settings", "status", "version", "namespace"]
       },
       "ClientKeyIssued": {
         "type": "object",
@@ -6692,6 +7364,16 @@
           "probe_snapshot_id": {
             "type": ["string", "null"],
             "format": "uuid"
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -6706,7 +7388,8 @@
           "finished_at",
           "attempts",
           "expenses",
-          "probe_snapshot_id"
+          "probe_snapshot_id",
+          "namespace"
         ],
         "allOf": [
           {
@@ -7080,6 +7763,16 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+              "namespace": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/NamespaceRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
               "from": {
                 "type": "string",
                 "format": "date-time"
@@ -7088,31 +7781,6 @@
                 "type": "string",
                 "format": "date-time"
               },
-              "timezone": {
-                "type": "string"
-              },
-              "project": {
-                "type": ["string", "null"]
-              },
-              "client": {
-                "type": ["string", "null"]
-              },
-              "delegated_user": {
-                "type": ["string", "null"]
-              },
-              "virtual_model": {
-                "type": ["string", "null"]
-              },
-              "profile_revision": {
-                "type": ["string", "null"],
-                "format": "uuid"
-              },
-              "provider": {
-                "type": ["string", "null"]
-              },
-              "actual_model": {
-                "type": ["string", "null"]
-              },
               "currency": {
                 "type": ["string", "null"]
               },
@@ -7120,7 +7788,7 @@
                 "type": ["string", "null"]
               }
             },
-            "required": ["from", "to", "timezone"]
+            "required": ["namespace", "from", "to", "currency", "group_by"]
           },
           "source_basis": {
             "type": "object",
@@ -7196,6 +7864,16 @@
           "throughput_per_second": {
             "type": "number",
             "minimum": 0
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -7227,7 +7905,8 @@
           "fallback_rate",
           "availability_rate",
           "latency_p50_ms",
-          "throughput_per_second"
+          "throughput_per_second",
+          "namespace"
         ]
       },
       "DatasetInput": {
@@ -7287,6 +7966,17 @@
               },
               "required": ["case_id", "input", "assertion_kind", "expected"]
             }
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           }
         },
         "required": ["name", "project_binding", "cases"]
@@ -7318,6 +8008,16 @@
           "expires_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -7326,7 +8026,8 @@
           "sequence",
           "cases_hash",
           "case_count",
-          "expires_at"
+          "expires_at",
+          "namespace"
         ]
       },
       "EvaluationInput": {
@@ -7460,6 +8161,16 @@
           "happened_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -7470,7 +8181,8 @@
           "revision",
           "operation_id",
           "reason",
-          "happened_at"
+          "happened_at",
+          "namespace"
         ]
       },
       "EffectiveConfig": {
@@ -8462,6 +9174,201 @@
           "service_key",
           "central_branding_consumer",
           "local_fallback"
+        ]
+      },
+      "NamespaceRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "registry_instance_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "namespace_id": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "const": "00000000-0000-0000-0000-000000000000"
+            }
+          }
+        },
+        "required": ["registry_instance_id", "namespace_id"]
+      },
+      "NamespaceBinding": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "namespace": {
+            "$ref": "#/components/schemas/NamespaceRef"
+          },
+          "tracker_instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tracker_project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": ["active", "archived", "unavailable"]
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "namespace",
+          "tracker_instance_id",
+          "tracker_project_id",
+          "state",
+          "observed_at",
+          "generation"
+        ]
+      },
+      "ModelContextPreferenceInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "model_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "context_window_tokens": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          }
+        },
+        "required": ["model_id", "context_window_tokens"]
+      },
+      "ModelContextPreference": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "connection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "model_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "context_window_tokens": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "connection_id",
+          "model_id",
+          "context_window_tokens",
+          "version",
+          "updated_at"
+        ]
+      },
+      "Notification": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "event_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "warning", "error"]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "budget_threshold",
+              "budget_blocked",
+              "unknown_reserve",
+              "provider_unavailable",
+              "projection_lag"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "object_kind": {
+            "type": "string",
+            "enum": ["budget", "request", "connection", "statistics"]
+          },
+          "object_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "acknowledged_at": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "event_key",
+          "namespace",
+          "severity",
+          "kind",
+          "message",
+          "occurred_at",
+          "object_kind",
+          "object_id",
+          "acknowledged_at"
         ]
       }
     },

@@ -212,6 +212,9 @@ def validate(root: Path):
 
     def walk(value):
         if isinstance(value, dict):
+            required = value.get("required")
+            if isinstance(required, list) and len(required) != len(set(required)):
+                errors.append("Duplicate required schema field")
             if "$ref" in value:
                 target = value["$ref"]
                 if not target.startswith("#/"):
@@ -264,6 +267,12 @@ def validate(root: Path):
     routes = route_doc["routes"]
     ids(routes, "path", "route")
     for route in routes:
+        if route.get("route_class") == "auth":
+            if route["operations"] or route["auth"] != "public_sso_entry":
+                errors.append(
+                    "Auth route must use Central Auth entry, not product operations"
+                )
+            continue
         if not route["operations"] or not set(route["operations"]) <= op_ids:
             errors.append(f"Route operation missing: {route['path']}")
         if not set(route["tests"]) <= test_ids or route.get("qa") != "not_run":

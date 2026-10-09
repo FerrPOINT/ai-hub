@@ -57,3 +57,9 @@ Financial tests include near-zero/large amounts, cache/reasoning overlap,
 partial usage, ambiguous failures, duplicate invoice, refund, period boundaries,
 multi-currency и concurrency across processes.
 Цена synthetic в offline example проверяет арифметику, не provider bill.
+
+| TC-035 | FR-027 | Проверенная UUID-пара NamespaceRef связывает клиента, запрос, dataset и проектный бюджет; повреждённый контекст denied, непривязанные записи не присваиваются по имени. |
+
+| TC-036 | FR-028 | Каждое исходное поле/API/хранилище имеет mapping или прежнего owner; контекст точный, microdollars без округления, старые proof не активируют Hub. |
+
+| TC-037 | FR-029 | Polling возвращает только разрешённые безопасные события; ACK actor-local и идемпотентен, не меняет расходы, резерв или исход запроса. |

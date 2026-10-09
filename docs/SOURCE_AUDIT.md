@@ -41,3 +41,11 @@ prices/quotas/subscription rights или real installed provider behavior.
 различия; выбран own baseline без автоматического upgrade.
 Нет реальных credentials, provider calls, runtime screenshots и application release
 в documentation preparation.
+
+## Актуализация 2026-10-09
+
+Base reference `81decf7d9edd2c4218d8625a96e2e25c0617e9f1`, Admin reference `7c4240a2154478b4866661cbc45dbd06d3e855e2`. Source hashes обновлены по committed blobs; исходный SDK pin независим и сохранён. Это provenance документов, не live acceptance.
+
+## Актуализация 2026-10-09
+
+Текущая актуализация перепроверяет локальные committed sources. Внешние provider references сохраняют прежнюю дату snapshot; их live requalification и изменившиеся условия проверяются на S4, не объявлены свежими source-only audit.

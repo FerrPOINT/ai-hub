@@ -15,3 +15,5 @@ Accepted здесь означает проектное решение для п
 по user autonomy; scope расширения, destruction и live deployment — отдельная authority.
 
 - [ADR0007: development-ready design](adr/0007-develop-ready-design.md) — принято.
+
+- [ADR-0008: выделение AI и Namespace](adr/0008-admin-extraction-namespace.md)

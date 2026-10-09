@@ -1,6 +1,6 @@
 # Дизайн AI Hub
 
-[Интерактивный прототип](prototype.html) — все 15 operational routes с синтетическими
+[Интерактивный прототип](prototype.html) — 15 operational routes и auth /login с синтетическими
 данными; это design artifact, не приложение с provider/DB/SSO.
 [design-contract.json](design-contract.json) фиксирует pages/forms/states/API mapping.
 Token snapshot взят из exact Base SHA в .base-revision; production потребляет @sdlc/ui,
@@ -34,3 +34,5 @@ QA toolbar в production flows. Product screenshots и design screenshots име
 разные manifests/qa kinds.
 
 [Повторная UI/UX проверка](UX_RECHECK.md) описывает исправленные ошибки и сценарии регрессии.
+
+Namespace в шапке имеет tab-local URL. Контекст модели сохраняется отдельно по exact connection/model. История/откат и уведомления — simulation; новые требования и источники в [CURRENT_STATE](../CURRENT_STATE.md).

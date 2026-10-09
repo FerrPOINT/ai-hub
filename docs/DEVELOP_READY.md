@@ -24,3 +24,7 @@ rendered prototype и source-bound IAB evidence согласованы.Execution
 Application/backend/DB migrations/live SSO/provider/deployment not implemented;
 those are execution checkpoints and do not become prerequisites for documentation delivery.
 Следующий stage S1; account access/target ports/cutover occur at named later gates.
+
+## Актуализация 2026-10-09
+
+Namespace, Admin extraction, per-model preferences и notification contract согласованы. Текущая design QA: 219 geometry / 168 states / 73 flow assertions. [Статус](CURRENT_STATE.md), [evidence](design/evidence.json). Реальные execution gates not_run.

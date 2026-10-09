@@ -99,3 +99,7 @@ transcripts в аналитике. Существующие Octo/PDLC installati
 [Интерактивный дизайн](docs/design/README.md) / [галерея](docs/design/gallery.html).
 15 screens,3 themes, explicit states/forms/fields; IAB evidence — только prototype.
 Typed DD34 tables/294 fields и execution packets позволяют начать S1.
+
+## Дизайн и выделение из Admin
+
+[Прототип](docs/design/prototype.html), [руководство](docs/USER_GUIDE.md), [точная карта переноса](docs/contracts/ADMIN_HANDOFF_V1.md), [Namespace](docs/contracts/NAMESPACE_V1.md). Документы описывают целевой сервис; runtime/credential/data cutover не выполнялся.

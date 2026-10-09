@@ -17,7 +17,10 @@
       ],
       "tests": ["TC-024", "TC-032"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/"
     },
     {
       "path": "/providers",
@@ -35,7 +38,10 @@
       ],
       "tests": ["TC-024", "TC-032"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/providers"
     },
     {
       "path": "/providers/:id",
@@ -64,7 +70,10 @@
       ],
       "tests": ["TC-024", "TC-032"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/providers/api-a"
     },
     {
       "path": "/models",
@@ -82,7 +91,10 @@
       ],
       "tests": ["TC-024", "TC-032"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/models"
     },
     {
       "path": "/models/:id",
@@ -110,7 +122,10 @@
       ],
       "tests": ["TC-024", "TC-032"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/models/main-dev"
     },
     {
       "path": "/requests",
@@ -126,9 +141,12 @@
         "partial",
         "stale"
       ],
-      "tests": ["TC-024", "TC-032"],
+      "tests": ["TC-024", "TC-032", "TC-035"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/requests"
     },
     {
       "path": "/requests/:id",
@@ -146,7 +164,10 @@
       ],
       "tests": ["TC-024", "TC-032"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/requests/a17d"
     },
     {
       "path": "/statistics",
@@ -167,9 +188,12 @@
         "partial",
         "stale"
       ],
-      "tests": ["TC-024", "TC-032"],
+      "tests": ["TC-024", "TC-032", "TC-035"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/statistics"
     },
     {
       "path": "/expenses",
@@ -192,9 +216,12 @@
         "partial",
         "stale"
       ],
-      "tests": ["TC-024", "TC-032"],
+      "tests": ["TC-024", "TC-032", "TC-035"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/expenses"
     },
     {
       "path": "/budgets",
@@ -210,9 +237,12 @@
         "partial",
         "stale"
       ],
-      "tests": ["TC-024", "TC-032"],
+      "tests": ["TC-024", "TC-032", "TC-035"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/budgets"
     },
     {
       "path": "/clients",
@@ -236,9 +266,12 @@
         "partial",
         "stale"
       ],
-      "tests": ["TC-024", "TC-032"],
+      "tests": ["TC-024", "TC-032", "TC-035"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/clients"
     },
     {
       "path": "/evaluations",
@@ -259,9 +292,12 @@
         "partial",
         "stale"
       ],
-      "tests": ["TC-024", "TC-032"],
+      "tests": ["TC-024", "TC-032", "TC-035"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/evaluations"
     },
     {
       "path": "/evaluations/:id",
@@ -279,7 +315,10 @@
       ],
       "tests": ["TC-024", "TC-032"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/evaluations/run-24"
     },
     {
       "path": "/audit",
@@ -295,9 +334,12 @@
         "partial",
         "stale"
       ],
-      "tests": ["TC-024", "TC-032"],
+      "tests": ["TC-024", "TC-032", "TC-035"],
       "implementation": "planned",
-      "qa": "not_run"
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/audit"
     },
     {
       "path": "/settings",
@@ -314,6 +356,22 @@
         "stale"
       ],
       "tests": ["TC-024", "TC-032"],
+      "implementation": "planned",
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/settings"
+    },
+    {
+      "path": "/login",
+      "layout": "reading",
+      "route_class": "auth",
+      "roles": ["anonymous"],
+      "auth": "public_sso_entry",
+      "fixture": "design/prototype.html#/login",
+      "operations": [],
+      "states": ["ready", "loading", "error"],
+      "tests": ["TC-018", "TC-032"],
       "implementation": "planned",
       "qa": "not_run"
     }

@@ -51,3 +51,7 @@ Partial analytics сохраняет доступные cards, показыва�
 last successful values с timestamp. Export использует тот же authorized snapshot;
 CSV strings защищены от formula injection, decimals и null semantics сохранены.
 Projection rebuild никогда не запускает model calls.
+
+## Актуализация 2026-10-09
+
+Namespace UUID pair и binding=unbound входят в filter echo и cursor identity. Конфликт pair/unbound — ошибка, не all fallback. Budget period — текущий UTC месяц/день; диаграмма периода показывает cash occurrence, reserve остаётся отдельным current snapshot.

@@ -5,13 +5,13 @@
   "base_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
   "base_tokens_source": "frontend/src/ui/tokens.css",
   "themes": ["dark", "gray", "light"],
-  "viewports": [375, 1440, 2560],
+  "viewports": [375, 1440, 1920, 2560],
   "pages": [
     {
       "route": "/",
       "title": "Обзор",
       "layout": "wide",
-      "filters": ["Период", "Проект", "Валюта"],
+      "filters": ["Namespace в шапке", "Период", "Валюта"],
       "sections": [
         "Запросы",
         "Подтверждённые расходы",
@@ -21,7 +21,12 @@
         "Качество",
         "Последние запросы"
       ],
-      "operations": ["exportStatistics"],
+      "operations": [
+        "exportStatistics",
+        "readStatisticsSummary",
+        "listRequests",
+        "listNotifications"
+      ],
       "purpose": "Что использует модели, сколько стоит и что требует внимания.",
       "states": [
         "ready",
@@ -37,13 +42,14 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational"
     },
     {
       "route": "/providers",
       "title": "Провайдеры",
       "layout": "wide",
-      "filters": ["Поиск/состояние подключения"],
+      "filters": ["Поиск подключения", "Состояние"],
       "sections": [
         "Название",
         "Adapter kind",
@@ -52,7 +58,7 @@
         "Каталог",
         "Capabilities"
       ],
-      "operations": ["createConnection", "readConnection"],
+      "operations": ["createConnection", "readConnection", "listProviders"],
       "purpose": "Состояние подключения отдельно от доступа модели.",
       "states": [
         "ready",
@@ -68,7 +74,8 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational"
     },
     {
       "route": "/providers/:id",
@@ -82,7 +89,9 @@
         "Model metadata",
         "Qualified capabilities",
         "Proof history",
-        "Safe configuration"
+        "Safe configuration",
+        "Сохранённый контекст каждой модели",
+        "Readback login/connection operation"
       ],
       "operations": [
         "updateConnection",
@@ -90,7 +99,10 @@
         "startManagedLogin",
         "revokeConnectionAuthorization",
         "startVerification",
-        "disableConnection"
+        "disableConnection",
+        "listModelContextPreferences",
+        "saveModelContextPreference",
+        "readOperation"
       ],
       "purpose": "Own authorization и квалификация exact account/model/endpoint.",
       "states": [
@@ -107,13 +119,14 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational"
     },
     {
       "route": "/models",
       "title": "Модели",
       "layout": "wide",
-      "filters": ["Поиск", "Mode", "Active/draft"],
+      "filters": ["Поиск профиля", "Режим", "Статус"],
       "sections": [
         "Slug",
         "Display name",
@@ -122,7 +135,11 @@
         "Traffic",
         "Expense confidence"
       ],
-      "operations": ["createVirtualModel", "readVirtualModel"],
+      "operations": [
+        "createVirtualModel",
+        "readVirtualModel",
+        "listVirtualModels"
+      ],
       "purpose": "Имена API и версии профилей без скрытой подмены.",
       "states": [
         "ready",
@@ -138,7 +155,8 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational"
     },
     {
       "route": "/models/:id",
@@ -154,7 +172,9 @@
         "Allowed overrides",
         "Deadline/max attempts",
         "Proof",
-        "Publication"
+        "Publication",
+        "История и откат",
+        "Disable/enable/archive"
       ],
       "operations": [
         "updateVirtualModelDraft",
@@ -181,20 +201,14 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational"
     },
     {
       "route": "/requests",
       "title": "Запросы",
       "layout": "wide",
-      "filters": [
-        "Период",
-        "Project/client",
-        "Profile/revision",
-        "Status",
-        "Currency",
-        "Purpose"
-      ],
+      "filters": ["Namespace в шапке", "Период", "Статус"],
       "sections": [
         "ID/time",
         "Virtual profile",
@@ -220,7 +234,9 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational",
+      "context": "verified NamespaceRef; null explicitly unbound"
     },
     {
       "route": "/requests/:id",
@@ -253,21 +269,14 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational"
     },
     {
       "route": "/statistics",
       "title": "Статистика",
       "layout": "wide",
-      "filters": [
-        "From/to",
-        "Timezone",
-        "Project/client/user",
-        "Profile/revision",
-        "Provider/actual model",
-        "Purpose",
-        "Dimension"
-      ],
+      "filters": ["Namespace в шапке", "Период", "Валюта", "Разрез"],
       "sections": [
         "Known tokens",
         "Rates/denominators",
@@ -299,19 +308,19 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational",
+      "context": "verified NamespaceRef; null explicitly unbound"
     },
     {
       "route": "/expenses",
       "title": "Расходы",
       "layout": "wide",
       "filters": [
-        "Cash range",
-        "Currency",
-        "Project/client",
-        "Provider",
-        "Confidence",
-        "Ledger/Prices/Subscriptions"
+        "Namespace в шапке",
+        "Период",
+        "Валюта",
+        "Списания / Тарифы / Подписки"
       ],
       "sections": [
         "Confirmed",
@@ -347,7 +356,9 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational",
+      "context": "verified NamespaceRef; null explicitly unbound"
     },
     {
       "route": "/budgets",
@@ -380,13 +391,15 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational",
+      "context": "verified NamespaceRef; null explicitly unbound"
     },
     {
       "route": "/clients",
       "title": "Приложения",
       "layout": "wide",
-      "filters": ["Project", "Status"],
+      "filters": ["Namespace в шапке"],
       "sections": [
         "Application identity",
         "Project binding",
@@ -395,7 +408,10 @@
         "Expiry",
         "RPM/concurrency",
         "Cost policy",
-        "Keys"
+        "Keys",
+        "Несколько разрешённых профилей",
+        "Привязка Namespace",
+        "Выдача ключа отдельно"
       ],
       "operations": [
         "createClient",
@@ -420,7 +436,9 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational",
+      "context": "verified NamespaceRef; null explicitly unbound"
     },
     {
       "route": "/evaluations",
@@ -456,7 +474,9 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational",
+      "context": "verified NamespaceRef; null explicitly unbound"
     },
     {
       "route": "/evaluations/:id",
@@ -488,13 +508,14 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational"
     },
     {
       "route": "/audit",
       "title": "Аудит",
       "layout": "wide",
-      "filters": ["Object", "Actor", "Action", "Time"],
+      "filters": ["Namespace в шапке", "Объект", "Действие"],
       "sections": [
         "Actor/action",
         "Object/revision",
@@ -518,7 +539,9 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational",
+      "context": "verified NamespaceRef; null explicitly unbound"
     },
     {
       "route": "/settings",
@@ -548,7 +571,20 @@
         "budget_exhausted",
         "long"
       ],
-      "render_evidence": []
+      "render_evidence": ["evidence.json"],
+      "route_class": "operational"
+    },
+    {
+      "route": "/login",
+      "title": "Вход в платформу",
+      "route_class": "auth",
+      "layout": "reading",
+      "filters": [],
+      "sections": ["Нейтральный SSO entry", "Возврат в целевой продукт"],
+      "operations": [],
+      "purpose": "Central SSO entry; Hub does not own passwords.",
+      "states": ["ready", "loading", "error"],
+      "render_evidence": ["evidence.json"]
     }
   ],
   "states": [
@@ -732,7 +768,8 @@
         "max_concurrency",
         "max_requests_per_minute",
         "scopes",
-        "cost_policy"
+        "cost_policy",
+        "namespace"
       ],
       "derived": [],
       "result": "Client metadata; issueClientKey explicit separate operation"
@@ -740,7 +777,7 @@
     "dataset": {
       "operation": "createDatasetVersion",
       "schema": "DatasetInput",
-      "fields": ["name", "project_binding", "cases"],
+      "fields": ["name", "project_binding", "cases", "namespace"],
       "derived": ["hash/version generated by owner"],
       "result": "Immutable dataset"
     },
@@ -757,6 +794,29 @@
       ],
       "derived": ["actor/validated internal execution grant"],
       "result": "Frozen evaluation and own expenses"
+    },
+    "modelContext": {
+      "operation": "saveModelContextPreference",
+      "schema": "ModelContextPreferenceInput",
+      "fields": ["model_id", "context_window_tokens"],
+      "derived": ["connection_id", "If-Match"],
+      "result": "Saved exact connection/model preference; not physical limit"
     }
+  },
+  "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",
+  "namespace_states": [
+    "all",
+    "active",
+    "unbound",
+    "archived",
+    "unavailable",
+    "invalid"
+  ],
+  "notification_polling": {
+    "transport": "control_api",
+    "interval_seconds": 30,
+    "visible_authenticated_page_only": true,
+    "ack_financial_effect": false,
+    "prototype_transport": "none"
   }
 }

@@ -820,6 +820,12 @@
           "type": "bigint",
           "nullable": false,
           "rule": "CAS"
+        },
+        {
+          "name": "namespace_binding_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own verified binding FK; null explicitly unbound"
         }
       ]
     },
@@ -1027,6 +1033,12 @@
           "type": "bigint",
           "nullable": false,
           "rule": "CAS fence"
+        },
+        {
+          "name": "namespace_binding_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own verified binding FK; null explicitly unbound"
         }
       ]
     },
@@ -1429,6 +1441,12 @@
           "type": "text",
           "nullable": false,
           "rule": "active disabled"
+        },
+        {
+          "name": "namespace_binding_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own verified binding FK; null explicitly unbound"
         }
       ]
     },
@@ -1716,6 +1734,12 @@
           "type": "timestamptz",
           "nullable": false,
           "rule": "7d content default"
+        },
+        {
+          "name": "namespace_binding_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own verified binding FK; null explicitly unbound"
         }
       ]
     },
@@ -1948,6 +1972,12 @@
           "type": "timestamptz",
           "nullable": false,
           "rule": "UTC"
+        },
+        {
+          "name": "namespace_binding_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own verified binding FK; null explicitly unbound"
         }
       ]
     },
@@ -2003,6 +2033,263 @@
           "type": "timestamptz",
           "nullable": true,
           "rule": "in-app ack"
+        }
+      ]
+    },
+    {
+      "name": "namespace_bindings",
+      "phase": "S1",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own installation FK"
+        },
+        {
+          "name": "registry_instance_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "external Admin identity; nonnil"
+        },
+        {
+          "name": "namespace_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "external immutable ID; no lookup by display name"
+        },
+        {
+          "name": "tracker_instance_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "external verified instance"
+        },
+        {
+          "name": "tracker_project_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "external verified project"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "rule": "active archived unavailable; no inferred active"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "positive verified projection generation"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC last verified readback"
+        }
+      ]
+    },
+    {
+      "name": "model_context_preferences",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own connection FK"
+        },
+        {
+          "name": "model_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact upstream ID"
+        },
+        {
+          "name": "context_window_tokens",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "configured budget 1..4294967295; not physical bound"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "CAS"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "notifications",
+      "phase": "S5",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "installation_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own installation FK"
+        },
+        {
+          "name": "namespace_binding_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own binding FK; null installation event"
+        },
+        {
+          "name": "event_key",
+          "type": "text",
+          "nullable": false,
+          "rule": "unique stable domain event key"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "rule": "typed notification category"
+        },
+        {
+          "name": "severity",
+          "type": "text",
+          "nullable": false,
+          "rule": "info warning error"
+        },
+        {
+          "name": "safe_payload",
+          "type": "jsonb",
+          "nullable": false,
+          "rule": "no keys/prompt/raw upstream error"
+        },
+        {
+          "name": "object_kind",
+          "type": "text",
+          "nullable": false,
+          "rule": "allowlisted owner resource kind"
+        },
+        {
+          "name": "object_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "own safe resource reference"
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "event time UTC"
+        }
+      ]
+    },
+    {
+      "name": "notification_acknowledgements",
+      "phase": "S5",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "notification_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own notification FK"
+        },
+        {
+          "name": "actor_subject",
+          "type": "text",
+          "nullable": false,
+          "rule": "verified central subject"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "stable actor intent"
+        },
+        {
+          "name": "acknowledged_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC; unique notification/actor"
+        }
+      ]
+    },
+    {
+      "name": "legacy_import_provenance",
+      "phase": "S7",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "source_instance_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "explicit source"
+        },
+        {
+          "name": "source_workspace",
+          "type": "text",
+          "nullable": false,
+          "rule": "not a Namespace"
+        },
+        {
+          "name": "source_kind",
+          "type": "text",
+          "nullable": false,
+          "rule": "allowlisted ledger/profile/preference/operation"
+        },
+        {
+          "name": "source_record_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "immutable source identity"
+        },
+        {
+          "name": "source_digest",
+          "type": "text",
+          "nullable": false,
+          "rule": "SHA256"
+        },
+        {
+          "name": "target_kind",
+          "type": "text",
+          "nullable": false,
+          "rule": "own typed kind"
+        },
+        {
+          "name": "target_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own identity"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "rule": "staged verified rejected; duplicate different digest denied"
         }
       ]
     }
@@ -2252,6 +2539,54 @@
       "target_table": "profile_revisions",
       "target_column": "id",
       "on_delete": "restrict / archive; content TTL separate"
+    },
+    {
+      "table": "clients",
+      "column": "namespace_binding_id",
+      "target_table": "namespace_bindings",
+      "target_column": "id"
+    },
+    {
+      "table": "requests",
+      "column": "namespace_binding_id",
+      "target_table": "namespace_bindings",
+      "target_column": "id"
+    },
+    {
+      "table": "budget_policies",
+      "column": "namespace_binding_id",
+      "target_table": "namespace_bindings",
+      "target_column": "id"
+    },
+    {
+      "table": "dataset_versions",
+      "column": "namespace_binding_id",
+      "target_table": "namespace_bindings",
+      "target_column": "id"
+    },
+    {
+      "table": "audit_events",
+      "column": "namespace_binding_id",
+      "target_table": "namespace_bindings",
+      "target_column": "id"
+    },
+    {
+      "table": "model_context_preferences",
+      "column": "connection_id",
+      "target_table": "connections",
+      "target_column": "id"
+    },
+    {
+      "table": "notifications",
+      "column": "namespace_binding_id",
+      "target_table": "namespace_bindings",
+      "target_column": "id"
+    },
+    {
+      "table": "notification_acknowledgements",
+      "column": "notification_id",
+      "target_table": "notifications",
+      "target_column": "id"
     }
   ],
   "composite_invariants": [
@@ -2266,6 +2601,10 @@
     "reservations unique attempt/budget period; sorted multi-scope locks",
     "evaluation case unique run/candidate/repetition/case; restart no replay unknown I/O",
     "operation safe_result never stores plaintext client/provider keys or model output",
-    "UTC half-open periods; cash occurred_at distinct subscription service period"
+    "UTC half-open periods; cash occurred_at distinct subscription service period",
+    "unique registry_instance_id/namespace_id within own installation; exact Tracker binding; no external FK",
+    "unique connection_id/model_id preference; CAS; no unknown physical-bound default",
+    "notification outbox delivery acknowledgement differs from actor read/ACK; no financial effect",
+    "unique source_instance_id/source_kind/source_record_id import identity with digest conflict protection"
   ]
 }

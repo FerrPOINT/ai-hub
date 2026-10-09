@@ -120,7 +120,7 @@ def validate(root=ROOT, require_evidence=True):
         errors.append("Invalid design evidence surface/kind")
     checks = evidence["geometry"]
     for route in [r["path"] for r in routes]:
-        for width in (375, 1440, 2560):
+        for width in (375, 1440, 1920, 2560):
             if not any(
                 x["route"] == route and x["width"] == width and x["theme"] == "dark"
                 for x in checks
@@ -163,6 +163,17 @@ def validate(root=ROOT, require_evidence=True):
         "financial-save-visible",
         "export-downloaded-snapshot",
         "conflict-preserves-draft",
+        "namespace-foreign-registry",
+        "namespace-unbound",
+        "namespace-back",
+        "namespace-reload",
+        "model-context-saved",
+        "managed-login-no-duplicate",
+        "notification-no-financial-effect",
+        "client-multiple-profiles",
+        "client-binding-requires-revocation",
+        "profile-rollback",
+        "profile-archive-readonly",
     }
     if not required_flows <= {item.get("name") for item in evidence["flows"]}:
         errors.append("Missing behavioral UX regression evidence")

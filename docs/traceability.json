@@ -340,6 +340,36 @@
       "phase": "S7",
       "document": "docs/QUALITY_GATE.md",
       "status": "planned"
+    },
+    {
+      "id": "FR-027",
+      "name": "Сквозной Namespace",
+      "acceptance": "Проверенная UUID-пара NamespaceRef связывает клиента, запрос, dataset и проектный бюджет; повреждённый контекст denied, непривязанные записи не присваиваются по имени.",
+      "owner": "AI Hub",
+      "tests": ["TC-035"],
+      "phase": "S1",
+      "document": "docs/contracts/NAMESPACE_V1.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-028",
+      "name": "Выделение AI из Admin",
+      "acceptance": "Каждое исходное поле/API/хранилище имеет mapping или прежнего owner; контекст точный, microdollars без округления, старые proof не активируют Hub.",
+      "owner": "AI Hub",
+      "tests": ["TC-036"],
+      "phase": "S7",
+      "document": "docs/contracts/ADMIN_HANDOFF_V1.md",
+      "status": "planned"
+    },
+    {
+      "id": "FR-029",
+      "name": "Уведомления",
+      "acceptance": "Polling возвращает только разрешённые безопасные события; ACK actor-local и идемпотентен, не меняет расходы, резерв или исход запроса.",
+      "owner": "AI Hub",
+      "tests": ["TC-037"],
+      "phase": "S5",
+      "document": "docs/OPERATIONS.md",
+      "status": "planned"
     }
   ],
   "tests": [
@@ -545,6 +575,24 @@
       "id": "TC-034",
       "requirements": ["NFR-008"],
       "scenario": "Final merged source/Base/image artifact hashes match served target; authenticate UI + actual provider/consumer checks; old screenshot/probe receipt rejected as current.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-035",
+      "requirements": ["FR-027"],
+      "scenario": "Проверенная UUID-пара NamespaceRef связывает клиента, запрос, dataset и проектный бюджет; повреждённый контекст denied, непривязанные записи не присваиваются по имени. Positive/negative/neighboring identity, repeated readback and restart cases.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-036",
+      "requirements": ["FR-028"],
+      "scenario": "Каждое исходное поле/API/хранилище имеет mapping или прежнего owner; контекст точный, microdollars без округления, старые proof не активируют Hub. Positive/negative/neighboring identity, repeated readback and restart cases.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-037",
+      "requirements": ["FR-029"],
+      "scenario": "Polling возвращает только разрешённые безопасные события; ACK actor-local и идемпотентен, не меняет расходы, резерв или исход запроса. Positive/negative/neighboring identity, repeated readback and restart cases.",
       "status": "not_run"
     }
   ],

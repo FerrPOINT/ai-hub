@@ -71,3 +71,7 @@ DATA_DICTIONARY и contracts/data-dictionary.v1.json уточняют34 tables/2
 operation/login ledgers и immutable connection generations. Wire DTO — OpenAPI.
 Operations safe_result не содержит one-time keys/model result; FK/proof/lifecycle
 и stage increments перечислены в MIGRATION_PLAN/STATE_MACHINES.
+
+## Дополнение Namespace и выделения
+
+Namespace projection, model context preferences, notifications/actor acknowledgements и legacy import provenance описаны в [DATA_DICTIONARY](DATA_DICTIONARY.md). External IDs не FK к чужой БД. Null binding явно unbound. Сохранённый context budget не verification evidence.
