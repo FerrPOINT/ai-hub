@@ -3982,6 +3982,34 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "binding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["all", "unbound"],
+              "default": "all"
+            }
           }
         ],
         "responses": {
@@ -7670,6 +7698,16 @@
           "version": {
             "type": "integer",
             "minimum": 1
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -7680,7 +7718,8 @@
           "charged",
           "reserved",
           "remaining",
-          "version"
+          "version",
+          "namespace"
         ]
       },
       "Statistics": {
@@ -8127,9 +8166,19 @@
                 "expenses"
               ]
             }
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
-        "required": ["id", "config", "status", "results"]
+        "required": ["id", "config", "status", "results", "namespace"]
       },
       "AuditEvent": {
         "type": "object",
