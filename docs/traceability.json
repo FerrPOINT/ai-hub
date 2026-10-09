@@ -370,6 +370,16 @@
       "phase": "S5",
       "document": "docs/OPERATIONS.md",
       "status": "planned"
+    },
+    {
+      "id": "FR-030",
+      "name": "Тарифы проектов и источники себестоимости",
+      "acceptance": "Per-million input/output rates; default cost markup 20%; exact Namespace overrides; OpenRouter automatic costs and manual subscription/Ollama rates remain separate from provider cash; frozen snapshots, decimal arithmetic and unknown are preserved.",
+      "owner": "AI Hub",
+      "tests": ["TC-038"],
+      "phase": "S5",
+      "document": "docs/PROJECT_TARIFFS.md",
+      "status": "planned"
     }
   ],
   "tests": [
@@ -593,6 +603,12 @@
       "id": "TC-037",
       "requirements": ["FR-029"],
       "scenario": "Polling возвращает только разрешённые безопасные события; ACK actor-local и идемпотентен, не меняет расходы, резерв или исход запроса. Positive/negative/neighboring identity, repeated readback and restart cases.",
+      "status": "not_run"
+    },
+    {
+      "id": "TC-038",
+      "requirements": ["FR-030"],
+      "scenario": "Automatic/manual sources, 1M conversion, 20% markup/custom rates, subscription allocation, same-name Namespace separation, historical revisions and unknown receipt recovery.",
       "status": "not_run"
     }
   ],

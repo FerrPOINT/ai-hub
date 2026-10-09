@@ -4,7 +4,7 @@
 для приложений и агентов, собственные виртуальные модели для разработки и
 тестирования, статистика и контроль расходов.
 
-Статус: подготовка к разработке. Требования и проектные контракты документированы;
+Статус: DESIGN_ALIGNMENT после semantic audit; документы и прототип актуализируются. Требования и проектные контракты документированы;
 backend, frontend и runtime ещё не реализованы. Наличие документов не доказывает
 работу endpoint, доступ подписки, точность provider billing или live SSO.
 
@@ -103,3 +103,7 @@ Typed DD34 tables/294 fields и execution packets позволяют начат�
 ## Дизайн и выделение из Admin
 
 [Прототип](docs/design/prototype.html), [руководство](docs/USER_GUIDE.md), [точная карта переноса](docs/contracts/ADMIN_HANDOFF_V1.md), [Namespace](docs/contracts/NAMESPACE_V1.md). Документы описывают целевой сервис; runtime/credential/data cutover не выполнялся.
+
+## Тарифы проектов
+
+[PROJECT_TARIFFS](docs/PROJECT_TARIFFS.md): 1M input/output, default 20% markup, свои проектные цены, OpenRouter auto и manual Ollama Online/ChatGPT. В [прототипе](docs/design/prototype.html) добавлен /tariffs. Реальный billing/provider/runtime not_run.

@@ -49,3 +49,7 @@ Base reference `81decf7d9edd2c4218d8625a96e2e25c0617e9f1`, Admin reference `7c42
 ## Актуализация 2026-10-09
 
 Текущая актуализация перепроверяет локальные committed sources. Внешние provider references сохраняют прежнюю дату snapshot; их live requalification и изменившиеся условия проверяются на S4, не объявлены свежими source-only audit.
+
+## OpenRouter pricing — 2026-10-09
+
+Официальные [usage accounting](https://openrouter.ai/docs/cookbook/administration/usage-accounting) и [models pricing](https://openrouter.ai/docs/api/api-reference/models/list-all-models-and-their-properties) подтверждают response usage/cost, terminal SSE accounting и catalog rates. [PROJECT_TARIFFS](PROJECT_TARIFFS.md) фиксирует adapter qualification и unknown/BYOK ограничения. Проверка документации не runtime provider receipt.

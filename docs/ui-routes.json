@@ -374,6 +374,35 @@
       "tests": ["TC-018", "TC-032"],
       "implementation": "planned",
       "qa": "not_run"
+    },
+    {
+      "path": "/tariffs",
+      "layout": "wide",
+      "operations": [
+        "listPricingSources",
+        "createPricingSourceRevision",
+        "listProjectTariffs",
+        "createProjectTariffRevision",
+        "listPrices",
+        "createPriceRevision",
+        "listProjectCharges"
+      ],
+      "auth": "central_verified_with_product_grants",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "not_found",
+        "permission_denied",
+        "partial",
+        "stale"
+      ],
+      "tests": ["TC-038", "TC-035"],
+      "implementation": "planned",
+      "qa": "not_run",
+      "route_class": "operational",
+      "roles": ["central_verified_with_product_grants"],
+      "fixture": "design/prototype.html#/tariffs"
     }
   ]
 }

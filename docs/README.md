@@ -75,3 +75,7 @@ Single owner specification каждой нормы указан в TRACEABILITY.
 [Namespace](contracts/NAMESPACE_V1.md), [Consumer](contracts/CONSUMER_V1.md), [версии API](API_VERSIONING.md), [руководство](USER_GUIDE.md). Typed OpenAPI, DD и UI обновляются вместе; operational acceptance остаётся not_run.
 
 [Реестр актуализации](ALIGNMENT_REGISTER.md) связывает источники, устранённые пробелы и проверки.
+
+## Тарифы проектов
+
+[PROJECT_TARIFFS](PROJECT_TARIFFS.md): per-million цены, OpenRouter auto usage/cost, ручные Ollama Online/ChatGPT rates, default 20%, Namespace overrides и immutable начисления.

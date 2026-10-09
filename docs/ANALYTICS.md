@@ -55,3 +55,7 @@ Projection rebuild никогда не запускает model calls.
 ## Актуализация 2026-10-09
 
 Namespace UUID pair и binding=unbound входят в filter echo и cursor identity. Конфликт pair/unbound — ошибка, не all fallback. Budget period — текущий UTC месяц/день; диаграмма периода показывает cash occurrence, reserve остаётся отдельным current snapshot.
+
+## Начисления проектам
+
+В /tariffs отдельно показаны cost basis/confidence, project charge, margin и tariff revision. Суммы из project_charge_events не прибавляются к provider cash expenses. Currency/Namespace/range/snapshot identity общие для списка и экспорта; pending/provisional не confirmed expense. [Тарифы](PROJECT_TARIFFS.md).

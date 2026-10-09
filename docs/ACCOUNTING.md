@@ -103,3 +103,7 @@ PriceInput.request_fee — известный fixed per-attempt amount38/18 ли
 при квалифицированном no-acceptance rejection; tokens при этом не выдумываются.
 Эта fee snapshot включается в upper bound/reservation и per-attempt ledger.
 Допустимость fallback определяется независимой acceptance certainty из ROUTING.
+
+## Цена проекта
+
+[PROJECT_TARIFFS](PROJECT_TARIFFS.md) отделяет account expense от project charge и margin. Default markup=2000 bps; manually allocated subscription token cost не создаёт provider receipt. Project amounts NUMERIC(50,24); неизвестный basis не обнуляет reserve. Existing monetary budgets используют provider cost.

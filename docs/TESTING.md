@@ -62,4 +62,9 @@ multi-currency и concurrency across processes.
 
 | TC-036 | FR-028 | Каждое исходное поле/API/хранилище имеет mapping или прежнего owner; контекст точный, microdollars без округления, старые proof не активируют Hub. |
 
+| TC-038 | FR-030 | Exact per-million automatic/manual rates, Namespace identity, 20% markup, custom rates, unknown and frozen history. |
 | TC-037 | FR-029 | Polling возвращает только разрешённые безопасные события; ACK actor-local и идемпотентен, не меняет расходы, резерв или исход запроса. |
+
+## TC-038 — Тарифы
+
+[PROJECT_TARIFFS](PROJECT_TARIFFS.md): input/output conversion ×1M; receipt 10 → default charge 12; custom 3/10 rates; decimal tiny values; same names/different UUID pair; manual pricing not confirmed cash; missing cost/usage not zero; 412 draft retained; tariff change leaves old request and late receipt on old revision; unknown reserve held; receipt replay produces one correction. Actual API/DB acceptance planned.

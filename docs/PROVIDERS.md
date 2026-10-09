@@ -52,3 +52,7 @@ Adapter с недоказанными native retries не допускается
 Ollama compatible API имеет subset/state limitations; Z.AI usage содержит cached
 input; OpenAI Responses streaming — typed SSE. Mapping сверяется с exact provider
 и версиями adapter, не с универсальным обещанием «полная совместимость».
+
+## Pricing sources
+
+OpenRouter explicit preset поддерживает qualified automatic catalog pricing и terminal usage.cost / generation readback. Ollama Online/ChatGPT по подписке получают manual per-million rates как allocation; это не API list price или confirmed cash. [PROJECT_TARIFFS](PROJECT_TARIFFS.md) хранит official source/date и unknown rules.

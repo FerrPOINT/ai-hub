@@ -1,5 +1,7 @@
 # Готовность полного пакета к разработке
 
+> Текущий статус: DESIGN_ALIGNMENT. Ниже исторический gate до semantic audit и добавления проектных тарифов; повторная полная приёмка pending. См. [CURRENT_STATE](CURRENT_STATE.md).
+
 Цель: передать достаточные product/architecture/API/data/UI/quality inputs, чтобы
 инженер мог начать S1 без повторного проектирования и без fake runtime PASS.
 

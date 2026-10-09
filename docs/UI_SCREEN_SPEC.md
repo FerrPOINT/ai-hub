@@ -153,3 +153,7 @@
 - Loading/empty/error/403/404/partial/stale различаются. Dirty navigation/reload/close, validation/pending/412 сохраняют ввод.
 - Mutation требует confirmed operation/readback; unknown не success. Key issue — отдельное действие.
 - Prototype моделирует действия на безопасных fixtures; реальные rights, provider/billing и SSO acceptance not_run.
+
+## Тарифы — /tariffs
+
+Operational, wide. Tabs «Проекты» / «Себестоимость подключений» в URL. NamespacePicker общий; all показывает сравнение, exact active Namespace разрешает scoped edit. Default 20%; формы переключают markup/custom rates и auto/manual source, input/output/cached за 1M, currency/version/effective interval. Таблица показывает cost basis, начисление и margin отдельно. Operations: listPricingSources/createPricingSourceRevision/listProjectTariffs/createProjectTariffRevision/listPrices/createPriceRevision/listProjectCharges. Состояния pending/412/unknown сохраняют ввод и резерв.

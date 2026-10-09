@@ -36,3 +36,7 @@ QA toolbar в production flows. Product screenshots и design screenshots име
 [Повторная UI/UX проверка](UX_RECHECK.md) описывает исправленные ошибки и сценарии регрессии.
 
 Namespace в шапке имеет tab-local URL. Контекст модели сохраняется отдельно по exact connection/model. История/откат и уведомления — simulation; новые требования и источники в [CURRENT_STATE](../CURRENT_STATE.md).
+
+## Тарифы и актуальная приёмка
+
+/tariffs: проекты и себестоимость подключений. [QA](QA.md) и [evidence](evidence.json) привязаны к финальному исходнику. Semantic audit остаётся открытым; rendered PASS не означает DEVELOP_READY или actual application acceptance.

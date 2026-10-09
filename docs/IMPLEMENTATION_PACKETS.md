@@ -36,3 +36,7 @@ request-scoped fields, or copied provider policy in pages.
 ## Актуализация 2026-10-09
 
 FR-027/TC-035: S1 namespace projection + S3 frozen admission context. FR-028/TC-036: S2 model preferences и S7 extraction. FR-029/TC-037: S5 polling notification projection/actor ACK. До кодирования packets используют актуальные OpenAPI/DD/design; docs+prototype gates не подменяют live acceptance.
+
+## FR-030 / TC-038
+
+S2 cost-source settings и manual price snapshots; S3 immutable tariff admission/charge journal; S4 OpenRouter official usage/catalog qualification; S5 Namespace тарифы, basis/charge/margin и exports. [PROJECT_TARIFFS](PROJECT_TARIFFS.md) — обязательный input; S7 сверяет финансовые источники и consumer readback.

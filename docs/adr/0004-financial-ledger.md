@@ -29,3 +29,7 @@ New schema/recovery/real PG tests обязательны. Цена не из cod
 Mixed currencies не один total. Hard monetary budget requires qualified upper bound.
 [Требования](../PRODUCT_REQUIREMENTS.md), [traceability](../TRACEABILITY.md)
 и [стадии](../IMPLEMENTATION_PLAN.md) связывают решение с будущими критериями.
+
+## Дополнение 2026-10-09
+
+По прямому поручению владельца добавлены project tariffs: 1M input/output, default 20% markup, exact Namespace overrides. Project-charge journal отдельный от provider cash. [PROJECT_TARIFFS](../PROJECT_TARIFFS.md) определяет auto/manual, units, decimal scale и snapshots; область v1 остаётся внутренним учётом без payment execution.

@@ -39,3 +39,7 @@
   допускается только от доверенного authenticated delegation binding.
 - Disable блокирует новые admissions; исторические facts/revisions остаются доступны
   в пределах прав. Archive сохраняет историческую ссылочную целостность.
+
+## Проектное ценообразование
+
+Cost-source revision выбирает auto provider или manual allocation. Project tariff revision определяет цену для Namespace/profile/currency. Project charge — внутреннее начисление; margin amount — charge минус basis, markup — процент от basis. Provider receipt и subscription cash fee не заменяются этими фактами. [Правила](PROJECT_TARIFFS.md).

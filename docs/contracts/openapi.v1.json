@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AI Hub — проектный контракт v1",
-    "version": "0.2.0-design",
+    "version": "0.3.0-design",
     "description": "Design-only: API/handlers отсутствуют. Не generated runtime OpenAPI. Unknown/unsupported semantics fail closed."
   },
   "x-readiness": "design-only",
@@ -6221,6 +6221,473 @@
         },
         "x-requirements": ["FR-023", "FR-029"]
       }
+    },
+    "/api/v1/pricing-sources": {
+      "get": {
+        "operationId": "listPricingSources",
+        "summary": "listPricingSources",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-030"],
+        "description": "Design-only. PROJECT_TARIFFS.md defines authorization, exact decimal arithmetic, snapshots and unknown handling. Namespace query pair validates identity/grants; conflicting or incomplete selectors are rejected.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "connection_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/PricingSourceRevision"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "next_cursor"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createPricingSourceRevision",
+        "summary": "createPricingSourceRevision",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-030"],
+        "description": "Design-only. PROJECT_TARIFFS.md defines authorization, exact decimal arithmetic, snapshots and unknown handling. Namespace query pair validates identity/grants; conflicting or incomplete selectors are rejected.",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricingSourceRevision"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PricingSourceInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project-tariffs": {
+      "get": {
+        "operationId": "listProjectTariffs",
+        "summary": "listProjectTariffs",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-030"],
+        "description": "Design-only. PROJECT_TARIFFS.md defines authorization, exact decimal arithmetic, snapshots and unknown handling. Namespace query pair validates identity/grants; conflicting or incomplete selectors are rejected.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "virtual_model_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/ProjectTariffRevision"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "next_cursor"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createProjectTariffRevision",
+        "summary": "createProjectTariffRevision",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-030"],
+        "description": "Design-only. PROJECT_TARIFFS.md defines authorization, exact decimal arithmetic, snapshots and unknown handling. Namespace query pair validates identity/grants; conflicting or incomplete selectors are rejected.",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectTariffRevision"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectTariffInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/project-charges": {
+      "get": {
+        "operationId": "listProjectCharges",
+        "summary": "listProjectCharges",
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ],
+        "x-requirements": ["FR-030"],
+        "description": "Design-only. PROJECT_TARIFFS.md defines authorization, exact decimal arithmetic, snapshots and unknown handling. Namespace query pair validates identity/grants; conflicting or incomplete selectors are rejected.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Target response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "$ref": "#/components/schemas/ProjectCharge"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": ["string", "null"]
+                    }
+                  },
+                  "required": ["items", "next_cursor"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "422": {
+            "$ref": "#/components/responses/InvalidSemantics"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -9418,6 +9885,424 @@
           "object_kind",
           "object_id",
           "acknowledged_at"
+        ]
+      },
+      "PricingSourceInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "connection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "model_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["provider_auto", "manual"]
+          },
+          "manual_price_revision_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "connection_id",
+          "model_id",
+          "mode",
+          "manual_price_revision_id",
+          "expected_version"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "manual"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "manual_price_revision_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "manual_price_revision_id": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PricingSourceRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "config": {
+            "$ref": "#/components/schemas/PricingSourceInput"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor_subject": {
+            "type": "string"
+          },
+          "catalog_observed_at": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data_status": {
+            "type": "string",
+            "enum": ["complete", "stale", "unavailable"]
+          }
+        },
+        "required": [
+          "id",
+          "config",
+          "version",
+          "created_at",
+          "actor_subject",
+          "catalog_observed_at",
+          "data_status"
+        ]
+      },
+      "ProjectTariffInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "namespace": {
+            "$ref": "#/components/schemas/NamespaceRef"
+          },
+          "virtual_model_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["default_markup", "custom_rates"]
+          },
+          "markup_bps": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000,
+                "default": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "input_uncached": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "input_cached": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "output_billable": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unit": {
+            "type": "string",
+            "const": "per_million_tokens"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effective_to": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "namespace",
+          "virtual_model_id",
+          "currency",
+          "mode",
+          "markup_bps",
+          "input_uncached",
+          "input_cached",
+          "output_billable",
+          "unit",
+          "effective_from",
+          "effective_to",
+          "expected_version"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "custom_rates"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "markup_bps": {
+                  "type": "null"
+                },
+                "input_uncached": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?$"
+                },
+                "output_billable": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?$"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "markup_bps": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000000
+                },
+                "input_uncached": {
+                  "type": "null"
+                },
+                "input_cached": {
+                  "type": "null"
+                },
+                "output_billable": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ProjectTariffRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "config": {
+            "$ref": "#/components/schemas/ProjectTariffInput"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor_subject": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "config", "version", "created_at", "actor_subject"]
+      },
+      "ProjectCharge": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tariff_revision_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cost_source_revision_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "cost_basis": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^-?(0|[1-9][0-9]{0,25})(\\.[0-9]{1,24})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "project_amount": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^-?(0|[1-9][0-9]{0,25})(\\.[0-9]{1,24})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "margin_amount": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^-?(0|[1-9][0-9]{0,25})(\\.[0-9]{1,24})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "basis_confidence": {
+            "type": "string",
+            "enum": ["confirmed", "estimated", "unknown"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["final", "provisional", "pending"]
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source_event_id": {
+            "type": "string"
+          },
+          "supersedes_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "request_id",
+          "attempt_id",
+          "namespace",
+          "tariff_revision_id",
+          "cost_source_revision_id",
+          "currency",
+          "cost_basis",
+          "project_amount",
+          "margin_amount",
+          "basis_confidence",
+          "status",
+          "occurred_at",
+          "source_event_id",
+          "supersedes_id"
         ]
       }
     },

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "develop_ready",
+  "status": "alignment_in_progress",
   "prototype": "prototype.html",
   "base_revision": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
   "base_tokens_source": "frontend/src/ui/tokens.css",
@@ -585,6 +585,48 @@
       "purpose": "Central SSO entry; Hub does not own passwords.",
       "states": ["ready", "loading", "error"],
       "render_evidence": ["evidence.json"]
+    },
+    {
+      "route": "/tariffs",
+      "title": "Тарифы",
+      "layout": "wide",
+      "filters": [
+        "Namespace в шапке",
+        "Проекты / Себестоимость подключений в URL"
+      ],
+      "sections": [
+        "20% default",
+        "Project per-million input/output",
+        "Automatic provider / manual rates",
+        "Revision history",
+        "Cost / project charge / margin"
+      ],
+      "operations": [
+        "listPricingSources",
+        "createPricingSourceRevision",
+        "listProjectTariffs",
+        "createProjectTariffRevision",
+        "listPrices",
+        "createPriceRevision",
+        "listProjectCharges"
+      ],
+      "purpose": "Настроить цены проектов отдельно от себестоимости.",
+      "states": [
+        "ready",
+        "loading",
+        "empty",
+        "error",
+        "forbidden",
+        "not_found",
+        "partial",
+        "stale",
+        "conflict",
+        "pending",
+        "budget_exhausted",
+        "long"
+      ],
+      "render_evidence": ["tariffs-evidence.json"],
+      "route_class": "operational"
     }
   ],
   "states": [
@@ -801,6 +843,39 @@
       "fields": ["model_id", "context_window_tokens"],
       "derived": ["connection_id", "If-Match"],
       "result": "Saved exact connection/model preference; not physical limit"
+    },
+    "pricingSource": {
+      "operation": "createPricingSourceRevision",
+      "schema": "PricingSourceInput",
+      "fields": [
+        "connection_id",
+        "model_id",
+        "mode",
+        "manual_price_revision_id",
+        "expected_version"
+      ],
+      "derived": ["expected_version CAS, exact verified identity"],
+      "result": "New immutable revision; historical requests preserved"
+    },
+    "projectTariff": {
+      "operation": "createProjectTariffRevision",
+      "schema": "ProjectTariffInput",
+      "fields": [
+        "namespace",
+        "virtual_model_id",
+        "currency",
+        "mode",
+        "markup_bps",
+        "input_uncached",
+        "input_cached",
+        "output_billable",
+        "unit",
+        "effective_from",
+        "effective_to",
+        "expected_version"
+      ],
+      "derived": ["expected_version CAS, exact verified identity"],
+      "result": "New immutable revision; historical requests preserved"
     }
   },
   "namespace_reference_revision": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1",

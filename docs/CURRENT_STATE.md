@@ -1,19 +1,15 @@
 # Текущее состояние
 
-Дата: 2026-10-09. Stage: DEVELOP_READY — согласованный документационный/design пакет.
+Дата: 2026-10-09. Stage: DESIGN_ALIGNMENT — актуализация по semantic audit и новым тарифам.
 
-- 37 FR/NFR и 37 planned behavioral tests; приложение и их runtime-приёмка не реализованы.
-- Typed draft OpenAPI 0.2.0-design, 39 таблиц / 336 полей в проектном dictionary.
-- 15 operational routes + auth /login; три темы, Namespace и миграционная карта Admin.
-- IAB: 219 geometry, 168 state, 73 flow assertions; 48 native viewport screenshots.
-- [Карта переноса](contracts/ADMIN_HANDOFF_V1.md) содержит 20 source UI/API/storage/retained-owner rows.
-- Backend/frontend manifests, SQL migrations, provider adapters и runtime отсутствуют.
-- Реальные credentials, authorization, данные, Admin /ai и установленный PDLC/Octo не переносились.
-- SDK .base-revision, skills pin и operator tooling сохранены; Namespace cohort — отдельная будущая квалификация.
+- Документы и prototype; backend/API/SQL/provider runtime отсутствуют.
+- OpenAPI 0.3.0-design; FR-030/TC-038 добавляют per-million tariffs, default 20%, project prices и automatic/manual sources.
+- /tariffs отдельный operational route; Namespace остаётся Base identity.
+- Свежий IAB evidence финального прототипа: 230 geometry / 179 states / 94 flow assertions; 71 native PNG, 4 просмотрены. Цена, Namespace и предыдущие UX регрессии проверены; runtime acceptance not_run.
+- Semantic audit выявил несогласованность proof/Namespace budgets/dataset/URL/exports и незамкнутый consumer transport; эти границы требуют дальнейшей доработки.
+- Полный DEVELOP_READY/design gate повторно не принят. Реальное приложение и provider acceptance not_run.
+- SDK/skills/operator pins, данные, Admin /ai, установленный runtime и соседние checkout не меняются.
 
 ## Следующая веха
 
-S1 создаёт настоящее изолированное приложение, own schema, Base/Namespace bridge и
-trusted access. S2–S7 отдельно доказывают provider/inference/ledger/consumer/UI/restore.
-Документационный онбординг Base — discovery и provenance, не runtime registration.
-Publication exact heads и mirror owner commit проверяются после owner commits.
+Закрыть semantic audit и собрать один полный source-bound documentation/design gate, затем S1 настоящего изолированного приложения. Тарифы проектов не являются runtime billing acceptance.

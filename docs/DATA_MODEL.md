@@ -75,3 +75,7 @@ Operations safe_result не содержит one-time keys/model result; FK/proo
 ## Дополнение Namespace и выделения
 
 Namespace projection, model context preferences, notifications/actor acknowledgements и legacy import provenance описаны в [DATA_DICTIONARY](DATA_DICTIONARY.md). External IDs не FK к чужой БД. Null binding явно unbound. Сохранённый context budget не verification evidence.
+
+## Цены проектов
+
+Pricing source revisions и project tariff revisions отдельны от provider price revisions. Admission сохраняет project_tariff_snapshot; project_charge_events не заменяют provider ledger. [Контракт](PROJECT_TARIFFS.md); typed dictionary содержит поля, собственные FK и ключи dedupe.

@@ -199,3 +199,15 @@ Control one-time key replay при недоступном output:409 one_time_ou
 | ackNotification | `POST /api/v1/notifications/{notification_id}/ack` |
 
 [Версионирование](API_VERSIONING.md); [Namespace](contracts/NAMESPACE_V1.md). Query q/status/mode/action bounded и allowlisted. Namespace query pair validates grants, malformed input не сбрасывает фильтр. ACK actor-local и идемпотентен.
+
+## Тарифы проектов и источники себестоимости
+
+| Метод | Путь                    | Operation                   |
+| ----- | ----------------------- | --------------------------- |
+| GET   | /api/v1/pricing-sources | listPricingSources          |
+| POST  | /api/v1/pricing-sources | createPricingSourceRevision |
+| GET   | /api/v1/project-tariffs | listProjectTariffs          |
+| POST  | /api/v1/project-tariffs | createProjectTariffRevision |
+| GET   | /api/v1/project-charges | listProjectCharges          |
+
+[PROJECT_TARIFFS](PROJECT_TARIFFS.md) определяет режимы, Namespace/CAS и decimal scale. Новые DTO входят в 0.3.0-design. Actual runtime not_run.

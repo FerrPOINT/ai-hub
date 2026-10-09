@@ -25,3 +25,7 @@ facts and unknown reserves cannot be recreated as empty state.
 ## Дополнение 2026-10-09
 
 DB-01/S1: namespace_bindings и nullable bindings клиентов. DB-02/S2: model_context_preferences с CAS. DB-03/S3: frozen request binding. DB-05/S5: notifications и actor ACK отдельно от alert_outbox delivery. DB-06/S6: dataset binding. DB-07/S7: legacy_import_provenance и точный import mapping. Applied SQL отсутствует; документация не запускает DDL.
+
+## Дополнение тарифов
+
+S2: pricing_source_revisions. S3: project_tariff_revisions, requests.project_tariff_snapshot и project_charge_events. S5: projection/control UI. Own FK, nonoverlap, CAS/dedupe и decimal scale требуют настоящих SQL migrations при реализации; ручного переноса legacy aggregate в выдуманные project charges нет.

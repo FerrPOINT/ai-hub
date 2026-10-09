@@ -144,6 +144,39 @@ def main():
         "Rate",
         {"numerator": 0, "denominator": 0, "value": 1, "basis": "explicit_probes"},
     )
+    source_price = {
+        "connection_id": "10000000-0000-4000-8000-000000000001",
+        "model_id": "model-a", "mode": "provider_auto",
+        "manual_price_revision_id": None, "expected_version": 0,
+    }
+    assert accepts("PricingSourceInput", source_price)
+    assert not accepts("PricingSourceInput", {**source_price, "mode": "manual"})
+    assert accepts("PricingSourceInput", {
+        **source_price, "mode": "manual",
+        "manual_price_revision_id": "20000000-0000-4000-8000-000000000001",
+    })
+    tariff = {
+        "namespace": {"registry_instance_id": source_price["connection_id"],
+                      "namespace_id": "20000000-0000-4000-8000-000000000001"},
+        "virtual_model_id": None, "currency": "USD", "mode": "default_markup",
+        "markup_bps": 2000, "input_uncached": None, "input_cached": None,
+        "output_billable": None, "unit": "per_million_tokens",
+        "effective_from": "2026-10-09T00:00:00Z", "effective_to": None,
+        "expected_version": 0,
+    }
+    assert accepts("ProjectTariffInput", tariff)
+    assert not accepts("ProjectTariffInput", {**tariff, "namespace": None})
+    assert not accepts("ProjectTariffInput", {**tariff, "mode": "custom_rates"})
+    custom = {**tariff, "mode": "custom_rates", "markup_bps": None,
+              "input_uncached": "3", "output_billable": "10"}
+    assert accepts("ProjectTariffInput", custom)
+    assert not accepts("ProjectTariffInput", {**custom, "input_uncached": "0.0000000000001"})
+    assert not accepts("ProjectTariffInput", {**custom, "input_uncached": 3})
+    assert not accepts("ProjectTariffInput", {**tariff, "unit": "per_token"})
+    assert not accepts("ProjectTariffInput", {**tariff, "markup_bps": 2000.5})
+    assert not accepts("ProjectTariffInput", {**tariff, "namespace": {
+        **tariff["namespace"], "namespace_id": "00000000-0000-0000-0000-000000000000"}})
+    print("Project tariff/source positive and negative schema examples: PASS")
     print("Independent OpenAPI 3.1 and schema validation: PASS")
     print("Money/draft/tools/stateless/pinned-mode examples: PASS")
     print("Application behavior and live provider access: NOT RUN")

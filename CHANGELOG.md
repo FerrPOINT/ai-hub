@@ -23,3 +23,10 @@ Runtime-реализации и выпущенной версии пока не�
 ## Документация и дизайн — 2026-10-09
 
 Добавлены Namespace, уведомления, per-model context, Admin field/storage mapping, потребительские примеры, совместимость и runbooks. Прототип сохраняет текущий стиль, моделирует новые действия и общий dataset. Backend/runtime/data не переносились.
+
+## 2026-10-09 — Project tariffs
+
+- Отдельный /tariffs design и contract: per-million input/output, default 20%, Namespace overrides.
+- OpenRouter automatic catalog/usage cost и manual Ollama Online/ChatGPT subscription cost allocation.
+- Immutable pricing-source/tariff/charge DTO и dataflow; runtime не реализован.
+- Полный design handoff остаётся на актуализации после semantic audit; прошлый evidence исторический.

@@ -2306,6 +2306,17 @@
           "Эффективные параметры окружения и правила хранения.",
         ],
       ];
+      routeDefs.splice(
+        routeDefs.findIndex((r) => r[0] === "/budgets"),
+        0,
+        [
+          "/tariffs",
+          "Тарифы",
+          "tariffs",
+          "wide",
+          "Цены проектов и себестоимость за миллион токенов.",
+        ],
+      );
       const navDefs = routeDefs.filter((x) => !x[0].includes(":"));
       let current,
         scene = new URLSearchParams(location.search).get("state") || "ready",
@@ -2869,7 +2880,7 @@
         navDefs
           .map(
             (r, i) =>
-              `${i === 0 ? "" : i === 4 ? '<div class="nav-heading">Аналитика</div>' : i === 7 ? '<div class="nav-heading">Управление</div>' : ""}<a class="base-shell-link ${current && current[2] === r[2] ? "is-active" : ""}" href="#${r[0]}" aria-label="${r[1]}" title="${r[1]}" ${current && current[2] === r[2] ? 'aria-current="page"' : ""}>${icon(r[2])}<span class="base-shell-nav-label">${r[1]}</span></a>`,
+              `${i === 0 ? "" : i === 4 ? '<div class="nav-heading">Аналитика</div>' : i === 8 ? '<div class="nav-heading">Управление</div>' : ""}<a class="base-shell-link ${current && current[2] === r[2] ? "is-active" : ""}" href="#${r[0]}" aria-label="${r[1]}" title="${r[1]}" ${current && current[2] === r[2] ? 'aria-current="page"' : ""}>${icon(r[2] === "tariffs" ? "expenses" : r[2])}<span class="base-shell-nav-label">${r[1]}</span></a>`,
           )
           .join("");
       function route() {
@@ -3052,16 +3063,20 @@
         document
           .querySelectorAll("[data-namespace-status]")
           .forEach((el) => el.remove());
-        const scoped = [
-          "overview",
-          "requests",
-          "statistics",
-          "expenses",
-          "budgets",
-          "clients",
-          "evaluations",
-          "audit",
-        ].includes(current[2]);
+        const scoped =
+          [
+            "overview",
+            "requests",
+            "statistics",
+            "expenses",
+            "budgets",
+            "clients",
+            "evaluations",
+            "audit",
+          ].includes(current[2]) ||
+          (current[2] === "tariffs" &&
+            new URLSearchParams(location.search).get("tariff_tab") !==
+              "sources");
         const namespaceFrame = document.querySelector("#main .page-frame");
         if (namespaceFrame)
           namespaceFrame.dataset.namespaceState =
@@ -3080,7 +3095,7 @@
                 : "Общие настройки установки") +
               "</p>",
           );
-        if (ns && ns.state !== "active" && scoped) {
+        if (ns && ns.state !== "active" && scoped && current[2] !== "tariffs") {
           document.querySelector("#main .page-frame .stack").innerHTML =
             "<h1>" +
             esc(current[1]) +
@@ -3957,11 +3972,362 @@
               ],
             ];
       }
+      const sourcePrices = [
+        {
+          key: "openrouter",
+          label: "OpenRouter",
+          model: "model-a",
+          mode: "provider_auto",
+          automatic: true,
+          input: "2",
+          output: "8",
+          cached: "0.5",
+          currency: "USD",
+          version: 1,
+        },
+        {
+          key: "ollama-online",
+          label: "Ollama Online",
+          model: "model-b",
+          mode: "manual",
+          automatic: false,
+          input: "2",
+          output: "8",
+          cached: null,
+          currency: "USD",
+          version: 1,
+        },
+        {
+          key: "chatgpt",
+          label: "ChatGPT · подписка",
+          model: "model-a",
+          mode: "manual",
+          automatic: false,
+          input: null,
+          output: null,
+          cached: null,
+          currency: "USD",
+          version: 1,
+        },
+      ];
+      const projectPrices = {};
+      let editingSourcePrice = null,
+        editingProjectPrice = null;
+      const tariffHistory = [
+        {
+          namespace: "20000000-0000-4000-8000-000000000001",
+          request: "demo-price-01",
+          revision: "default-20-v1",
+          basis: "10",
+          charge: "12",
+          margin: "2",
+          confidence: "Синтетический receipt",
+        },
+      ];
+      function scaledDecimal(value, scale = 24) {
+        if (!/^(0|[1-9][0-9]*)(\.[0-9]+)?$/.test(String(value)))
+          throw Error("invalid decimal");
+        const [whole, fraction = ""] = String(value).split(".");
+        if (fraction.length > scale) throw Error("decimal scale");
+        return (
+          BigInt(whole) * 10n ** BigInt(scale) +
+          BigInt(fraction.padEnd(scale, "0"))
+        );
+      }
+      function decimalString(value, scale = 24) {
+        const sign = value < 0n ? "-" : "",
+          digits = (value < 0n ? -value : value)
+            .toString()
+            .padStart(scale + 1, "0");
+        return (
+          sign +
+          digits.slice(0, -scale) +
+          (digits.slice(-scale).replace(/0+$/, "")
+            ? "." + digits.slice(-scale).replace(/0+$/, "")
+            : "")
+        );
+      }
+      function markupValue(value, bps) {
+        return decimalString(
+          (scaledDecimal(value) * (10000n + BigInt(bps))) / 10000n,
+        );
+      }
+      function projectPrice(ns) {
+        return (
+          projectPrices[ns] || {
+            mode: "default_markup",
+            bps: 2000,
+            input: null,
+            output: null,
+            cached: null,
+            currency: "USD",
+            version: 0,
+          }
+        );
+      }
+      function tariffRates(price, source) {
+        if (price.mode === "custom_rates") return [price.input, price.output];
+        return [
+          source.input === null ? null : markupValue(source.input, price.bps),
+          source.output === null ? null : markupValue(source.output, price.bps),
+        ];
+      }
+      function tariffs() {
+        const tab =
+          new URLSearchParams(location.search).get("tariff_tab") === "sources"
+            ? "sources"
+            : "projects";
+        const tabs =
+          '<div class="tabs" role="tablist" aria-label="Тарифы">' +
+          [
+            ["projects", "Проекты"],
+            ["sources", "Себестоимость подключений"],
+          ]
+            .map(
+              ([value, label]) =>
+                '<button class="tab" role="tab" aria-selected="' +
+                (tab === value) +
+                '" tabindex="' +
+                (tab === value ? 0 : -1) +
+                '" data-action="tariff-tab" data-value="' +
+                value +
+                '">' +
+                label +
+                "</button>",
+            )
+            .join("") +
+          "</div>";
+        if (tab === "sources")
+          return (
+            tabs +
+            callout(
+              "Источник цены",
+              "Автоматически — данные провайдера. Для Ollama Online и ChatGPT по подписке задайте ручные ставки. Все значения в макете синтетические.",
+              "neutral",
+            ) +
+            tablePanel(
+              "Себестоимость подключений · установка",
+              [
+                "Подключение / модель",
+                "Источник",
+                "Валюта",
+                "Вход / 1M",
+                "Выход / 1M",
+                "Версия",
+                "Действие",
+              ],
+              sourcePrices.map((p) => [
+                esc(p.label) + " · " + esc(p.model),
+                p.mode === "provider_auto"
+                  ? "Автоматически от провайдера"
+                  : "Введено вручную · расчёт",
+                p.currency,
+                p.input ?? "Не задана",
+                p.output ?? "Не задана",
+                "r" + p.version,
+                btn(
+                  "Настроить цену",
+                  "edit-source-price",
+                  "",
+                  'data-source="' + p.key + '"',
+                ),
+              ]),
+              "",
+              "Ставки каталога — оценка. Ручная цена подписки не создаёт второе фактическое списание.",
+            )
+          );
+        const ns = namespaceContext();
+        if (ns && ns.state !== "active")
+          return (
+            tabs +
+            callout(
+              "Новые тарифы недоступны",
+              "Выбранный проект сохранён; история доступна по прежним правам.",
+              "warn",
+            )
+          );
+        const projects = namespaceCatalog.filter(
+          (n) => n.state === "active" && (!ns || n.id === ns.id),
+        );
+        if (new URLSearchParams(location.search).get("binding") === "unbound")
+          return (
+            tabs +
+            callout(
+              "Без привязки",
+              "Выберите доступный проект для персонального тарифа. Без привязки действует наценка установки 20%.",
+              "neutral",
+            )
+          );
+        return (
+          tabs +
+          callout(
+            "По умолчанию · наценка 20%",
+            "Цена проекта = себестоимость × 1,20. Можно задать свою наценку или свои ставки за миллион входных и выходных токенов.",
+            "neutral",
+          ) +
+          tablePanel(
+            "Тарифы проектов · main-dev",
+            [
+              "Namespace",
+              "Правило",
+              "Валюта",
+              "Вход / 1M",
+              "Выход / 1M",
+              "Версия",
+              "Действие",
+            ],
+            projects.map((n) => {
+              const p = projectPrice(n.id),
+                rates = tariffRates(p, sourcePrices[0]);
+              return [
+                esc(n.label),
+                p.mode === "custom_rates"
+                  ? "Свои ставки"
+                  : decimalString(BigInt(p.bps) * 10n ** 22n) + "% наценки",
+                p.currency,
+                rates[0] ?? "Неизвестно",
+                rates[1] ?? "Неизвестно",
+                p.version ? "r" + p.version : "Установка · по умолчанию 20%",
+                btn(
+                  "Настроить тариф",
+                  "edit-project-price",
+                  "",
+                  'data-namespace="' + n.id + '"',
+                ),
+              ];
+            }),
+            "",
+            "Показаны quotes для синтетического OpenRouter model-a. Фактическая стоимость уточняется по ответу провайдера; каталог даёт оценку.",
+          ) +
+          panel(
+            "Пример расчёта · 1M вход + 1M выход",
+            projects
+              .map((n) => {
+                const p = projectPrice(n.id),
+                  [inputRate, outputRate] = tariffRates(p, sourcePrices[0]);
+                const charge =
+                  inputRate === null || outputRate === null
+                    ? null
+                    : decimalString(
+                        scaledDecimal(inputRate) + scaledDecimal(outputRate),
+                      );
+                const basis =
+                  sourcePrices[0].input === null ||
+                  sourcePrices[0].output === null
+                    ? null
+                    : decimalString(
+                        scaledDecimal(sourcePrices[0].input) +
+                          scaledDecimal(sourcePrices[0].output),
+                      );
+                const margin =
+                  charge === null || basis === null
+                    ? null
+                    : decimalString(
+                        scaledDecimal(charge) - scaledDecimal(basis),
+                      );
+                return (
+                  '<div class="stack-tight"><h3>' +
+                  esc(n.label) +
+                  "</h3>" +
+                  kv([
+                    [
+                      "Расчётная себестоимость",
+                      basis === null ? "Неизвестно" : basis + " USD",
+                    ],
+                    [
+                      "Начисление проекту",
+                      charge === null ? "Неизвестно" : charge + " USD",
+                    ],
+                    ["Маржа", margin === null ? "Неизвестно" : margin + " USD"],
+                  ]) +
+                  "</div>"
+                );
+              })
+              .join("<hr>"),
+          ) +
+          tablePanel(
+            "Исторические начисления · пример",
+            [
+              "Запрос",
+              "Версия тарифа",
+              "Основание",
+              "Себестоимость",
+              "Начислено",
+              "Маржа",
+            ],
+            tariffHistory
+              .filter((h) => !ns || h.namespace === ns.id)
+              .map((h) => [
+                h.request,
+                h.revision,
+                h.confidence,
+                h.basis + " USD",
+                h.charge + " USD",
+                h.margin + " USD",
+              ]),
+            "",
+            "Новые тарифы не меняют этот запрос. Неизвестная стоимость ожидает подтверждения; резерв сохраняется.",
+          )
+        );
+      }
+      function pricingFields(prefix, record) {
+        return [
+          field(
+            prefix + "-input",
+            "Вход · цена за 1M",
+            input(
+              prefix + "-input",
+              record.input ?? "",
+              "text",
+              'required inputmode="decimal" pattern="(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?"',
+            ),
+          ),
+          field(
+            prefix + "-output",
+            "Выход · цена за 1M",
+            input(
+              prefix + "-output",
+              record.output ?? "",
+              "text",
+              'required inputmode="decimal" pattern="(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?"',
+            ),
+          ),
+          field(
+            prefix + "-cached",
+            "Cached input · цена за 1M",
+            input(
+              prefix + "-cached",
+              record.cached ?? "",
+              "text",
+              'inputmode="decimal" pattern="(0|[1-9][0-9]{0,17})(\\.[0-9]{1,12})?"',
+            ),
+          ),
+        ].join("");
+      }
+      function togglePricingFields() {
+        const sourceMode = document.querySelector("#source-price-mode"),
+          projectMode = document.querySelector("#project-price-mode");
+        const manual = sourceMode
+          ? sourceMode.value === "manual"
+          : projectMode?.value === "custom_rates";
+        const block = document.querySelector("#pricing-rate-fields");
+        if (block) {
+          block.hidden = !manual;
+          block
+            .querySelectorAll("input")
+            .forEach((x) => (x.disabled = !manual));
+        }
+        const bps = document.querySelector("#project-price-bps");
+        if (bps) {
+          bps.disabled = manual;
+          bps.closest(".field").hidden = manual;
+        }
+      }
       function expenses() {
         const t = tabChoice.expenses || "ledger";
         return `${filters()}<div class="metrics">${metric("Подтверждено", "12,40 <small>$</small>", "По receipt в выбранном периоде")}${metric("Оценка", "4,85 <small>$</small>", "Не подтверждена списанием", "warning")}${metric("Неизвестно", "3 <small>попытки</small>", "Сумма ещё не определена", "warning")}${metric("Удержанный резерв", "0,72 <small>$</small>", "Не включён в расходы")}</div><div class="tabs" role="tablist" aria-label="Учёт расходов">${[
           ["ledger", "Списания"],
-          ["prices", "Тарифы"],
+          ["prices", "Себестоимость"],
           ["subscriptions", "Подписки"],
         ]
           .map(
@@ -4321,6 +4687,7 @@
         requests: requestsPage,
         statistics,
         expenses,
+        tariffs,
         budgets,
         clients: clientsPage,
         evaluations,
@@ -4346,6 +4713,7 @@
           requests: btn(icon("retry") + "Обновить", "retry"),
           statistics: btn(icon("download") + "Экспорт", "export"),
           expenses: btn(icon("download") + "Экспорт", "export"),
+          tariffs: "",
           budgets: btn(icon("plus") + "Новый бюджет", "budget", "primary"),
           clients: btn(
             icon("plus") + "Добавить приложение",
@@ -4687,6 +5055,11 @@
       }
       function handleAction(action, button) {
         if (
+          scene === "pending" &&
+          ["save-source-price", "save-project-price"].includes(action)
+        )
+          return;
+        if (
           scene === "conflict" &&
           [
             "publish-confirm",
@@ -5005,6 +5378,7 @@
                     [
                       ["api-a", "Операторское подключение API"],
                       ["ollama", "Локальный Ollama"],
+                      ["openrouter", "OpenRouter · разрешённый endpoint"],
                     ],
                     "api-a",
                   ),
@@ -5688,9 +6062,195 @@
             toast("Скачан пример с видимыми строками и выбранными фильтрами.");
             break;
           }
+          case "tariff-tab": {
+            const url = new URL(location.href);
+            url.searchParams.set("tariff_tab", button.dataset.value);
+            history.pushState(null, "", url);
+            render();
+            break;
+          }
+          case "edit-source-price": {
+            editingSourcePrice = sourcePrices.find(
+              (p) => p.key === button.dataset.source,
+            );
+            const p = editingSourcePrice;
+            dataForm(
+              "Себестоимость · " + p.label,
+              [
+                '<p class="span-all">' +
+                  esc(p.model) +
+                  " · " +
+                  p.currency +
+                  " · версия цены r" +
+                  p.version +
+                  "</p>",
+                field(
+                  "source-price-mode",
+                  "Источник цены",
+                  select(
+                    "source-price-mode",
+                    [
+                      ["manual", "Ввести вручную"],
+                      ...(p.automatic
+                        ? [["provider_auto", "Автоматически от провайдера"]]
+                        : []),
+                    ],
+                    p.mode,
+                  ),
+                ),
+                '<div id="pricing-rate-fields" class="span-all form-grid">' +
+                  pricingFields("source-price", p) +
+                  "</div>",
+                '<p class="span-all muted">Вход и выход за 1 000 000 токенов. Подписка: расчётная цена, не фактическое списание.</p>',
+              ],
+              "save-source-price",
+              "Сохранить новую версию",
+            );
+            togglePricingFields();
+            break;
+          }
+          case "save-source-price": {
+            if (!validateFields(modal)) break;
+            if (scene === "conflict") {
+              document.querySelector("#dialog-error").textContent =
+                "412: цена изменена. Ввод сохранён; обновите данные перед сохранением.";
+              break;
+            }
+            const p = editingSourcePrice,
+              mode = document.querySelector("#source-price-mode").value;
+            if (mode === "provider_auto" && !p.automatic) {
+              document.querySelector("#dialog-error").textContent =
+                "Автоматические цены этого подключения не подтверждены.";
+              break;
+            }
+            p.mode = mode;
+            if (mode === "manual") {
+              p.input = document.querySelector("#source-price-input").value;
+              p.output = document.querySelector("#source-price-output").value;
+              p.cached =
+                document.querySelector("#source-price-cached").value || null;
+            } else {
+              p.input = "2";
+              p.output = "8";
+              p.cached = "0.5";
+            }
+            p.version++;
+            closeModal();
+            render();
+            toast(
+              "Создана новая версия цены в макете. История расходов сохранена.",
+            );
+            break;
+          }
+          case "edit-project-price": {
+            editingProjectPrice = button.dataset.namespace;
+            const n = namespaceCatalog.find(
+                (n) => n.id === editingProjectPrice,
+              ),
+              p = projectPrice(editingProjectPrice);
+            if (!n || n.state !== "active") {
+              toast("Нужен active verified Namespace.");
+              break;
+            }
+            dataForm(
+              "Тариф проекта · " + n.label,
+              [
+                '<p class="span-all">main-dev · ' +
+                  p.currency +
+                  " · текущая версия " +
+                  p.version +
+                  "</p>",
+                field(
+                  "project-price-mode",
+                  "Правило цены",
+                  select(
+                    "project-price-mode",
+                    [
+                      ["default_markup", "Наценка на себестоимость"],
+                      ["custom_rates", "Свои ставки за миллион"],
+                    ],
+                    p.mode,
+                  ),
+                ),
+                field(
+                  "project-price-bps",
+                  "Наценка, %",
+                  input(
+                    "project-price-bps",
+                    decimalString(BigInt(p.bps ?? 2000) * 10n ** 22n),
+                    "text",
+                    'required inputmode="decimal" pattern="(0|[1-9][0-9]{0,4})(\\.[0-9]{1,2})?"',
+                  ),
+                  "По умолчанию 20%. Максимум 10000%.",
+                ),
+                '<div id="pricing-rate-fields" class="span-all form-grid">' +
+                  pricingFields("project-price", p) +
+                  "</div>",
+                '<p class="span-all muted">Новая версия действует для новых запросов. Исторические цены сохраняются. В макете интервал начинается сейчас.</p>',
+              ],
+              "save-project-price",
+              "Сохранить новую версию",
+            );
+            togglePricingFields();
+            break;
+          }
+          case "save-project-price": {
+            if (!validateFields(modal)) break;
+            if (scene === "conflict") {
+              document.querySelector("#dialog-error").textContent =
+                "412: тариф изменён. Черновик сохранён; обновите данные перед сохранением.";
+              break;
+            }
+            const mode = document.querySelector("#project-price-mode").value,
+              old = projectPrice(editingProjectPrice);
+            if (
+              mode === "default_markup" &&
+              scaledDecimal(
+                document.querySelector("#project-price-bps").value,
+                2,
+              ) > 1000000n
+            ) {
+              document.querySelector("#dialog-error").textContent =
+                "Наценка не может превышать 10000%.";
+              break;
+            }
+            projectPrices[editingProjectPrice] = {
+              mode,
+              bps:
+                mode === "default_markup"
+                  ? Number(
+                      scaledDecimal(
+                        document.querySelector("#project-price-bps").value,
+                        2,
+                      ),
+                    )
+                  : null,
+              input:
+                mode === "custom_rates"
+                  ? document.querySelector("#project-price-input").value
+                  : null,
+              output:
+                mode === "custom_rates"
+                  ? document.querySelector("#project-price-output").value
+                  : null,
+              cached:
+                mode === "custom_rates"
+                  ? document.querySelector("#project-price-cached").value ||
+                    null
+                  : null,
+              currency: old.currency,
+              version: old.version + 1,
+            };
+            closeModal();
+            render();
+            toast(
+              "Новая версия тарифа сохранена. Исторические начисления не изменены.",
+            );
+            break;
+          }
           case "price":
             dataForm(
-              "Новая версия тарифа",
+              "Новая версия себестоимости",
               [
                 field(
                   "price-connection",
@@ -5700,6 +6260,12 @@
                     [
                       ["api-a", "API · поколение 3"],
                       ["ollama", "Ollama · поколение 3"],
+                      ["openrouter", "OpenRouter · поколение 3"],
+                      [
+                        "ollama-online",
+                        "Ollama Online · синтетическое подключение",
+                      ],
+                      ["chatgpt", "ChatGPT · собственная подписка"],
                     ],
                     "api-a",
                   ),
@@ -6650,6 +7216,11 @@
         }
       });
       document.addEventListener("change", (e) => {
+        if (["source-price-mode", "project-price-mode"].includes(e.target.id)) {
+          modalDirty = true;
+          togglePricingFields();
+          return;
+        }
         if (e.target.id === "context-search") {
           const options = modelOptions(id()).filter(([value]) =>
             value.toLowerCase().includes(e.target.value.toLowerCase()),
@@ -6827,6 +7398,16 @@
                     (i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) %
                       tabs.length
                   ];
+          if (next.dataset.action === "tariff-tab") {
+            const value = next.dataset.value;
+            handleAction("tariff-tab", next);
+            document
+              .querySelector(
+                '[data-action="tariff-tab"][data-value="' + value + '"]',
+              )
+              .focus();
+            return;
+          }
           tabChoice[next.dataset.tab] = next.dataset.value;
           const selector = `[data-tab="${next.dataset.tab}"][data-value="${next.dataset.value}"]`;
           render();

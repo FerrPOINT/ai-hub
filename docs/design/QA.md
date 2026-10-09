@@ -1,23 +1,18 @@
-# Приёмка актуализированного дизайна
+# Проверка актуализированного прототипа
 
 Дата: 2026-10-09. Kind: prototype. Surface: Codex in-app browser.
-Канонический [evidence](evidence.json) привязан к окончательным HTML/script hashes.
+Canonical [evidence](evidence.json) относится к финальному HTML/script текущих тарифов.
 
-- 219 проверок геометрии: 16 маршрутов, dark/gray/light, 375/1440/1920/2560 и адаптивные границы.
-- 168 проверок loading/empty/error/403/404/partial/stale/long/412/pending/budget-exhausted; auth ready/loading/error отдельно.
-- 73 behavioral assertions: предыдущие регрессии, Namespace URL/вкладки, per-model context, OpenRouter unknown limits, managed readback, multiple profiles, actor ACK без финансовых изменений, snapshots/rollback/archive.
-- 48 нативных viewport снимков без редактирования; 20 просмотрены непосредственно. Остальные — захват, не отдельная ручная визуальная приёмка.
-- 15 color-token contrast checks в трёх темах; не formal full WCAG audit.
+- 230 geometry / 179 states / 94 flow assertions: 17 маршрутов, 375/1440/1920/2560 во всех трёх темах; дополнительные тарифные границы 320/374/376/767/768/1279/1280.
+- 71 native PNG конкретной IAB вкладки; размер изображения проверен. Четыре тарифных снимка просмотрены непосредственно; остальные — захват, не отдельная ручная визуальная приёмка.
+- 15 token contrast checks; это не formal full WCAG acceptance.
 - Unexpected JavaScript errors: 0; provider calls: 0.
+- Viewport применяется через scoped IAB CDP. Общий browser viewport не подтверждает размер новой фоновой вкладки; screenshot clip учитывает origin прокрученного viewport.
+- 24 тарифных сценария: default 20%, custom per-million, auto/manual, subscription missing rate, exact percentage, Namespace isolation, history, 412 и URL reload/Back/Forward. [Scoped evidence](tariffs-evidence.json).
 
-## Границы
+## Границы приёмки
 
-HTML — self-contained simulation. Нет настоящего API/DB/SSO/провайдера, billing или миграции.
-SDK token snapshot и Namespace source reference независимы. Нативные снимки actual
-приложения и full-page README evidence собираются после реальной реализации.
-Fixture время: 2–8 октября; 30-дневный cash total включает подписку 1 октября на уровне установки.
-Дневные confirmed суммы читаются из одного dataset графиками и breakdown. Namespace
-и unbound samples входят в общую сводку; scope budgets не суммируются между собой.
-
-Регрессионный runner: scripts/design_flows.mjs принимает существующий IAB tab,
-не запускает другой браузер. Actual application/provider acceptance остаётся not_run.
+Structural/rendered gates не закрывают открытый semantic audit proof/Namespace budgets/datasets/exports/consumer transport. Полный статус DEVELOP_READY остаётся на актуализации.
+Backend/API/SQL/SSO/live adapters не реализованы. Цены синтетические; автоматический режим в макете не читает OpenRouter и не выполняет платежи.
+Prototype показывает представительные USD/main-dev examples; multi-profile/currency/effective interval application forms реализуются по полному [контракту тарифов](../PROJECT_TARIFFS.md).
+Provider cash, manual subscription allocation и project charge различаются; неизвестная сумма не бесплатный вызов.

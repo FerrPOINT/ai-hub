@@ -200,3 +200,7 @@ Derived: connection_id, If-Match.
 ## Семантическая проверка
 
 Namespace/project binding сверяется с owner projection. Client Namespace сменяется только после отзыва прежнего key. Profiles — массив UUID, модельный бюджет — exact connection/model preference. Physical unknown не заменяется default. Money — строки decimal; параметры генерации отдельно от финансовой арифметики. Invalid fields связаны с errors и сохраняют ввод.
+
+## pricingSource / projectTariff
+
+OpenAPI PricingSourceInput и ProjectTariffInput — canonical fields. Auto требует qualified provider pricing; manual требует immutable price revision. NamespaceRef обязателен для project override; custom input/output decimal per_million_tokens; markup_bps=2000 default. expected_version передаёт CAS. [Контракт](PROJECT_TARIFFS.md).

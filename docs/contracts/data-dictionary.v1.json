@@ -1039,6 +1039,12 @@
           "type": "uuid",
           "nullable": true,
           "rule": "own verified binding FK; null explicitly unbound"
+        },
+        {
+          "name": "project_tariff_snapshot",
+          "type": "jsonb",
+          "nullable": true,
+          "rule": "immutable tariff/source/default 2000 bps and exact Namespace; null explicitly unbound"
         }
       ]
     },
@@ -2292,6 +2298,237 @@
           "rule": "staged verified rejected; duplicate different digest denied"
         }
       ]
+    },
+    {
+      "name": "pricing_source_revisions",
+      "phase": "S2",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "connection_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own connection FK"
+        },
+        {
+          "name": "model_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "exact upstream model"
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "nullable": false,
+          "rule": "provider_auto manual"
+        },
+        {
+          "name": "price_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "required manual; own immutable price"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "logical key CAS"
+        },
+        {
+          "name": "actor_subject",
+          "type": "text",
+          "nullable": false,
+          "rule": "verified actor"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "project_tariff_revisions",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "namespace_binding_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own verified binding FK"
+        },
+        {
+          "name": "virtual_model_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "null project-wide; own model"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "rule": "no FX"
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "nullable": false,
+          "rule": "default_markup custom_rates"
+        },
+        {
+          "name": "markup_bps",
+          "type": "integer",
+          "nullable": true,
+          "rule": "2000 default; 0..1000000 for markup"
+        },
+        {
+          "name": "rates",
+          "type": "jsonb",
+          "nullable": true,
+          "rule": "exact per-million decimal strings, custom only"
+        },
+        {
+          "name": "effective_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "inclusive"
+        },
+        {
+          "name": "effective_to",
+          "type": "timestamptz",
+          "nullable": true,
+          "rule": "exclusive; no overlap"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "rule": "logical key CAS"
+        },
+        {
+          "name": "actor_subject",
+          "type": "text",
+          "nullable": false,
+          "rule": "verified actor"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
+    },
+    {
+      "name": "project_charge_events",
+      "phase": "S3",
+      "owner": "AI Hub",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "PK"
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own request FK"
+        },
+        {
+          "name": "attempt_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own attempt FK"
+        },
+        {
+          "name": "namespace_binding_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "frozen own binding; null explicitly unbound installation default"
+        },
+        {
+          "name": "tariff_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "null immutable installation default snapshot"
+        },
+        {
+          "name": "cost_source_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "rule": "own source snapshot FK"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "rule": "no FX"
+        },
+        {
+          "name": "cost_basis",
+          "type": "numeric(50,24)",
+          "nullable": true,
+          "rule": "null unknown; confidence separate"
+        },
+        {
+          "name": "project_amount",
+          "type": "numeric(50,24)",
+          "nullable": true,
+          "rule": "null unknown; no float or per-request rounding"
+        },
+        {
+          "name": "margin_amount",
+          "type": "numeric(50,24)",
+          "nullable": true,
+          "rule": "charge minus basis; may be negative"
+        },
+        {
+          "name": "basis_confidence",
+          "type": "text",
+          "nullable": false,
+          "rule": "confirmed estimated unknown"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "rule": "final provisional pending"
+        },
+        {
+          "name": "source_event_id",
+          "type": "text",
+          "nullable": false,
+          "rule": "unique attempt/event semantic identity"
+        },
+        {
+          "name": "supersedes_id",
+          "type": "uuid",
+          "nullable": true,
+          "rule": "append-only correction FK"
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "rule": "UTC"
+        }
+      ]
     }
   ],
   "relationships": [
@@ -2587,6 +2824,60 @@
       "column": "notification_id",
       "target_table": "notifications",
       "target_column": "id"
+    },
+    {
+      "table": "pricing_source_revisions",
+      "column": "connection_id",
+      "target_table": "connections",
+      "target_column": "id"
+    },
+    {
+      "table": "pricing_source_revisions",
+      "column": "price_revision_id",
+      "target_table": "price_revisions",
+      "target_column": "id"
+    },
+    {
+      "table": "project_tariff_revisions",
+      "column": "namespace_binding_id",
+      "target_table": "namespace_bindings",
+      "target_column": "id"
+    },
+    {
+      "table": "project_tariff_revisions",
+      "column": "virtual_model_id",
+      "target_table": "virtual_models",
+      "target_column": "id"
+    },
+    {
+      "table": "project_charge_events",
+      "column": "request_id",
+      "target_table": "requests",
+      "target_column": "id"
+    },
+    {
+      "table": "project_charge_events",
+      "column": "attempt_id",
+      "target_table": "attempts",
+      "target_column": "id"
+    },
+    {
+      "table": "project_charge_events",
+      "column": "namespace_binding_id",
+      "target_table": "namespace_bindings",
+      "target_column": "id"
+    },
+    {
+      "table": "project_charge_events",
+      "column": "tariff_revision_id",
+      "target_table": "project_tariff_revisions",
+      "target_column": "id"
+    },
+    {
+      "table": "project_charge_events",
+      "column": "cost_source_revision_id",
+      "target_table": "pricing_source_revisions",
+      "target_column": "id"
     }
   ],
   "composite_invariants": [
@@ -2605,6 +2896,9 @@
     "unique registry_instance_id/namespace_id within own installation; exact Tracker binding; no external FK",
     "unique connection_id/model_id preference; CAS; no unknown physical-bound default",
     "notification outbox delivery acknowledgement differs from actor read/ACK; no financial effect",
-    "unique source_instance_id/source_kind/source_record_id import identity with digest conflict protection"
+    "unique source_instance_id/source_kind/source_record_id import identity with digest conflict protection",
+    "project tariff precedence exact namespace/profile then namespace default then installation 2000 bps; currency-qualified nonoverlapping intervals",
+    "project charge events append-only and deduped by attempt/source event; unknown amount null; old snapshot used for late receipt",
+    "manual subscription allocation never counted as a second provider cash charge; budget policy remains provider cost"
   ]
 }

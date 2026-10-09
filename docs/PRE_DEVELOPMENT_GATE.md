@@ -1,5 +1,7 @@
 # Готовность к разработке
 
+> Текущий статус: DESIGN_ALIGNMENT. Ниже исторический gate до semantic audit и добавления проектных тарифов; повторная полная приёмка pending. См. [CURRENT_STATE](CURRENT_STATE.md).
+
 Этот gate проверяет достаточность документационного baseline для старта S1.
 Работающий UI/API, provider access и runtime release здесь не требуются и не
 подменяются фиктивной реализацией. Product acceptance после S7 — отдельный gate.

@@ -551,3 +551,7 @@
 - unique connection_id/model_id preference; CAS; no unknown physical-bound default
 - notification outbox delivery acknowledgement differs from actor read/ACK; no financial effect
 - unique source_instance_id/source_kind/source_record_id import identity with digest conflict protection
+
+## Тарифы и начисления — S2/S3
+
+Канонические поля pricing_source_revisions, project_tariff_revisions и project_charge_events описаны в [typed dictionary](contracts/data-dictionary.v1.json). Request получает immutable project_tariff_snapshot. Project amount/margin — NUMERIC(50,24); provider expense сохраняет прежний тип. [Правила](PROJECT_TARIFFS.md).

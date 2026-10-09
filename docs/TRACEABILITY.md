@@ -51,4 +51,9 @@ No missing test автоматически не означает implementation 
 
 | FR-028 | [Спецификация](contracts/ADMIN_HANDOFF_V1.md) | S7 | TC-036 |
 
+| FR-030 | [Спецификация](PROJECT_TARIFFS.md) | S5 | TC-038 |
 | FR-029 | [Спецификация](OPERATIONS.md) | S5 | TC-037 |
+
+## Дополнение FR-030
+
+FR-030 → TC-038 → S5: [тарифы](PROJECT_TARIFFS.md), OpenAPI PricingSourceInput/ProjectTariffInput/ProjectCharge, own typed dictionary и /tariffs prototype. Admission/ledger snapshots S3, provider qualification S4, UI S5. [Machine traceability](traceability.json).

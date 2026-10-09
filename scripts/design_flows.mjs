@@ -532,7 +532,7 @@ export async function verifyDesign(tab, sourceScriptHash) {
   );
   await reset("/expenses");
   await tab.playwright
-    .getByRole("tab", { name: "Тарифы", exact: true })
+    .getByRole("tab", { name: "Себестоимость", exact: true })
     .click();
   await observe();
   await click("Новый тариф");
@@ -543,7 +543,7 @@ export async function verifyDesign(tab, sourceScriptHash) {
     "no fake receipt",
   );
   await tab.playwright
-    .getByRole("tab", { name: "Тарифы", exact: true })
+    .getByRole("tab", { name: "Себестоимость", exact: true })
     .press("ArrowRight");
   await observe();
   assert(
