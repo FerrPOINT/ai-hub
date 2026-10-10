@@ -4,9 +4,9 @@
 для приложений и агентов, собственные виртуальные модели для разработки и
 тестирования, статистика и контроль расходов.
 
-Статус: DEVELOP_READY для документов и дизайна после закрытия semantic audit. Требования и проектные контракты документированы;
-backend, frontend и runtime ещё не реализованы. Наличие документов не доказывает
-работу endpoint, доступ подписки, точность provider billing или live SSO.
+Статус: IMPLEMENTING S1. Созданы native Rust/PostgreSQL foundation и React/Base
+shell; общий объём v1 и runtime acceptance ещё не завершены. Точные результаты
+и открытые этапы — в [IMPLEMENTATION_STATUS](docs/IMPLEMENTATION_STATUS.md).
 
 <a name="overview"></a>
 
@@ -19,8 +19,8 @@ backend, frontend и runtime ещё не реализованы. Наличие 
 | Frontend — целевой       | React 19, TypeScript 5.9, Vite 6, Tailwind 4, @sdlc/ui                   |
 | Build baseline — целевой | Rust 1.88.0, Node 22.20.0, pnpm 10.28.1                                  |
 | Base SDK                 | Exact SHA в [.base-revision](.base-revision)                             |
-| API                      | [Draft OpenAPI 3.1](docs/contracts/openapi.v1.json); runtime отсутствует |
-| Порты                    | Пока не выделены; deployment owner выбирает свободные loopback ports     |
+| API                      | [Draft OpenAPI 3.1](docs/contracts/openapi.v1.json); implemented subset генерируется из Rust |
+| Порты                    | PDLC3 temporary QA: 127.0.0.3:8191/8192; постоянный bundle ещё не изменён |
 | License                  | FerrPOINT Proprietary Source-Available Evaluation License v1.0           |
 
 <a name="features"></a>
@@ -43,7 +43,7 @@ backend, frontend и runtime ещё не реализованы. Наличие 
 
 ## Быстрый старт
 
-Сейчас можно проверить только documentation baseline:
+Быстрые documentation checks:
 
 ```shell
 python scripts/check_docs.py
@@ -52,7 +52,8 @@ python -m unittest discover -s scripts/tests -v
 
 Проектный старт: [ТЗ](docs/TZ.md) → [требования](docs/PRODUCT_REQUIREMENTS.md) →
 [этапы](docs/IMPLEMENTATION_PLAN.md) → [pre-development gate](docs/PRE_DEVELOPMENT_GATE.md).
-Образов и команд запуска приложения пока нет.
+Scoped Rust/PostgreSQL/frontend команды — в [LOCAL_SETUP](docs/LOCAL_SETUP.md).
+Постоянный runtime и release image ещё не квалифицированы.
 
 <a name="architecture"></a>
 
@@ -78,8 +79,8 @@ python -m unittest discover -s scripts/tests -v
 [Полный индекс](docs/README.md), [API](docs/API.md), [Data model](docs/DATA_MODEL.md),
 [учёт расходов](docs/ACCOUNTING.md), [аналитика](docs/ANALYTICS.md),
 [план проверок](docs/TESTING.md), [CURRENT_STATE](docs/CURRENT_STATE.md).
-Локальный documentation gate — основной; hosted backend/frontend CI появится
-только после реальных manifests. Release, coverage и live acceptance не заявлены.
+Локальные scoped checks уже выполняются; hosted milestone CI ещё pending.
+Release и live acceptance не заявлены.
 
 <a name="safety"></a>
 

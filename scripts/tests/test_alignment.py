@@ -50,7 +50,7 @@ class AlignmentTests(unittest.TestCase):
             shutil.copytree(
                 ROOT,
                 target,
-                ignore=shutil.ignore_patterns(".git", ".local", "__pycache__"),
+                ignore=shutil.ignore_patterns(".git", ".local", "__pycache__", "node_modules", "target", "dist", "coverage"),
             )
             path = target / "docs/contracts/admin-extraction-map.json"
             data = json.loads(path.read_text())

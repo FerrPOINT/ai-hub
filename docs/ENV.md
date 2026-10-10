@@ -1,6 +1,7 @@
 # Конфигурация
 
-Проектные env names; .env example/application loader появятся в S1.
+Application loader реализован для foundation subset; остальные значения таблицы
+остаются planned до соответствующего этапа.
 Prefix AIHUB_. Secrets передаются через file/secret provider, не literal config.
 
 | Имя                                | Назначение / безопасный default                               |
@@ -10,9 +11,9 @@ Prefix AIHUB_. Secrets передаются через file/secret provider, н�
 | AIHUB_DATABASE_URL_FILE            | Required private own DSN file; no default database            |
 | AIHUB_VAULT_KEY_FILE               | Required own encryption key вне state/backup                  |
 | AIHUB_AUTH_ISSUER                  | Exact trusted Central Auth issuer                             |
-| AIHUB_AUTH_JWKS_URL                | Trusted endpoint; validated deployment URL                    |
+| AIHUB_AUTH_JWKS_URI                | Exact Base bridge env; trusted /oidc/jwks endpoint            |
 | AIHUB_AUTH_BASE_URL                | Bridge session/PAT validation endpoint                        |
-| AIHUB_ADMIN_BASE_URL               | Branding/catalog; отсутствие не расширяет grants              |
+| AIHUB_ADMIN_ORIGIN                 | Optional branding/catalog origin; отсутствие не расширяет grants |
 | AIHUB_CORS_ORIGINS                 | Exact UI origins, no wildcard with credentials                |
 | AIHUB_PROVIDER_ENDPOINTS_FILE      | Deployment allowlist включая exact local Ollama               |
 | AIHUB_EXTERNAL_CALLS               | false default; true только explicit qualification/rollout     |

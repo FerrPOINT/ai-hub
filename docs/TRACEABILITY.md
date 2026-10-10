@@ -3,7 +3,10 @@
 [traceability.json](traceability.json) — machine-readable planned requirements,
 stage DAG и behavioral test definitions; текст и JSON проверяются вместе.
 Все 37 requirements принадлежат AI Hub; cross-product участники указаны в handoff.
-Status planned/not_run, code coverage не заявлен.
+Полные behavioral oracles сохраняют planned/not_run до полной приёмки.
+Реализованные slices и partial evidence отдельно отмечены в
+[implementation-evidence.json](implementation-evidence.json); частичный pass
+не закрывает весь TC.
 
 | Requirement | Owner specification                                        | Stage | Behavioral oracle |
 | ----------- | ---------------------------------------------------------- | ----- | ----------------- |

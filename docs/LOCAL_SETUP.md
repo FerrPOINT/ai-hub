@@ -1,7 +1,22 @@
 # Локальная подготовка
 
-Сейчас нет Cargo/pnpm manifests, Compose или приложения. Единственная
-работающая команда — documentation gate из README; его Python tooling stdlib-only.
+Cargo/pnpm manifests и locks созданы, scoped commands доступны ниже.
+Постоянный установленный bundle пока не расширен новым сервисом.
+
+```powershell
+. ../enter-dev.ps1
+python scripts/materialize_dependencies.py
+python scripts/verify_dependencies.py
+./scripts/rust.ps1 -CargoArgs @('check','--locked','-p','aihub-api')
+./scripts/test_foundation_pg.ps1
+./scripts/rust.ps1 -CargoArgs @('run','--locked','-p','aihub-api','--','export-openapi','openapi/openapi.json')
+pnpm --dir frontend openapi:generate
+pnpm --dir frontend typecheck
+```
+
+PG harness использует own временный container, tmpfs и непубличную DB/role.
+Он не подключается к common PostgreSQL и не меняет его пользователей/данные.
+CLI migrate/initialize применяются явно; serve никогда не выполняет bootstrap.
 
 ## Рабочий baseline
 

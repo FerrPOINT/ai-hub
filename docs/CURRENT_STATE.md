@@ -1,6 +1,15 @@
 # Текущее состояние
 
-Дата: 2026-10-10. Stage: DEVELOP_READY для документации и дизайна перед реализацией.
+Дата: 2026-10-10. Stage: IMPLEMENTING, S1 в работе.
+
+Полная реализация S1–S7 поручена пользователем. В PDLC3 создана отдельная ветка
+`feat/ai-hub-v1-implementation-20261010` на baseline `b266e15`. Добавляются actual
+Cargo/pnpm manifests, own DB-01, central-auth/vault ports, control reads, Rust OpenAPI
+и Base React shell. Фактические результаты и незакрытые gates:
+[IMPLEMENTATION_STATUS](IMPLEMENTATION_STATUS.md). Ни один полный FR/TC пока не
+объявлен принятым. Установленный PDLC runtime и Admin `/ai` сохранены.
+
+## Проверенный исходный документационный baseline
 
 - READY-01–05 закрыты в [READINESS_AUDIT](READINESS_AUDIT.md); R01–R15 предыдущего ревью сохранены в [реестре](REVIEW_RESOLUTION.md).
 - OpenAPI 0.5.0-design, 47 таблиц/420 полей; 38 requirements/40 planned actual-app tests; 16 operational routes и /login.
@@ -13,7 +22,7 @@
 - SDK baseline/Namespace cohort/operator tooling независимы; Base/Admin docs branches не main/runtime integration.
 - Backend/API/SQL migrations/SSO/live adapters/consumer/restore/cutover не реализованы, execution acceptance not_run.
 
-Следующая веха: S1 настоящего изолированного приложения, затем S2a → S2b → S3…S7.
+Текущая веха: S1 настоящего изолированного приложения, затем S2a → S2b → S3…S7.
 Действующий Admin /ai, данные, pins и установленный runtime сохраняются до accepted cutover.
 
 ## Повторное ревью 2026-10-10

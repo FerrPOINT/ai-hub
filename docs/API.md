@@ -1,7 +1,8 @@
 # API AI Hub v1
 
 [openapi.v1.json](contracts/openapi.v1.json) — проектный OpenAPI 3.1 контракт.
-Handlers/runtime отсутствуют. `openapi/openapi.json` после реализации генерируется
+Часть S1 handlers реализована; полный runtime acceptance ещё не выполнен.
+`openapi/openapi.json` генерируется
 из Rust DTO/handlers; draft сохраняется как исходная design revision, parity migration
 не расширяет capabilities автоматически. Версия 0.5.0-design — не release приложения.
 

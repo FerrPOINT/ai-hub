@@ -19,7 +19,7 @@ class DesignHandoffTests(unittest.TestCase):
         shutil.copytree(
             ROOT,
             self.root,
-            ignore=shutil.ignore_patterns(".git", ".local", "__pycache__"),
+            ignore=shutil.ignore_patterns(".git", ".local", "__pycache__", "node_modules", "target", "dist", "coverage"),
         )
 
     def tearDown(self):

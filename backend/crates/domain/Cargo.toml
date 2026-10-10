@@ -1,0 +1,17 @@
+[package]
+name = "aihub-domain"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+
+[dependencies]
+sdlc-shared.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+thiserror.workspace = true
+utoipa.workspace = true
+url.workspace = true
+bigdecimal.workspace = true

@@ -1,0 +1,792 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AI Hub — implemented API",
+    "description": "",
+    "license": {
+      "name": ""
+    },
+    "version": "0.1.0-dev"
+  },
+  "paths": {
+    "/api/v1/audit": {
+      "get": {
+        "tags": [],
+        "operationId": "listAudit",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "registry_instance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "namespace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [],
+        "operationId": "readIdentity",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Identity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/namespaces": {
+      "get": {
+        "tags": [],
+        "operationId": "listNamespaceBindings",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NamespacePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/operations/{operation_id}": {
+      "get": {
+        "tags": [],
+        "operationId": "readOperation",
+        "parameters": [
+          {
+            "name": "operation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/public/config": {
+      "get": {
+        "tags": [],
+        "operationId": "readPublicConfig",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/branding/contract": {
+      "get": {
+        "tags": [],
+        "operationId": "readBrandingContract",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrandingContract"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/live": {
+      "get": {
+        "tags": [],
+        "operationId": "healthLive",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [],
+        "operationId": "healthReady",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integration/status": {
+      "get": {
+        "tags": [],
+        "operationId": "readIntegrationStatus",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationStatus"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "tags": [],
+        "operationId": "readVersion",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuditEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "actor",
+          "action",
+          "object_id",
+          "operation_id",
+          "happened_at"
+        ],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "happened_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "namespace": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/NamespaceRef"
+              }
+            ]
+          },
+          "object_id": {
+            "type": "string"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "revision": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuditPage": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditEvent"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "BrandingContract": {
+        "type": "object",
+        "required": [
+          "schema_version",
+          "service_key",
+          "central_branding_consumer",
+          "local_fallback"
+        ],
+        "properties": {
+          "central_branding_consumer": {
+            "type": "boolean"
+          },
+          "local_fallback": {
+            "type": "boolean"
+          },
+          "schema_version": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "service_key": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        }
+      },
+      "ErrorDetail": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "request_id"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "schema_revision": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Identity": {
+        "type": "object",
+        "required": [
+          "subject",
+          "installation_id",
+          "capabilities",
+          "project_grants"
+        ],
+        "properties": {
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "installation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "project_grants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subject": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IntegrationStatus": {
+        "type": "object",
+        "required": [
+          "service_key",
+          "contract_version",
+          "status",
+          "source_revision",
+          "base_revision"
+        ],
+        "properties": {
+          "base_revision": {
+            "type": "string"
+          },
+          "contract_version": {
+            "type": "string"
+          },
+          "service_key": {
+            "type": "string"
+          },
+          "source_revision": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "NamespaceBinding": {
+        "type": "object",
+        "required": [
+          "namespace",
+          "tracker_instance_id",
+          "tracker_project_id",
+          "state",
+          "observed_at",
+          "generation",
+          "label",
+          "tracker_project_key"
+        ],
+        "properties": {
+          "generation": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "label": {
+            "type": "string"
+          },
+          "namespace": {
+            "$ref": "#/components/schemas/NamespaceRef"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "state": {
+            "type": "string"
+          },
+          "tracker_instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tracker_project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tracker_project_key": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NamespacePage": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NamespaceBinding"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "NamespaceRef": {
+        "type": "object",
+        "required": [
+          "registry_instance_id",
+          "namespace_id"
+        ],
+        "properties": {
+          "namespace_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "registry_instance_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Operation": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resource_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "safe_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicConfig": {
+        "type": "object",
+        "required": [
+          "auth_issuer",
+          "oidc_client_id",
+          "installation_id"
+        ],
+        "properties": {
+          "auth_issuer": {
+            "type": "string"
+          },
+          "branding_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "installation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "oidc_client_id": {
+            "type": "string"
+          },
+          "service_catalog_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Version": {
+        "type": "object",
+        "required": [
+          "service_key",
+          "installation_id",
+          "source_revision",
+          "source_dirty",
+          "base_revision",
+          "namespace_base_revision",
+          "external_calls",
+          "schema_revision"
+        ],
+        "properties": {
+          "base_revision": {
+            "type": "string"
+          },
+          "external_calls": {
+            "type": "boolean"
+          },
+          "installation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "namespace_base_revision": {
+            "type": "string"
+          },
+          "schema_revision": {
+            "type": "string"
+          },
+          "service_key": {
+            "type": "string"
+          },
+          "source_dirty": {
+            "type": "boolean"
+          },
+          "source_revision": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "CentralAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

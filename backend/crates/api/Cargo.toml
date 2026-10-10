@@ -1,0 +1,28 @@
+[package]
+name = "aihub-api"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+
+[dependencies]
+aihub-domain.workspace = true
+aihub-application.workspace = true
+aihub-infrastructure.workspace = true
+axum.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+utoipa.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+sha2.workspace = true
+hex.workspace = true
+url.workspace = true
+
+[dev-dependencies]
+tower.workspace = true
+async-trait.workspace = true

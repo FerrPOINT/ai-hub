@@ -1,0 +1,43 @@
+[workspace]
+resolver = "3"
+members = ["backend/crates/domain", "backend/crates/application", "backend/crates/infrastructure", "backend/crates/api"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license-file = "LICENSE"
+repository = "https://github.com/FerrPOINT/ai-hub"
+
+[workspace.dependencies]
+aihub-domain = { path = "backend/crates/domain" }
+aihub-application = { path = "backend/crates/application" }
+aihub-infrastructure = { path = "backend/crates/infrastructure" }
+sdlc-auth-core = { path = "../.local/sdk/services-base-875cac2/crates/sdlc-auth-core" }
+sdlc-shared = { path = "../.local/sdk/services-base-81decf7/crates/sdlc-shared", default-features = false, features = ["openapi"] }
+axum = { version = "0.8", features = ["macros"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+async-trait = "0.1"
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "uuid", "chrono", "json", "migrate", "macros", "bigdecimal"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "stream"] }
+utoipa = { version = "5", features = ["axum_extras", "uuid", "chrono"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+sha2 = "0.10"
+hmac = "0.12"
+hex = "0.4"
+url = "2"
+aes-gcm = { version = "0.10", features = ["zeroize"] }
+zeroize = { version = "1", features = ["derive"] }
+bigdecimal = { version = "0.4", features = ["serde-json"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.6", features = ["cors", "trace", "limit", "fs"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

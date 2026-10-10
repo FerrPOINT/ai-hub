@@ -1,6 +1,7 @@
 # Пакеты реализации для разработчика
 
-Все components ниже — target files; код ещё не создан. Source authority:
+Таблица ниже задаёт целевой объём; фактическое исполнение ведётся в
+[IMPLEMENTATION_STATUS](IMPLEMENTATION_STATUS.md). Source authority:
 requirements/OpenAPI/DD/design; routine coding не требует повторной discovery.
 
 | Stage | First working vertical path                                     | Required deliverables                                                                                                        | Gate / dependencies                                                      |

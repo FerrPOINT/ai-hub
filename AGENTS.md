@@ -4,8 +4,9 @@
 
 AI Hub — отдельный сервис Base для доступа приложений к моделям, виртуальных
 профилей, воспроизводимых проверок, статистики и расходов. Репозиторий находится
-на стадии подготовки к разработке; API, UI, adapters и runtime ещё не реализованы.
-Default branch — main. Пользователь поручил подготовить и проверить документы.
+на стадии IMPLEMENTING S1; точные факты и открытые gates находятся в
+[IMPLEMENTATION_STATUS](docs/IMPLEMENTATION_STATUS.md). Default branch — main.
+Пользователь поручил полный объём S1–S7 и isolated release candidate.
 
 ## Перед изменениями
 
@@ -49,5 +50,8 @@ Design screenshots разрешены в docs/design с kind prototype; не act
 
 Сохранять чужую работу; task-owned документация коммитится и публикуется обычным git.
 Identity: FerrPOINT <ferrpoint@users.noreply.github.com>. Перед push fetch и проверка
-remote; never force-push. Merge/deploy и реальное provider I/O не входят в эту задачу.
+remote; never force-push. Production cutover не входит в текущую задачу.
+OpenRouter dev account разрешён для дешёвых ограниченных qualification checks;
+перед I/O зафиксировать явный budget и durable financial intent. Остальные accounts
+требуют своей авторизации. Сохранять secrets и чужие установки.
 Browser proof только Codex in-app browser по workspace policy.

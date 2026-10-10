@@ -1,7 +1,8 @@
 # Документация AI Hub
 
 Начать с TZ/PRODUCT_REQUIREMENTS/CURRENT_STATE, затем IMPLEMENTATION_PLAN.
-Документы describe planned v1 и sufficient development inputs; runtime не реализован.
+Документы задают согласованный v1; реализация начата. Фактический статус каждого
+этапа и evidence — в [IMPLEMENTATION_STATUS](IMPLEMENTATION_STATUS.md).
 
 | Документ                                                             | Назначение                                    |
 | -------------------------------------------------------------------- | --------------------------------------------- |

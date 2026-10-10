@@ -1,7 +1,8 @@
 # Интеграция с Base
 
 SDK baseline — полный SHA в [.base-revision](../.base-revision), взят из актуальных
-Rust/React продуктов. Это planned dependency; runtime сборки AI Hub пока нет.
+Rust/React продуктов. Зависимость materialized и Rust check выполнен;
+live runtime integration ещё не квалифицирована.
 [Base compatibility](https://github.com/FerrPOINT/services-base/blob/3a48de8c5696dd20b78c94205d9feb7dbb69c8e0/docs/BASE_COMPATIBILITY.md)
 обсуждается в SOURCE_AUDIT; использовать точный подтверждённый source URL из аудита.
 

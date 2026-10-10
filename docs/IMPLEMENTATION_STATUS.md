@@ -1,0 +1,91 @@
+# Фактическая реализация AI Hub v1
+
+Дата: 2026-10-10. Ветка: `feat/ai-hub-v1-implementation-20261010`.
+Источник задачи: полный S1–S7 implementation; production cutover исключён.
+Baseline Hub: `b266e158b33e6cc70e02a9df3ba1d21c74b983af`.
+
+## Владельцы и решения
+
+Hub владеет schema/domain/application/API/UI. Central Auth остаётся владельцем
+SSO/session/PAT; Admin — Namespace registry; Tracker/Fleet/Forge — исходным
+resource/execution context. Base/Admin documentation branches не вливаются целиком.
+Remote refs обновлены; оба owner packet SHA совпадают с заданными baseline.
+
+Выбран native Rust application boundary с SQLx transactions и Base auth/UI.
+Generic proxy или второй policy engine отклонены: они теряют durable intent,
+accounting и qualification provenance. Миграции выполняет явная команда,
+а serve проверяет сохранённые schema/installation/key без initialization.
+
+SDK `875cac2edf1a18c3a8a59e2f67256d02a8fc04e4` сохраняется в `.base-revision`.
+Технические Namespace types и controlled UI берутся отдельно из cohort
+`81decf7d9edd2c4218d8625a96e2e25c0617e9f1` по `.namespace-base-revision`.
+Оба checkout материализованы независимо и проверяются до Cargo/consumer checks.
+Operator tooling остаётся pinned workspace dependency; его acceptance не
+выводится из проверки двух SDK checkout.
+
+Grant получает `namespace_binding_id` с own composite FK. Project ID/name сами
+по себе не предоставляют доступ к Namespace другой registry. Это уточнение
+DB-01 не меняет владельцев или public NamespaceRef wire.
+
+## Последовательность и открытые этапы
+
+| Этап | Фактический статус | Следующий результат |
+| --- | --- | --- |
+| S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
+| S2a | Начат: exact amount/rate/project codecs и disjoint usage; unit checks pass | Atomic budgets/reservations/requests/attempts/ledger/replay до proof I/O |
+| S2b | Не реализован | Connection/catalog/draft/CAS/proof/publication UI/API |
+| S3 | Не реализован | Scoped public/signed inference и общий financial engine |
+| S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
+| S5 | Не реализован | Полный operational UI и authorized snapshot/export |
+| S6 | Не реализован | Immutable datasets, fenced pinned comparisons |
+| S7 | Не реализован | Consumer/restore/load/rollout candidate и final evidence |
+
+Source реализация не означает закрытие соответствующих FR/TC. Существующая
+design traceability сохраняет actual acceptance `not_run` до полного сценария.
+Результаты scoped checks дополняются после исполнения. Ни SDK pin, ни prototype
+evidence не считается доказательством живой интеграции.
+
+## Проверки и запуск
+
+В source workspace PDLC3 доступны `enter-dev.ps1` и exact installed Rust image.
+`scripts/rust.ps1` проверяет обе зависимости и запускает только указанную Cargo
+команду с собственным cache/target, ограниченными CPU/RAM и `--rm`.
+`scripts/test_foundation_pg.ps1` создаёт временный PostgreSQL17 с own role/DB,
+без опубликованных портов и named volumes, затем удаляет только свой контейнер.
+
+Реальный постоянный runtime добавляется через штатного owner/operator после
+проверки image/schema/SSO и ресурсов. Ни existing PDLC groups, ни common bundle,
+ни текущий Admin `/ai` не переключаются подготовкой source packet.
+
+Provider I/O выполнено: **0**. OpenRouter dev account разрешён пользователем;
+проверки ограничены пятью короткими вызовами и общим budget 0.10 USD.
+Ключ на Dev подтверждён без вывода/переноса. Account/currency/model qualification,
+financial admission и остальные S4/S7 gates ещё не закрыты.
+
+## Scoped evidence
+
+- `cargo check -p aihub-api`: pass для foundation source.
+- `cargo test -p aihub-domain --lib`: 6 pass, включая four financial rules.
+- Own PostgreSQL17: 1 integration scenario pass, 0 ignored при explicit harness.
+  Проверены rollback partial initialize, concurrent initialize, wrong installation/key,
+  immutable audit, own composite FKs, nonnil identities, exact Namespace grants и
+  cursor snapshot/actor/query/revocation boundaries. Temporary DB удалена runner.
+- Frontend Namespace/transport: 5 pass; URL pair, late previous-session 401,
+  current revocation, 403 preservation и отсутствие bearer в profile storage.
+- Documentation: structural/readiness/semantics pass; Python regression 39 pass.
+- Rust OpenAPI export и generated TypeScript consumer/typecheck pass.
+- API auth/Namespace boundary tests: 2 pass (controlled ports, не live SSO).
+- Infrastructure unit checks: 3 pass, vault AAD/wrong key, trusted origins и
+  Namespace identity/confirmed/archived transitions. Reader ещё не подключён к
+  живому owner; его observation не выдаёт grant и не заменяет Tracker readback.
+- Fresh PostgreSQL check после `0003_financial_prerequisites`: все три миграции
+  применились, foundation scenario pass. Financial transactions ещё не проверены.
+- Live SSO, owner readers, served UI и CI ещё pending.
+
+`0003_financial_prerequisites` вводит connection/generation/catalog/price/probe,
+requests/attempts/usage/replay, immutable ledger и budget/reservation таблицы.
+Это schema introduction; admission/settlement API и concurrency engine ещё не
+реализованы. FK profile revision присоединяется S2b до public inference.
+
+Полные TC остаются `not_run`, когда исполнена только часть oracle. Partial mapping
+и источник каждого результата — [implementation-evidence.json](implementation-evidence.json).

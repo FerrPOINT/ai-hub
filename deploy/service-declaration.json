@@ -1,0 +1,8 @@
+{
+  "service_key": "ai-hub",
+  "service_contract_version": "1.0",
+  "capabilities": ["health.read", "integration.status.read", "branding.runtime.read"],
+  "public_ui_url": null,
+  "qualification_status": "pending",
+  "note": "Owner packet: URLs/registry_entry_id/approval are supplied by Admin owner. ui.render is added after live UI acceptance. This file does not register or switch a running service."
+}
