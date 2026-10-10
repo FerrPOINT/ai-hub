@@ -31,6 +31,7 @@ impl Purpose {
 /// Internal frozen context, never deserialized from public caller metadata.
 #[derive(Clone)]
 pub struct AdmissionIntent {
+    pub intent_ttl_seconds: i32,
     pub protocol: crate::replay::ReplayProtocol,
     pub streaming: bool,
     pub client_id: Uuid,
@@ -100,4 +101,17 @@ pub struct DispatchClaim {
     pub owner_id: Uuid,
     pub fence: Uuid,
     pub deployment_snapshot: serde_json::Value,
+}
+
+/// Derived from verified request authentication; never deserialized from caller metadata.
+#[derive(Debug, Clone, Serialize)]
+pub struct RequestOwner {
+    pub client_id: Uuid,
+    pub principal_id: String,
+}
+#[derive(Debug, Clone)]
+pub struct CancellationReceipt {
+    pub request_id: Uuid,
+    pub state: String,
+    pub cancel_requested: bool,
 }

@@ -19,6 +19,9 @@
   исходная операция после unknown/reload/revocation и явный rebase после 412.
 - Protected result delivery port: frozen protocol/stream mode, atomic settlement
   и encrypted body, отдельный read_result grant и TTL без content resurrection.
+- Owned cancellation через common settlement engine; after-dispatch intent
+  сохраняет резерв. Immutable queue deadline и bounded unclaimed recovery
+  запрещают новый send после expiry/restart.
 
 ### Повторная проверка 2026-10-10
 

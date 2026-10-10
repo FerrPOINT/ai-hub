@@ -3,7 +3,7 @@ use crate::{financial::db_failure, postgres::PgStore};
 use aihub_domain::{
     error::HubError,
     financial::{Acceptance, Adjustment, Amount, Price},
-    settlement::{SettlementFact, SettlementReceipt},
+    settlement::{SettlementAuthority, SettlementFact, SettlementReceipt, TerminalState},
 };
 use bigdecimal::BigDecimal;
 use sqlx::Row;
@@ -33,14 +33,16 @@ impl PgStore {
         result: Option<&crate::replay::EncryptedResult>,
     ) -> Result<SettlementReceipt, HubError> {
         if fact.attempt_id.is_nil()
-            || fact.owner_id.is_nil()
-            || fact.fence.is_nil()
             || fact.source.is_empty()
             || fact.source.len() > 256
             || fact.source_event_id.is_empty()
             || fact.source_event_id.len() > 256
         {
             return Err(HubError::Invalid("settlement identity"));
+        }
+        if matches!(&fact.authority,SettlementAuthority::Dispatch {owner_id,fence} if owner_id.is_nil() || fence.is_nil())
+        {
+            return Err(HubError::Invalid("settlement claim"));
         }
         let json = serde_json::to_value(fact).map_err(|_| HubError::Invalid("settlement fact"))?;
         let mut tx = self
@@ -63,7 +65,7 @@ impl PgStore {
             .fetch_one(&mut *tx)
             .await
             .map_err(|err| db_failure(err, line!()))?;
-        let request=sqlx::query("SELECT id,state,wire_protocol,streaming FROM requests WHERE installation_id=$1 AND id=$2 FOR UPDATE")
+        let request=sqlx::query("SELECT id,state,cancel_requested,wire_protocol,streaming FROM requests WHERE installation_id=$1 AND id=$2 FOR UPDATE")
             .bind(self.installation_id)
             .bind(context.get::<Uuid, _>("id"))
             .fetch_one(&mut *tx)
@@ -95,21 +97,64 @@ impl PgStore {
                 .fetch_one(&mut *tx)
                 .await
                 .map_err(|err|db_failure(err,line!()))?;
-        if attempt.get::<Option<Uuid>, _>("dispatch_owner_id") != Some(fact.owner_id)
-            || attempt.get::<Option<Uuid>, _>("dispatch_fence") != Some(fact.fence)
-        {
-            return Err(HubError::PreconditionFailed);
-        }
         let snapshot: serde_json::Value = attempt.get("deployment_snapshot");
-        if snapshot.get("adapter_revision").and_then(|v| v.as_str()) != Some(fact.source.as_str()) {
-            return Err(HubError::Forbidden);
-        }
+        let before_dispatch = match &fact.authority {
+            SettlementAuthority::Dispatch { owner_id, fence } => {
+                if attempt.get::<Option<Uuid>, _>("dispatch_owner_id") != Some(*owner_id)
+                    || attempt.get::<Option<Uuid>, _>("dispatch_fence") != Some(*fence)
+                {
+                    return Err(HubError::PreconditionFailed);
+                }
+                if snapshot.get("adapter_revision").and_then(|v| v.as_str())
+                    != Some(fact.source.as_str())
+                {
+                    return Err(HubError::Forbidden);
+                }
+                false
+            }
+            SettlementAuthority::BeforeDispatchCancellation { cancellation } => {
+                if cancellation.client_id != context.get::<Uuid, _>("client_id")
+                    || cancellation.principal_id != context.get::<String, _>("principal_id")
+                {
+                    return Err(HubError::Forbidden);
+                }
+                if !request.get::<bool, _>("cancel_requested")
+                    || !matches!(
+                        request.get::<String, _>("state").as_str(),
+                        "admitted" | "cancelled"
+                    )
+                    || !matches!(
+                        attempt.get::<String, _>("state").as_str(),
+                        "intended" | "cancelled"
+                    )
+                    || attempt.get::<String, _>("accepted") != "not_accepted"
+                    || attempt.get::<Option<Uuid>, _>("dispatch_fence").is_some()
+                    || attempt
+                        .get::<Option<chrono::DateTime<chrono::Utc>>, _>("dispatched_at")
+                        .is_some()
+                    || fact.acceptance != Acceptance::NotAccepted
+                    || fact.terminal != TerminalState::Cancelled
+                    || fact.usage.is_some()
+                    || fact.receipt.is_some()
+                    || result.is_some()
+                    || fact.source != "hub-cancel-before-dispatch"
+                    || fact.source_event_id != fact.attempt_id.to_string()
+                {
+                    return Err(HubError::PreconditionFailed);
+                }
+                true
+            }
+        };
         // Provider event IDs are scoped to the exact account, not a display name or adapter alone.
-        let source_key = format!(
-            "{}:{}",
-            fact.source,
-            attempt.get::<Uuid, _>("connection_id")
-        );
+        let source_key = if before_dispatch {
+            format!("hub-cancel-before-dispatch:{}", self.installation_id)
+        } else {
+            format!(
+                "{}:{}",
+                fact.source,
+                attempt.get::<Uuid, _>("connection_id")
+            )
+        };
         if source_key.len() > 256 {
             return Err(HubError::Invalid("settlement source"));
         }
@@ -131,14 +176,17 @@ impl PgStore {
                 duplicate: true,
             });
         }
-        if fact.acceptance != Acceptance::Unknown
+        if !before_dispatch
+            && fact.acceptance != Acceptance::Unknown
             && fact.receipt.is_none()
             && !attempt.get::<bool, _>("lease_valid")
         {
             return Err(HubError::PreconditionFailed);
         }
         let currency: String = attempt.get("currency");
-        let (cost, confidence) = if fact.acceptance == Acceptance::Unknown {
+        let (cost, confidence) = if before_dispatch {
+            (Some(Amount::from_units(0)?), "confirmed")
+        } else if fact.acceptance == Acceptance::Unknown {
             (None, "unknown")
         } else if let Some(receipt) = &fact.receipt {
             if snapshot

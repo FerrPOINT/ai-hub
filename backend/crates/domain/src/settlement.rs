@@ -30,10 +30,21 @@ pub struct ProviderCharge {
 
 /// Internal terminal/reconciliation fact. Unknown acceptance keeps its reserve.
 #[derive(Debug, Clone, Serialize)]
+#[serde(untagged)]
+pub enum SettlementAuthority {
+    Dispatch {
+        owner_id: Uuid,
+        fence: Uuid,
+    },
+    BeforeDispatchCancellation {
+        cancellation: crate::admission::RequestOwner,
+    },
+}
+#[derive(Debug, Clone, Serialize)]
 pub struct SettlementFact {
     pub attempt_id: Uuid,
-    pub owner_id: Uuid,
-    pub fence: Uuid,
+    #[serde(flatten)]
+    pub authority: SettlementAuthority,
     pub source: String,
     pub source_event_id: String,
     pub acceptance: Acceptance,

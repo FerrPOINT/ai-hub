@@ -1,7 +1,7 @@
 use aihub_application::{FinancialAdmission, FoundationStore, ResultDelivery};
 use aihub_domain::replay::{ReplayOutcome, ReplayProtocol, ResultPayload, ResultReader};
 use aihub_domain::{
-    admission::{AdmissionIntent, Purpose, PurposeBounds},
+    admission::{AdmissionIntent, Purpose, PurposeBounds, RequestOwner},
     error::HubError,
     financial::{Amount, Currency, Usage},
 };
@@ -15,6 +15,15 @@ async fn fixture_intent(
     connection: Uuid,
     price: Uuid,
     qualification: Uuid,
+) -> AdmissionIntent {
+    fixture_intent_ttl(store, connection, price, qualification, 120).await
+}
+async fn fixture_intent_ttl(
+    store: &PgStore,
+    connection: Uuid,
+    price: Uuid,
+    qualification: Uuid,
+    intent_ttl_seconds: i32,
 ) -> AdmissionIntent {
     let client = Uuid::new_v4();
     let grant = Uuid::new_v4();
@@ -38,9 +47,10 @@ async fn fixture_intent(
         .bind(grant).bind(store.installation_id).bind(client).bind(serde_json::to_value(bounds).unwrap()).execute(&store.pool).await.unwrap();
     sqlx::query("INSERT INTO operations(id,installation_id,principal_kind,principal_id,idempotency_key,binding_hmac,action,state,expires_at) VALUES($1,$2,'internal','fixture-worker',$1,$3,'verify','pending',now()+interval '30 days')").bind(op).bind(store.installation_id).bind(vec![7_u8;32]).execute(&store.pool).await.unwrap();
     let usage = Usage::normalized(100, 0, 50, "qualified-synthetic-fixture".into()).unwrap();
-    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":price,"qualification_id":qualification,"upper_usage":usage,"protocol":"chat_completions","streaming":false});
+    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":price,"qualification_id":qualification,"upper_usage":usage,"protocol":"chat_completions","streaming":false,"intent_ttl_seconds":intent_ttl_seconds});
     sqlx::query("INSERT INTO probe_snapshots(id,installation_id,operation_id,scope,config_hash,configuration) VALUES($1,$2,$3,'connection_model',$4,$5)").bind(probe).bind(store.installation_id).bind(op).bind("1".repeat(64)).bind(serde_json::json!({"targets":[target]})).execute(&store.pool).await.unwrap();
     AdmissionIntent {
+        intent_ttl_seconds,
         protocol: aihub_domain::replay::ReplayProtocol::ChatCompletions,
         streaming: false,
         client_id: client,
@@ -123,7 +133,7 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         price_revision_id: None,
         ..fixture_intent(&store, connection, price, qualification).await
     };
-    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":null,"qualification_id":qualification,"upper_usage":no_price.upper_usage,"protocol":no_price.protocol,"streaming":no_price.streaming});
+    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":null,"qualification_id":qualification,"upper_usage":no_price.upper_usage,"protocol":no_price.protocol,"streaming":no_price.streaming,"intent_ttl_seconds":no_price.intent_ttl_seconds});
     let no_price_probe = Uuid::new_v4();
     sqlx::query("INSERT INTO probe_snapshots(id,installation_id,operation_id,scope,config_hash,configuration) SELECT $1,installation_id,operation_id,scope,config_hash,$2 FROM probe_snapshots WHERE id=$3")
         .bind(no_price_probe).bind(serde_json::json!({"targets":[target]})).bind(no_price.probe_snapshot_id).execute(&store.pool).await.unwrap();
@@ -307,12 +317,14 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
     assert_eq!(held, "held");
     use aihub_domain::{
         financial::Acceptance,
-        settlement::{ProviderCharge, SettlementFact, TerminalState},
+        settlement::{ProviderCharge, SettlementAuthority, SettlementFact, TerminalState},
     };
     let pending = SettlementFact {
         attempt_id: claim.attempt_id,
-        owner_id: claim.owner_id,
-        fence: claim.fence,
+        authority: SettlementAuthority::Dispatch {
+            owner_id: claim.owner_id,
+            fence: claim.fence,
+        },
         source: "synthetic-v1".into(),
         source_event_id: "pending-event".into(),
         acceptance: Acceptance::Unknown,
@@ -471,8 +483,10 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         .unwrap();
     let estimated_fact = SettlementFact {
         attempt_id: estimate_claim.attempt_id,
-        owner_id: estimate_claim.owner_id,
-        fence: estimate_claim.fence,
+        authority: SettlementAuthority::Dispatch {
+            owner_id: estimate_claim.owner_id,
+            fence: estimate_claim.fence,
+        },
         source: "synthetic-v1".into(),
         source_event_id: "estimate-event".into(),
         acceptance: Acceptance::Accepted,
@@ -673,6 +687,214 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
             .execute(&store.pool)
             .await
             .is_err()
+    );
+    // Owned cancellation before a claim releases only its reserve, even with a nonzero request fee.
+    sqlx::query("UPDATE budget_policies SET hard_limit=0.10 WHERE id=$1")
+        .bind(budget)
+        .execute(&store.pool)
+        .await
+        .unwrap();
+    let fee_price = Uuid::new_v4();
+    sqlx::query("INSERT INTO price_revisions(id,installation_id,connection_id,model_id,tier,currency,input_uncached,input_cached,output_billable,request_fee,effective_from,source) VALUES($1,$2,$3,'model-a','metered','USD',2,0.5,8,0.03,now()-interval '1 minute','synthetic-fixed-fee')").bind(fee_price).bind(installation).bind(connection).execute(&store.pool).await.unwrap();
+    let unsent = fixture_intent(&store, connection, fee_price, qualification).await;
+    let unsent_admission = store.reserve(&unsent).await.unwrap();
+    let unsent_owner = RequestOwner {
+        client_id: unsent.client_id,
+        principal_id: unsent.principal_id.clone(),
+    };
+    assert!(matches!(
+        store
+            .cancel_owned(
+                &RequestOwner {
+                    client_id: winner.client_id,
+                    principal_id: winner.principal_id.clone()
+                },
+                unsent_admission.request_id
+            )
+            .await,
+        Err(HubError::NotFound)
+    ));
+    sqlx::raw_sql("CREATE FUNCTION reject_cancel_fixture_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='request.settle' THEN RAISE EXCEPTION 'fixture final cancel audit unavailable'; END IF; RETURN NEW; END; $$; CREATE TRIGGER reject_cancel_fixture_audit BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION reject_cancel_fixture_audit();").execute(&store.pool).await.unwrap();
+    assert!(
+        store
+            .cancel_owned(&unsent_owner, unsent_admission.request_id)
+            .await
+            .is_err()
+    );
+    let pending_cancel:(String,bool,String)=sqlx::query_as("SELECT r.state,r.cancel_requested,s.state FROM requests r JOIN attempts a ON a.request_id=r.id JOIN reservations s ON s.attempt_id=a.id WHERE r.id=$1").bind(unsent_admission.request_id).fetch_one(&store.pool).await.unwrap();
+    assert_eq!(pending_cancel, ("admitted".into(), true, "held".into()));
+    assert!(matches!(
+        store
+            .claim_dispatch(unsent_admission.attempt_id, Uuid::new_v4(), 120)
+            .await,
+        Err(HubError::PreconditionFailed)
+    ));
+    sqlx::raw_sql("DROP TRIGGER reject_cancel_fixture_audit ON audit_events; DROP FUNCTION reject_cancel_fixture_audit();").execute(&store.pool).await.unwrap();
+    sqlx::query("UPDATE grants SET revoked_at=now() WHERE id=$1")
+        .bind(unsent.grant_id)
+        .execute(&store.pool)
+        .await
+        .unwrap();
+    let (cancel_a, cancel_b) = tokio::join!(
+        store.cancel_owned(&unsent_owner, unsent_admission.request_id),
+        second_store.cancel_owned(&unsent_owner, unsent_admission.request_id)
+    );
+    assert_eq!(cancel_a.unwrap().state, "cancelled");
+    assert_eq!(cancel_b.unwrap().state, "cancelled");
+    let cancel_expense: (String, String) =
+        sqlx::query_as("SELECT amount::text,confidence FROM attempt_expenses WHERE attempt_id=$1")
+            .bind(unsent_admission.attempt_id)
+            .fetch_one(&store.pool)
+            .await
+            .unwrap();
+    assert_eq!(
+        cancel_expense,
+        ("0.000000000000000000".into(), "confirmed".into())
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>(
+            "SELECT count(*) FROM ledger_entries WHERE attempt_id=$1 AND kind='release'"
+        )
+        .bind(unsent_admission.attempt_id)
+        .fetch_one(&store.pool)
+        .await
+        .unwrap(),
+        1
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, String>(
+            "SELECT reserved::text FROM grant_accounts WHERE grant_id=$1"
+        )
+        .bind(unsent.grant_id)
+        .fetch_one(&store.pool)
+        .await
+        .unwrap(),
+        "0.000000000000000000"
+    );
+    assert!(
+        sqlx::query_scalar::<_, Option<Uuid>>("SELECT dispatch_fence FROM attempts WHERE id=$1")
+            .bind(unsent_admission.attempt_id)
+            .fetch_one(&store.pool)
+            .await
+            .unwrap()
+            .is_none()
+    );
+    // Dispatch has already committed: cancellation is an intent, not a billing witness.
+    let sent = fixture_intent(&store, connection, price, qualification).await;
+    let sent_admission = store.reserve(&sent).await.unwrap();
+    let sent_owner = RequestOwner {
+        client_id: sent.client_id,
+        principal_id: sent.principal_id.clone(),
+    };
+    let sent_claim = store
+        .claim_dispatch(sent_admission.attempt_id, Uuid::new_v4(), 120)
+        .await
+        .unwrap();
+    let after_claim = store
+        .cancel_owned(&sent_owner, sent_admission.request_id)
+        .await
+        .unwrap();
+    assert_eq!(after_claim.state, "dispatching");
+    assert!(after_claim.cancel_requested);
+    let forged_no_send = SettlementFact {
+        attempt_id: sent_admission.attempt_id,
+        authority: SettlementAuthority::BeforeDispatchCancellation {
+            cancellation: sent_owner.clone(),
+        },
+        source: "hub-cancel-before-dispatch".into(),
+        source_event_id: sent_admission.attempt_id.to_string(),
+        acceptance: Acceptance::NotAccepted,
+        terminal: TerminalState::Cancelled,
+        usage: None,
+        receipt: None,
+    };
+    assert!(matches!(
+        store.settle(&forged_no_send).await,
+        Err(HubError::PreconditionFailed)
+    ));
+    store.record_uncertain(&sent_claim).await.unwrap();
+    assert_eq!(
+        store
+            .cancel_owned(&sent_owner, sent_admission.request_id)
+            .await
+            .unwrap()
+            .state,
+        "unknown"
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, String>("SELECT state FROM reservations WHERE attempt_id=$1")
+            .bind(sent_admission.attempt_id)
+            .fetch_one(&store.pool)
+            .await
+            .unwrap(),
+        "held"
+    );
+    // The request row serializes a real cancel/claim race across two stores.
+    let racing = fixture_intent(&store, connection, price, qualification).await;
+    let racing_admission = store.reserve(&racing).await.unwrap();
+    let racing_owner = RequestOwner {
+        client_id: racing.client_id,
+        principal_id: racing.principal_id.clone(),
+    };
+    let (race_cancel, race_claim) = tokio::join!(
+        store.cancel_owned(&racing_owner, racing_admission.request_id),
+        second_store.claim_dispatch(racing_admission.attempt_id, Uuid::new_v4(), 120)
+    );
+    let race_cancel = race_cancel.unwrap();
+    if race_claim.is_ok() {
+        assert_eq!(race_cancel.state, "dispatching");
+    } else {
+        assert!(matches!(race_claim, Err(HubError::PreconditionFailed)));
+        assert_eq!(race_cancel.state, "cancelled");
+    }
+    // Expired unclaimed intent is fenced and held; a still-live neighbor is not recovered.
+    let stale_intent = fixture_intent_ttl(&store, connection, price, qualification, 5).await;
+    let stale_admission = store.reserve(&stale_intent).await.unwrap();
+    let live_intent = fixture_intent(&store, connection, price, qualification).await;
+    let live_admission = store.reserve(&live_intent).await.unwrap();
+    assert_eq!(store.recover_expired_intents().await.unwrap(), 0);
+    assert!(
+        sqlx::query("UPDATE requests SET intent_deadline=now()+interval '1 hour' WHERE id=$1")
+            .bind(stale_admission.request_id)
+            .execute(&store.pool)
+            .await
+            .is_err()
+    );
+    sqlx::query("SELECT pg_sleep(5.1)")
+        .execute(&store.pool)
+        .await
+        .unwrap();
+    assert!(matches!(
+        store
+            .claim_dispatch(stale_admission.attempt_id, Uuid::new_v4(), 120)
+            .await,
+        Err(HubError::PreconditionFailed)
+    ));
+    assert_eq!(store.recover_expired_intents().await.unwrap(), 1);
+    assert_eq!(second_store.recover_expired_intents().await.unwrap(), 0);
+    assert_eq!(store.reserve(&stale_intent).await.unwrap().state, "unknown");
+    assert_eq!(store.reserve(&live_intent).await.unwrap().state, "admitted");
+    assert_eq!(
+        store.reserve(&live_intent).await.unwrap().request_id,
+        live_admission.request_id
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, String>("SELECT state FROM reservations WHERE attempt_id=$1")
+            .bind(stale_admission.attempt_id)
+            .fetch_one(&store.pool)
+            .await
+            .unwrap(),
+        "held"
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>(
+            "SELECT count(*) FROM ledger_entries WHERE attempt_id=$1 AND kind='release'"
+        )
+        .bind(stale_admission.attempt_id)
+        .fetch_one(&store.pool)
+        .await
+        .unwrap(),
+        0
     );
     assert!(
         sqlx::query("UPDATE ledger_entries SET amount=0")

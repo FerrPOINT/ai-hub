@@ -32,7 +32,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | Этап | Фактический статус | Следующий результат |
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
-| S2a | В реализации: financial SQL, control prices/budgets, basic budget UI и protected result buffer | Price/source forms, cancel и unclaimed intent recovery |
+| S2a | В реализации: financial SQL, control prices/budgets, basic budget UI, protected result buffer и cancel/recovery ports | Price/source forms, pricing-source timeline и runtime lifecycle worker |
 | S2b | Не реализован | Connection/catalog/draft/CAS/proof/publication UI/API |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
@@ -151,8 +151,7 @@ requests/attempts/usage/replay, immutable ledger и budget/reservation табл�
 effective expense pointer; `0008` — frozen wire mode и encrypted result receipts.
 Application financial port реализован для internal
 verification; provider transport ещё не подключён. Price forms,
-pricing-source timeline, cancel-before-dispatch и
-recovery unclaimed intent ещё впереди. Public/evaluation admission выключен до
+pricing-source timeline и runtime lifecycle worker ещё впереди. Public/evaluation admission выключен до
 S3/S6. FK profile revision присоединяется S2b до public inference.
 
 ## Protected results — текущий срез
@@ -180,3 +179,29 @@ expiry/purge и запрет resurrection. Provider accounts/body синтети
 
 Полные TC остаются `not_run`, когда исполнена только часть oracle. Partial mapping
 и источник каждого результата — [implementation-evidence.json](implementation-evidence.json).
+
+## Cancellation и unclaimed intent — текущий срез
+
+Internal owned cancellation сохраняет durable cancel intent с audit до terminal
+settlement. Новые claims заблокированы сразу. Если финальный accounting/audit
+недоступен, reserve остаётся held и retry продолжает исходную отмену.
+До единственного verification dispatch common settlement engine подтверждает
+zero expense по отдельному local no-send authority, без поддельного claim или
+provider usage. Даже ненулевой frozen request fee не начисляется до I/O.
+После dispatch/unknown отмена остаётся intent; она не доказывает отсутствие bill.
+
+`0009_intent_lifecycle` фиксирует queue TTL 5–120s, ограниченный также сроком grant.
+Deadline и TTL immutable; истёкший/legacy intent не получает новый send claim.
+Bounded recovery переводит истёкшие unclaimed intents в unknown с held reserve,
+без redispatch. Live neighbor не затрагивается. Producer authority остаётся
+verified internal context; public/signed cancel endpoint и scheduler — S3.
+Multi-attempt fallback cancellation/aggregation также квалифицируется в S3.
+
+Fresh PostgreSQL17 financial fixture после `0009`: 1 scenario pass, 0 ignored,
+13.46s. Проверены fixed-fee no-send cancellation, wrong client, durable intent
+при final settlement audit failure, запрет claim, retry после grant revoke,
+concurrent cancellation без double release, after-dispatch hold, forged no-send
+rejection, cancel/claim race, immutable deadline, expiry/no redispatch и untouched
+live neighbor с прежним request ID. Прежние settlement/replay assertions сохранены.
+`cargo check --locked -p aihub-api --tests` pass. Actual process crash, transport
+cancel, public authentication и runtime scheduler остаются `not_run`.

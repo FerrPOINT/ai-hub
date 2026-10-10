@@ -45,6 +45,12 @@ pub trait FinancialAdmission: Send + Sync {
         claim: &aihub_domain::admission::DispatchClaim,
     ) -> Result<(), HubError>;
     async fn recover_expired_dispatches(&self) -> Result<u64, HubError>;
+    async fn recover_expired_intents(&self) -> Result<u64, HubError>;
+    async fn cancel_owned(
+        &self,
+        owner: &aihub_domain::admission::RequestOwner,
+        request_id: Uuid,
+    ) -> Result<aihub_domain::admission::CancellationReceipt, HubError>;
     async fn settle(
         &self,
         fact: &aihub_domain::settlement::SettlementFact,

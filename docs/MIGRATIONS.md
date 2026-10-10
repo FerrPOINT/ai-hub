@@ -16,7 +16,7 @@ Production admission выключен до successful explicit migrate/readiness
 new state → switch; downgrade только если старый binary умеет читать актуальную schema.
 Rollback binary не откатывает facts и не освобождает unknown reserves.
 Миграция с irreversible data transformation требует own backup/restore rehearsal.
-Actual migrations `0001`–`0008` применились на own disposable PostgreSQL17;
+Actual migrations `0001`–`0009` применились на own disposable PostgreSQL17;
 foundation и financial evidence отражены в IMPLEMENTATION_STATUS. Все новые
 миграции квалифицировались только на disposable fixture, не на installed PDLC DB.
 Upgrade/nonempty restore остаются S7 gates; их PASS не выводится из fresh install.
@@ -30,3 +30,7 @@ policy IDs/балансы и запрещает изменение identity. Cal
 enforce новые writes через `NOT VALID`, а старый content без qualified receipt не
 выдаётся новым reader. Bounded TTL purge сохраняет финансовые facts и receipt
 dedupe. Nonempty upgrade/constraint validation остаются отдельным S7 gate.
+
+`0009` вводит immutable bounded queue deadline новых intents. Старый deadline
+не угадывается: legacy unclaimed state допускает uncertainty recovery, но не
+новый dispatch claim. Это не terminal no-billing witness и не release reserve.
