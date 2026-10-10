@@ -27,6 +27,7 @@ unknown hold/restart, atomic receipts/corrections и protected encrypted result 
 Добавлены owned cancel и expired unclaimed recovery ports; maintenance worker подключён к serve.
 Pricing-source control/CAS/resolver и mandatory financial source guard проверены
 на isolated SQL fixtures; forms и served runtime/provider evidence ещё pending.
+Начат S2b connection metadata control/operator allowlist; secret и catalog paths ещё pending.
 Control prices/budgets API
 и basic budget UI реализованы; price forms и live provider path ещё впереди.
 [Partial evidence](implementation-evidence.json)

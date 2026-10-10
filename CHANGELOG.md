@@ -28,6 +28,8 @@
   future policy инвалидирует queued proof, late settlement сохраняет прежнюю цену.
 - Serve maintenance worker: durable cancel/recovery, encrypted response и snapshot
   TTL, bounded timer loop и shutdown; provider transport не подключён к worker.
+- Connection list/read/create/update, operator endpoint policy, keyed operation/CAS;
+  rename сохраняет authorization, material settings создают непроверенную generation.
 
 ### Повторная проверка 2026-10-10
 

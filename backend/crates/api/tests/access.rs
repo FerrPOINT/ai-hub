@@ -423,3 +423,65 @@ async fn source_control_requires_write_scope_key_and_explicit_nullable_fields() 
         StatusCode::BAD_REQUEST
     );
 }
+
+#[tokio::test]
+async fn connection_control_cannot_accept_a_raw_url_secret_or_wrong_pat_scope() {
+    let (app, _) = fixture();
+    let input = serde_json::json!({"display_name":"connection","endpoint_policy_ref":"openrouter-api-v1","billing_mode":"metered"});
+    for (token, body, expected) in [
+        ("read", input.clone(), StatusCode::FORBIDDEN),
+        ("foreign", input.clone(), StatusCode::FORBIDDEN),
+        (
+            "write",
+            {
+                let mut p = input.clone();
+                p["endpoint_policy_ref"] = serde_json::json!("https://arbitrary.test/");
+                p
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            {
+                let mut p = input.clone();
+                p["secret"] = serde_json::json!("synthetic-secret-canary");
+                p
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+        ("write", input.clone(), StatusCode::SERVICE_UNAVAILABLE),
+    ] {
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/providers/openai_compatible/connections")
+                    .header("authorization", format!("Bearer {token}"))
+                    .header("idempotency-key", Uuid::new_v4().to_string())
+                    .header("content-type", "application/json")
+                    .body(Body::from(serde_json::to_vec(&body).unwrap()))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), expected);
+        let bytes = axum::body::to_bytes(response.into_body(), 65536)
+            .await
+            .unwrap();
+        assert!(!String::from_utf8_lossy(&bytes).contains("synthetic-secret-canary"));
+    }
+    assert_eq!(
+        status(&app, "/api/v1/connections?namespace_id=bad", Some("read")).await,
+        StatusCode::BAD_REQUEST
+    );
+    assert_eq!(
+        status(
+            &app,
+            "/api/v1/connections/00000000-0000-0000-0000-000000000000",
+            Some("read")
+        )
+        .await,
+        StatusCode::BAD_REQUEST
+    );
+}

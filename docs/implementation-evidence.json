@@ -114,6 +114,12 @@
       "source": "backend/crates/infrastructure/tests/financial_pg.rs",
       "evidence": "postgresql17_maintenance_partial_failure_owned_cancel_timer_retention_and_watch_shutdown_pass_20261010",
       "remaining": "actual Docker signal/HTTP drain; process kill/restart; provider execution worker; live runtime and full TC oracle"
+    },
+    {
+      "tests": ["TC-001", "TC-018", "TC-027"],
+      "source": "backend/crates/infrastructure/tests/connection_pg.rs",
+      "evidence": "postgresql17_connection_allowlist_identity_cas_generation_rename_and_audit_rollback_pass_20261010",
+      "remaining": "write-only credentials/managed auth; catalog and model context; disable/archive/proof; UI and actual owner/provider qualification"
     }
   ],
   "required_acceptance": {

@@ -140,6 +140,31 @@ impl PgStore {
 
 #[async_trait]
 impl FoundationStore for PgStore {
+    async fn connection_page(
+        &self,
+        subject: &str,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::connections::Connection>, HubError> {
+        PgStore::connection_page(self, subject, limit, cursor).await
+    }
+    async fn read_connection(
+        &self,
+        id: Uuid,
+    ) -> Result<aihub_domain::connections::Connection, HubError> {
+        PgStore::read_connection(self, id).await
+    }
+    async fn save_connection(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        kind: aihub_domain::connections::ProviderKind,
+        update: Option<(Uuid, i64)>,
+        input: &aihub_domain::connections::ConnectionInput,
+    ) -> Result<aihub_domain::connections::ConnectionMutation, HubError> {
+        PgStore::save_connection(self, subject, key, binding, kind, update, input).await
+    }
     async fn pricing_source_page(
         &self,
         subject: &str,

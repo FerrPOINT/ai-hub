@@ -3,6 +3,7 @@ use aihub_domain::{
     NamespaceRef,
     access::{HumanPrincipal, namespace_filter},
     budgets::{Budget, BudgetInput, BudgetPeriod, BudgetScope},
+    connections::{BillingMode, Connection, ConnectionInput, ProviderKind},
     error::HubError,
     prices::{PriceInput, PriceRevision, PriceUnit},
     pricing_sources::{PricingDataStatus, PricingMode, PricingSourceInput, PricingSourceRevision},
@@ -123,6 +124,92 @@ pub struct PricePage {
 pub struct PricingSourcePage {
     pub items: Vec<PricingSourceRevision>,
     pub next_cursor: Option<String>,
+}
+#[derive(Serialize, ToSchema)]
+pub struct ConnectionPage {
+    pub items: Vec<Connection>,
+    pub next_cursor: Option<String>,
+}
+#[utoipa::path(get,path="/api/v1/connections",operation_id="listConnections",security(("CentralAuth"=[])),params(("limit"=Option<i64>,Query,minimum=1,maximum=100),("cursor"=Option<Uuid>,Query)),responses((status=200,body=ConnectionPage),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=503,body=Error)))]
+pub async fn connections(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    RawQuery(query): RawQuery,
+) -> Result<Json<ConnectionPage>, ApiError> {
+    let (limit, cursor) = list_options(query.as_deref().unwrap_or(""), false)?;
+    let page = state
+        .foundation
+        .connections(&principal, limit, cursor)
+        .await?;
+    Ok(Json(ConnectionPage {
+        items: page.items,
+        next_cursor: page.next_cursor,
+    }))
+}
+#[utoipa::path(get,path="/api/v1/connections/{connection_id}",operation_id="readConnection",security(("CentralAuth"=[])),params(("connection_id"=Uuid,Path)),responses((status=200,body=Connection),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=503,body=Error)))]
+pub async fn read_connection(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(id): Path<String>,
+) -> Result<([(String, String); 1], Json<Connection>), ApiError> {
+    let id = Uuid::parse_str(&id).map_err(|_| HubError::Invalid("connection ID"))?;
+    let value = state.foundation.connection(&principal, id).await?;
+    Ok((
+        [("etag".into(), format!("\"{}\"", value.version))],
+        Json(value),
+    ))
+}
+type ConnectionResponse = (StatusCode, [(String, String); 2], Json<Connection>);
+fn connection_response(
+    result: aihub_domain::connections::ConnectionMutation,
+) -> ConnectionResponse {
+    (
+        StatusCode::CREATED,
+        [
+            ("etag".into(), format!("\"{}\"", result.value.version)),
+            ("x-operation-id".into(), result.operation_id.to_string()),
+        ],
+        Json(result.value),
+    )
+}
+#[utoipa::path(post,path="/api/v1/providers/{provider}/connections",operation_id="createConnection",security(("CentralAuth"=[])),params(("provider"=String,Path),("Idempotency-Key"=Uuid,Header)),request_body=ConnectionInput,responses((status=201,body=Connection),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=409,body=Error),(status=422,body=Error),(status=503,body=Error)))]
+pub async fn create_connection(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(provider): Path<String>,
+    headers: HeaderMap,
+    body: Result<Json<ConnectionInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<ConnectionResponse, ApiError> {
+    principal.require_config(true)?;
+    let key = mutation_key(&headers)?;
+    let kind = ProviderKind::parse(&provider)?;
+    let input = body.map_err(|_| HubError::Invalid("connection payload"))?.0;
+    Ok(connection_response(
+        state
+            .foundation
+            .save_connection(&principal, key, kind, None, &input)
+            .await?,
+    ))
+}
+#[utoipa::path(patch,path="/api/v1/connections/{connection_id}",operation_id="updateConnection",security(("CentralAuth"=[])),params(("connection_id"=Uuid,Path),("Idempotency-Key"=Uuid,Header),("If-Match"=String,Header)),request_body=ConnectionInput,responses((status=201,body=Connection),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=409,body=Error),(status=412,body=Error),(status=422,body=Error),(status=503,body=Error)))]
+pub async fn update_connection(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(id): Path<String>,
+    headers: HeaderMap,
+    body: Result<Json<ConnectionInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<ConnectionResponse, ApiError> {
+    principal.require_config(true)?;
+    let key = mutation_key(&headers)?;
+    let version = budget_version(&headers)?;
+    let id = Uuid::parse_str(&id).map_err(|_| HubError::Invalid("connection ID"))?;
+    let input = body.map_err(|_| HubError::Invalid("connection payload"))?.0;
+    Ok(connection_response(
+        state
+            .foundation
+            .update_connection(&principal, key, id, version, &input)
+            .await?,
+    ))
 }
 #[utoipa::path(get,path="/api/v1/pricing-sources",operation_id="listPricingSources",security(("CentralAuth"=[])),params(("limit"=Option<i64>,Query,minimum=1,maximum=100),("cursor"=Option<Uuid>,Query)),responses((status=200,body=PricingSourcePage),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=503,body=Error)))]
 pub async fn pricing_sources(
@@ -551,7 +638,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -589,6 +676,15 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
         .route("/api/v1/namespaces", get(namespaces))
         .route("/api/v1/audit", get(audit))
         .route("/api/v1/prices", get(prices).post(create_price))
+        .route("/api/v1/connections", get(connections))
+        .route(
+            "/api/v1/connections/{connection_id}",
+            get(read_connection).patch(update_connection),
+        )
+        .route(
+            "/api/v1/providers/{provider}/connections",
+            axum::routing::post(create_connection),
+        )
         .route(
             "/api/v1/pricing-sources",
             get(pricing_sources).post(create_pricing_source),

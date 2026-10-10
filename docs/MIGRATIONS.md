@@ -16,7 +16,7 @@ Production admission выключен до successful explicit migrate/readiness
 new state → switch; downgrade только если старый binary умеет читать актуальную schema.
 Rollback binary не откатывает facts и не освобождает unknown reserves.
 Миграция с irreversible data transformation требует own backup/restore rehearsal.
-Actual migrations `0001`–`0011` применились на own disposable PostgreSQL17;
+Actual migrations `0001`–`0012` применились на own disposable PostgreSQL17;
 foundation и financial evidence отражены в IMPLEMENTATION_STATUS. Все новые
 миграции квалифицировались только на disposable fixture, не на installed PDLC DB.
 Upgrade/nonempty restore остаются S7 gates; их PASS не выводится из fresh install.
@@ -44,3 +44,8 @@ fixture не означает квалифицированную nonempty migrat
 `0011` фиксирует source revision и policy version с own FK/immutable trigger.
 Legacy missing version не backfill-ится выдуманным current state; новый dispatch
 требует qualified source snapshot. Existing settlement history не переписывается.
+
+`0012` создаёт own immutable endpoint allowlist и generation endpoint snapshot.
+Legacy endpoint bytes не угадываются; миграция не подключает credentials или
+HTTP transport. Label-only updates не меняют generation; material settings дают
+новую непроверенную generation. Existing history остаётся immutable.

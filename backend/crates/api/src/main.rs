@@ -44,10 +44,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             store.initialize(&stable_key).await?;
             return Ok(());
         }
+        "configure-endpoints" => {
+            store.ready().await?;
+            let path = std::path::PathBuf::from(
+                std::env::var("AIHUB_ENDPOINT_POLICIES_FILE")
+                    .map_err(|_| "AIHUB_ENDPOINT_POLICIES_FILE required")?,
+            );
+            if !path.is_absolute() || !path.is_file() || path.metadata()?.len() > 65536 {
+                return Err("absolute bounded endpoint policy file required".into());
+            }
+            let policies: Vec<aihub_domain::connections::EndpointPolicyInput> =
+                serde_json::from_slice(&std::fs::read(path)?)?;
+            store.configure_endpoints(&policies).await?;
+            return Ok(());
+        }
         "serve" => (),
         _ => {
             return Err(
-                "unknown command; expected serve, migrate, initialize, export-openapi".into(),
+                "unknown command; expected serve, migrate, initialize, configure-endpoints, export-openapi".into(),
             );
         }
     }

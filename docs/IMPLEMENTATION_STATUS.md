@@ -33,7 +33,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
 | S2a | В реализации: financial SQL/source guard, control API, basic budget UI, protected results и wired maintenance worker | Price/source forms и milestone runtime/provider evidence |
-| S2b | Не реализован | Connection/catalog/draft/CAS/proof/publication UI/API |
+| S2b | Начат: connection metadata control и operator endpoint allowlist | Credential/catalog/context, draft/CAS/proof/publication UI/API |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
 | S5 | Не реализован | Полный operational UI и authorized snapshot/export |
@@ -271,3 +271,28 @@ live neighbor, реальный timer loop cleanup и завершение по 
 Прежние source/money/replay assertions сохранены. Locked API check pass.
 Docker signal, HTTP graceful drain, actual process crash/restart и installed-image
 provenance остаются S3/S7 runtime gates. External provider calls 0.
+
+## Connection metadata control — текущий срез
+
+Добавлены connection list/read/create/update. GET возвращает ETag, PATCH требует
+strong If-Match и full typed settings; mutation использует HMAC/keyed operation
+readback и atomic audit. Идентичность не выводится из display name. Label-only
+update сохраняет generation/authorization; endpoint или billing settings создают
+новую generation с absent authorization и invalidated qualification. Disabled
+state не включается настройками. Старые generation snapshots и credentials сохраняются.
+
+Endpoint policy устанавливает operator через `configure-endpoints` и bounded
+absolute `AIHUB_ENDPOINT_POLICIES_FILE`. Public input содержит только policy ref,
+не URL/headers/proxy. Policy bytes/hash immutable; изменение требует новой ref.
+Generation хранит endpoint snapshot. Sample OpenRouter origin проверен по
+[официальному API](https://openrouter.ai/docs/api/api-reference/chat/send-chat-completion-request).
+Sample — operator configuration, не native account/billing qualification.
+DNS/egress pinning при настоящем HTTP выполняется в adapter slice S4.
+
+Fresh PostgreSQL17 после `0012`: 1 scenario pass, 0 ignored, 0.54s. Проверены
+endpoint ref/provider matching, same-key create, stale/concurrent CAS, two same-name
+connections, rename without deauthorization, material generation change, pinned
+original readback, immutable old snapshot и final audit rollback. Six HTTP access
+tests pass; raw URL/secret fields rejected без secret echo. Credentials/quota
+отсутствуют, новый connection status authorization_unknown. Credential write/revoke,
+disable/enable/archive, model catalog и live verification ещё не реализованы.

@@ -2,6 +2,7 @@ pub mod auth;
 mod budget_control;
 mod cancellation;
 pub mod config;
+mod connection_control;
 mod control;
 pub mod financial;
 pub mod maintenance;

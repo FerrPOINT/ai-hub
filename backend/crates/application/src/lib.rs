@@ -64,6 +64,31 @@ pub trait CentralAuthentication: Send + Sync {
 
 #[async_trait]
 pub trait FoundationStore: Send + Sync {
+    async fn connection_page(
+        &self,
+        _subject: &str,
+        _limit: i64,
+        _cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::connections::Connection>, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn read_connection(
+        &self,
+        _id: Uuid,
+    ) -> Result<aihub_domain::connections::Connection, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn save_connection(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+        _kind: aihub_domain::connections::ProviderKind,
+        _update: Option<(Uuid, i64)>,
+        _input: &aihub_domain::connections::ConnectionInput,
+    ) -> Result<aihub_domain::connections::ConnectionMutation, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn pricing_source_page(
         &self,
         _subject: &str,
@@ -191,6 +216,62 @@ pub struct BudgetFilter {
 }
 
 impl Foundation {
+    pub async fn connections(
+        &self,
+        principal: &HumanPrincipal,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::connections::Connection>, HubError> {
+        principal.require_config(false)?;
+        self.store
+            .connection_page(&principal.subject, bounded_limit(limit)?, cursor)
+            .await
+    }
+    pub async fn connection(
+        &self,
+        principal: &HumanPrincipal,
+        id: Uuid,
+    ) -> Result<aihub_domain::connections::Connection, HubError> {
+        principal.require_config(false)?;
+        if id.is_nil() {
+            return Err(HubError::Invalid("connection ID"));
+        }
+        self.store.read_connection(id).await
+    }
+    pub async fn save_connection(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        kind: aihub_domain::connections::ProviderKind,
+        update: Option<(Uuid, i64)>,
+        input: &aihub_domain::connections::ConnectionInput,
+    ) -> Result<aihub_domain::connections::ConnectionMutation, HubError> {
+        principal.require_config(true)?;
+        input.validate()?;
+        if key.is_nil() || update.is_some_and(|(id, v)| id.is_nil() || v < 1) {
+            return Err(HubError::Invalid("connection operation"));
+        }
+        let binding=self.bindings.bind(&serde_json::json!({"installation_id":self.installation_id,"principal":principal.subject,"kind":kind,"update":update,"settings":input,"action":if update.is_some(){"connection.update"}else{"connection.create"}}))?;
+        self.store
+            .save_connection(&principal.subject, key, binding, kind, update, input)
+            .await
+    }
+    pub async fn update_connection(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        id: Uuid,
+        version: i64,
+        input: &aihub_domain::connections::ConnectionInput,
+    ) -> Result<aihub_domain::connections::ConnectionMutation, HubError> {
+        principal.require_config(true)?;
+        if id.is_nil() || key.is_nil() || version < 1 {
+            return Err(HubError::Invalid("connection operation"));
+        }
+        let kind = self.store.read_connection(id).await?.provider_kind;
+        self.save_connection(principal, key, kind, Some((id, version)), input)
+            .await
+    }
     pub async fn pricing_sources(
         &self,
         principal: &HumanPrincipal,

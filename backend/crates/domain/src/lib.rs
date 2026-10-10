@@ -1,6 +1,7 @@
 pub mod access;
 pub mod admission;
 pub mod budgets;
+pub mod connections;
 pub mod error;
 pub mod financial;
 pub mod prices;

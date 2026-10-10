@@ -1,0 +1,8 @@
+[
+  {
+    "policy_ref": "openrouter-api-v1",
+    "provider_kind": "openai_compatible",
+    "base_url": "https://openrouter.ai/api/v1/",
+    "allow_loopback": false
+  }
+]
