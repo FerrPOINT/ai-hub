@@ -1,6 +1,9 @@
 use aihub_api::{ApiDoc, AppState, router};
 use aihub_application::{Foundation, FoundationStore};
-use aihub_infrastructure::{auth::CentralAuth, config::Config, postgres::PgStore, vault::Vault};
+use aihub_infrastructure::{
+    auth::CentralAuth, config::Config, maintenance::MaintenanceWorker, postgres::PgStore,
+    vault::Vault,
+};
 use std::sync::Arc;
 use utoipa::OpenApi;
 
@@ -49,6 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     store.ready().await?;
+    let maintenance = MaintenanceWorker::new(store.clone(), vault.clone())?;
     let state = AppState {
         foundation: Foundation {
             installation_id: config.installation_id,
@@ -63,11 +67,43 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     let app = router(state, config.max_body_bytes);
     let listener = tokio::net::TcpListener::bind(config.listen).await?;
+    let (stop, receiver) = tokio::sync::watch::channel(false);
+    let mut worker = tokio::spawn(maintenance.run(
+        std::time::Duration::from_secs(config.maintenance_tick_seconds),
+        receiver,
+    ));
     tracing::info!(installation=%config.installation_id,"AI Hub listening");
-    axum::serve(listener, app)
-        .with_graceful_shutdown(async {
-            let _ = tokio::signal::ctrl_c().await;
+    let shutdown_stop = stop.clone();
+    let served = axum::serve(listener, app)
+        .with_graceful_shutdown(async move {
+            shutdown_signal().await;
+            let _ = shutdown_stop.send(true);
         })
-        .await?;
+        .await;
+    let _ = stop.send(true);
+    match tokio::time::timeout(std::time::Duration::from_secs(5), &mut worker).await {
+        Ok(Ok(Ok(()))) => (),
+        Ok(_) => tracing::warn!("AI Hub maintenance stopped with an error"),
+        Err(_) => {
+            worker.abort();
+            let _ = worker.await;
+            tracing::warn!("AI Hub maintenance shutdown timed out; database transactions dropped");
+        }
+    }
+    served?;
     Ok(())
+}
+
+async fn shutdown_signal() {
+    #[cfg(unix)]
+    {
+        let mut terminate =
+            tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+                .expect("SIGTERM handler");
+        tokio::select! {_=tokio::signal::ctrl_c()=>(),_=terminate.recv()=>()}
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = tokio::signal::ctrl_c().await;
+    }
 }

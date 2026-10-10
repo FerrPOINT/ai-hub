@@ -5,6 +5,7 @@ use aihub_domain::{
     error::HubError,
     financial::{Amount, Currency, Usage},
 };
+use aihub_infrastructure::maintenance::MaintenanceWorker;
 use aihub_infrastructure::{postgres::PgStore, replay::ProtectedResults, vault::Vault};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -771,6 +772,18 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
     );
     let pending_cancel:(String,bool,String)=sqlx::query_as("SELECT r.state,r.cancel_requested,s.state FROM requests r JOIN attempts a ON a.request_id=r.id JOIN reservations s ON s.attempt_id=a.id WHERE r.id=$1").bind(unsent_admission.request_id).fetch_one(&store.pool).await.unwrap();
     assert_eq!(pending_cancel, ("admitted".into(), true, "held".into()));
+    let maintenance = MaintenanceWorker::new(
+        Arc::new(
+            PgStore::connect(&dsn, installation, vault.fingerprint())
+                .await
+                .unwrap(),
+        ),
+        vault.clone(),
+    )
+    .unwrap();
+    let failed_cycle = maintenance.run_once().await.unwrap();
+    assert_eq!(failed_cycle.failed_tasks, 1);
+    assert_eq!(failed_cycle.cancellations, 0);
     assert!(matches!(
         store
             .claim_dispatch(unsent_admission.attempt_id, Uuid::new_v4(), 120)
@@ -784,10 +797,10 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         .await
         .unwrap();
     let (cancel_a, cancel_b) = tokio::join!(
-        store.cancel_owned(&unsent_owner, unsent_admission.request_id),
+        maintenance.run_once(),
         second_store.cancel_owned(&unsent_owner, unsent_admission.request_id)
     );
-    assert_eq!(cancel_a.unwrap().state, "cancelled");
+    assert_eq!(cancel_a.unwrap().failed_tasks, 0);
     assert_eq!(cancel_b.unwrap().state, "cancelled");
     let cancel_expense: (String, String) =
         sqlx::query_as("SELECT amount::text,confidence FROM attempt_expenses WHERE attempt_id=$1")
@@ -918,7 +931,7 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
             .await,
         Err(HubError::PreconditionFailed)
     ));
-    assert_eq!(store.recover_expired_intents().await.unwrap(), 1);
+    assert_eq!(maintenance.run_once().await.unwrap().expired_intents, 1);
     assert_eq!(second_store.recover_expired_intents().await.unwrap(), 0);
     assert_eq!(store.reserve(&stale_intent).await.unwrap().state, "unknown");
     assert_eq!(store.reserve(&live_intent).await.unwrap().state, "admitted");
@@ -1064,6 +1077,60 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         "0.000180000000000000",
         "late settlement uses frozen 2/8 rates, not replacement 20/80 rates"
     );
+    // Snapshot TTL cleanup removes opaque cursors through the own FK, without affecting live snapshots.
+    let expired_snapshot = Uuid::new_v4();
+    let live_snapshot = Uuid::new_v4();
+    let cursor = Uuid::new_v4();
+    sqlx::query("INSERT INTO read_snapshots(id,installation_id,subject,query_identity,items,created_at,expires_at) VALUES($1,$2,'fixture','expired','[]',now()-interval '16 minutes',now()-interval '1 minute'),($3,$2,'fixture','live','[]',now(),now()+interval '10 minutes')").bind(expired_snapshot).bind(installation).bind(live_snapshot).execute(&store.pool).await.unwrap();
+    sqlx::query("INSERT INTO read_cursors(id,snapshot_id,position) VALUES($1,$2,1)")
+        .bind(cursor)
+        .bind(expired_snapshot)
+        .execute(&store.pool)
+        .await
+        .unwrap();
+    assert_eq!(maintenance.run_once().await.unwrap().expired_snapshots, 1);
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM read_cursors WHERE id=$1")
+            .bind(cursor)
+            .fetch_one(&store.pool)
+            .await
+            .unwrap(),
+        0
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM read_snapshots WHERE id=$1")
+            .bind(live_snapshot)
+            .fetch_one(&store.pool)
+            .await
+            .unwrap(),
+        1
+    );
+    let (stop, receiver) = tokio::sync::watch::channel(false);
+    let scheduled_snapshot = Uuid::new_v4();
+    sqlx::query("INSERT INTO read_snapshots(id,installation_id,subject,query_identity,items,created_at,expires_at) VALUES($1,$2,'fixture','scheduled','[]',now()-interval '16 minutes',now()-interval '1 minute')").bind(scheduled_snapshot).bind(installation).execute(&store.pool).await.unwrap();
+    let task = tokio::spawn(maintenance.run(std::time::Duration::from_secs(1), receiver));
+    tokio::time::timeout(std::time::Duration::from_secs(3), async {
+        loop {
+            if sqlx::query_scalar::<_, i64>("SELECT count(*) FROM read_snapshots WHERE id=$1")
+                .bind(scheduled_snapshot)
+                .fetch_one(&store.pool)
+                .await
+                .unwrap()
+                == 0
+            {
+                break;
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+        }
+    })
+    .await
+    .unwrap();
+    stop.send(true).unwrap();
+    tokio::time::timeout(std::time::Duration::from_secs(2), task)
+        .await
+        .unwrap()
+        .unwrap()
+        .unwrap();
     assert!(
         sqlx::query("UPDATE ledger_entries SET amount=0")
             .execute(&store.pool)

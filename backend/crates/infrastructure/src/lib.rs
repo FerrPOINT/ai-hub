@@ -4,6 +4,7 @@ mod cancellation;
 pub mod config;
 mod control;
 pub mod financial;
+pub mod maintenance;
 pub mod namespace_reader;
 pub mod postgres;
 mod pricing_sources;

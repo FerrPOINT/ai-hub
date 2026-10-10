@@ -61,7 +61,7 @@
       ],
       "source": "backend/crates/infrastructure/tests/financial_pg.rs",
       "evidence": "actual_postgresql17_admission_claim_recovery_settlement_pass_20261010",
-      "remaining": "price/source forms; pricing-source bindings; runtime cancel/unclaimed scheduler; real provider I/O; public fallback/SSE/result endpoint; process crash and full S3 oracle"
+      "remaining": "price/source forms; real provider I/O; public fallback/SSE/result endpoint; process crash and full S3 oracle"
     },
     {
       "tests": [
@@ -95,7 +95,7 @@
       "tests": ["TC-010", "TC-011", "TC-027", "TC-028"],
       "source": "backend/crates/infrastructure/tests/financial_pg.rs",
       "evidence": "postgresql17_owned_cancel_no_send_fixed_fee_zero_after_dispatch_hold_race_and_unclaimed_deadline_recovery_pass_20261010",
-      "remaining": "public/signed cancel ownership; live adapter cancellation; multi-attempt aggregation; actual process crash/restart and scheduled worker; complete acceptance oracle"
+      "remaining": "public/signed cancel ownership; live adapter cancellation; multi-attempt aggregation; actual process crash/restart and hosted worker; complete acceptance oracle"
     },
     {
       "tests": ["TC-010", "TC-018", "TC-027", "TC-038"],
@@ -108,6 +108,12 @@
       "source": "backend/crates/infrastructure/tests/financial_pg.rs",
       "evidence": "postgresql17_mandatory_source_snapshot_future_version_claim_guard_and_frozen_late_settlement_pass_20261010",
       "remaining": "all-provider actual account qualification; public/signed runtime; operational forms; process crash/restore; project tariffs and complete acceptance"
+    },
+    {
+      "tests": ["TC-011", "TC-027", "TC-028"],
+      "source": "backend/crates/infrastructure/tests/financial_pg.rs",
+      "evidence": "postgresql17_maintenance_partial_failure_owned_cancel_timer_retention_and_watch_shutdown_pass_20261010",
+      "remaining": "actual Docker signal/HTTP drain; process kill/restart; provider execution worker; live runtime and full TC oracle"
     }
   ],
   "required_acceptance": {

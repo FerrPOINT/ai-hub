@@ -26,6 +26,8 @@
   bindings, expired source identity без fallback и qualified catalog provenance.
 - Financial admission/dispatch используют source snapshot/version/tier/quote;
   future policy инвалидирует queued proof, late settlement сохраняет прежнюю цену.
+- Serve maintenance worker: durable cancel/recovery, encrypted response и snapshot
+  TTL, bounded timer loop и shutdown; provider transport не подключён к worker.
 
 ### Повторная проверка 2026-10-10
 

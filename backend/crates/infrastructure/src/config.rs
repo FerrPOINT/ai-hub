@@ -14,6 +14,7 @@ pub struct Config {
     pub admin_origin: Option<Url>,
     pub external_calls: bool,
     pub max_body_bytes: usize,
+    pub maintenance_tick_seconds: u64,
 }
 
 fn required(name: &str) -> Result<String, HubError> {
@@ -68,6 +69,13 @@ pub fn trusted_origin(value: &str) -> Result<Url, HubError> {
 
 impl Config {
     pub fn load() -> Result<Self, HubError> {
+        let maintenance_tick_seconds = std::env::var("AIHUB_MAINTENANCE_TICK_SECONDS")
+            .unwrap_or_else(|_| "5".into())
+            .parse::<u64>()
+            .map_err(|_| HubError::Invalid("maintenance interval"))?;
+        if !(1..=60).contains(&maintenance_tick_seconds) {
+            return Err(HubError::Invalid("maintenance interval"));
+        }
         let installation_id = Uuid::parse_str(&required("AIHUB_INSTALLATION_ID")?)
             .map_err(|_| HubError::Invalid("installation UUID"))?;
         if installation_id.is_nil() {
@@ -142,6 +150,7 @@ impl Config {
             admin_origin,
             external_calls,
             max_body_bytes,
+            maintenance_tick_seconds,
         })
     }
 }

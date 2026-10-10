@@ -10,6 +10,33 @@ use sqlx::Row;
 use uuid::Uuid;
 
 impl PgStore {
+    pub(crate) async fn resume_pending_cancellations(&self) -> Result<(u64, u32), HubError> {
+        let rows=sqlx::query("SELECT id,client_id,principal_id FROM requests WHERE installation_id=$1 AND state='admitted' AND cancel_requested ORDER BY admitted_at,id LIMIT 100")
+            .bind(self.installation_id).fetch_all(&self.pool).await.map_err(|e|db_failure(e,line!()))?;
+        let mut count = 0;
+        let mut failed = 0;
+        for row in rows {
+            let owner = RequestOwner {
+                client_id: row.get("client_id"),
+                principal_id: row.get("principal_id"),
+            };
+            match self.cancel_request(&owner, row.get("id")).await {
+                Ok(receipt) if receipt.state == "cancelled" => count += 1,
+                Ok(_) => (),
+                Err(_) => {
+                    failed += 1;
+                }
+            }
+        }
+        if failed > 0 {
+            tracing::warn!(
+                task = "pending_cancellation",
+                failed,
+                "Owned cancellation remains pending; reserve held"
+            );
+        }
+        Ok((count, failed))
+    }
     pub(crate) async fn cancel_request(
         &self,
         owner: &RequestOwner,

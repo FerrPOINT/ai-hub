@@ -32,7 +32,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | Этап | Фактический статус | Следующий результат |
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
-| S2a | В реализации: financial SQL и source guard, control prices/budgets/sources, basic budget UI, protected result buffer и cancel/recovery ports | Price/source forms и runtime lifecycle worker |
+| S2a | В реализации: financial SQL/source guard, control API, basic budget UI, protected results и wired maintenance worker | Price/source forms и milestone runtime/provider evidence |
 | S2b | Не реализован | Connection/catalog/draft/CAS/proof/publication UI/API |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
@@ -151,7 +151,7 @@ requests/attempts/usage/replay, immutable ledger и budget/reservation табл�
 effective expense pointer; `0008` — frozen wire mode и encrypted result receipts.
 Application financial port реализован для internal
 verification; provider transport ещё не подключён. Price forms,
-runtime lifecycle worker ещё впереди. Public/evaluation admission выключен до
+maintenance worker подключён к serve; provider execution worker ещё впереди. Public/evaluation admission выключен до
 S3/S6. FK profile revision присоединяется S2b до public inference.
 
 ## Protected results — текущий срез
@@ -227,7 +227,7 @@ fallback, original readback после новых revisions, unique start, immut
 final audit rollback и auto rejection/qualification/invalidation. Catalog/account
 fixtures синтетические; ledger entries 0, provider calls 0. Five API access tests
 pass (controlled authentication ports). Полный TC-038/S2a остаётся открытым до
-forms, runtime worker и live adapter evidence.
+forms и live adapter/runtime evidence.
 
 ## Financial source binding — текущий срез
 
@@ -251,3 +251,23 @@ Fresh PostgreSQL17 financial fixture после `0011`: 1 scenario pass, 0 ignor
 change при той же effective quote, denied old claim, original request replay,
 immutable source version, fresh proof и late usage по прежним 2/8 rates после
 смены на 20/80. Currency/account/proof синтетические; provider calls 0.
+
+## Maintenance worker — текущий срез
+
+Serve после readiness и bind запускает installation-owned periodic maintenance.
+Сначала обрабатывается durable no-send cancel, затем expired intent/dispatch recovery,
+encrypted payload TTL и read snapshot/cursor cleanup. Каждая pass ограничена 100
+записями; сбой одного task не отменяет независимые следующие tasks. SQL/actor/body
+не печатаются в worker logs; только task/counts. Worker не имеет provider transport.
+
+`AIHUB_MAINTENANCE_TICK_SECONDS`: default 5, допустимо 1–60. Missed ticks skip,
+Ctrl-C/SIGTERM останавливают worker; join ограничен 5s. При timeout task abort
+не превращает held reserve в release. Source wiring не считается served acceptance.
+
+Fresh PostgreSQL17 financial fixture: 1 scenario pass, 0 ignored, 13.78s.
+Проверены retry после persistent final audit failure, worker/foreground cancel race,
+scheduled expired-intent recovery, expired snapshot/cursor cascade с сохранением
+live neighbor, реальный timer loop cleanup и завершение по watch signal.
+Прежние source/money/replay assertions сохранены. Locked API check pass.
+Docker signal, HTTP graceful drain, actual process crash/restart и installed-image
+provenance остаются S3/S7 runtime gates. External provider calls 0.
