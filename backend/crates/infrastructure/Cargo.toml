@@ -23,3 +23,8 @@ hex.workspace = true
 url.workspace = true
 aes-gcm.workspace = true
 zeroize.workspace = true
+bigdecimal.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tracing-subscriber.workspace = true

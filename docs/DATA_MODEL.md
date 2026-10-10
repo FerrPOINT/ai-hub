@@ -1,6 +1,8 @@
 # Модель данных AI Hub
 
-Проектная схема PostgreSQL 17; SQL migrations пока не созданы.
+Целевая схема PostgreSQL 17; actual subset реализован в `backend/migrations`
+(`0001`–`0006`). Полный dictionary не объявлен реализованным;
+факты проверок — в [IMPLEMENTATION_STATUS](IMPLEMENTATION_STATUS.md).
 UUID v4 IDs, timestamptz UTC; financial amounts NUMERIC(38,18), rates NUMERIC(30,12),
 units явные. Input precision проверяется до DB cast, implicit rounding запрещено.
 External project/subject IDs — opaque strings с provenance, без cross-service FK.

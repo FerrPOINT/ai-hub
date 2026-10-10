@@ -10,6 +10,8 @@ pub enum HubError {
     PreconditionFailed,
     #[error("Ключ операции уже связан с другим запросом")]
     IdempotencyConflict,
+    #[error("Доступный бюджет или лимит запросов исчерпан")]
+    BudgetExceeded,
     #[error("Некорректный запрос: {0}")]
     Invalid(&'static str),
     #[error("Сервис временно недоступен")]

@@ -1,3 +1,4 @@
+param([ValidateSet('foundation_pg','financial_pg')][string]$TestName='foundation_pg')
 $ErrorActionPreference = 'Stop'
 $hubRepo = Split-Path $PSScriptRoot -Parent
 $hubWorkspace = Split-Path $hubRepo -Parent
@@ -27,7 +28,7 @@ try {
     $hubSql = "CREATE ROLE aihub_fixture LOGIN PASSWORD '$hubPassword' NOSUPERUSER NOCREATEDB NOCREATEROLE;`nCREATE DATABASE aihub_fixture OWNER aihub_fixture;`nREVOKE CONNECT ON DATABASE postgres FROM PUBLIC;`nREVOKE CONNECT ON DATABASE template1 FROM PUBLIC;"
     $hubSql | & docker exec -i $hubFixture psql -v ON_ERROR_STOP=1 -U postgres | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'Fixture role/database initialization failed' }
-    & (Join-Path $PSScriptRoot 'rust.ps1') -CargoArgs @('test','--locked','-p','aihub-infrastructure','--test','foundation_pg','--','--ignored','--nocapture') -Network "container:$hubFixture" -EnvironmentFile $hubTestEnv
+    & (Join-Path $PSScriptRoot 'rust.ps1') -CargoArgs @('test','--locked','-p','aihub-infrastructure','--test',$TestName,'--','--ignored','--nocapture') -Network "container:$hubFixture" -EnvironmentFile $hubTestEnv
 } finally {
     if ($hubCreated) {
         $hubOwner = & docker inspect $hubFixture --format '{{index .Config.Labels "aihub.owner"}}'

@@ -9,6 +9,29 @@ use std::sync::Arc;
 use uuid::Uuid;
 
 #[async_trait]
+pub trait FinancialAdmission: Send + Sync {
+    async fn reserve(
+        &self,
+        intent: &aihub_domain::admission::AdmissionIntent,
+    ) -> Result<aihub_domain::admission::AdmissionReceipt, HubError>;
+    async fn claim_dispatch(
+        &self,
+        attempt_id: Uuid,
+        owner_id: Uuid,
+        lease_seconds: i32,
+    ) -> Result<aihub_domain::admission::DispatchClaim, HubError>;
+    async fn record_uncertain(
+        &self,
+        claim: &aihub_domain::admission::DispatchClaim,
+    ) -> Result<(), HubError>;
+    async fn recover_expired_dispatches(&self) -> Result<u64, HubError>;
+    async fn settle(
+        &self,
+        fact: &aihub_domain::settlement::SettlementFact,
+    ) -> Result<aihub_domain::settlement::SettlementReceipt, HubError>;
+}
+
+#[async_trait]
 pub trait CentralAuthentication: Send + Sync {
     async fn authenticate(&self, token: &str) -> Result<HumanPrincipal, HubError>;
 }

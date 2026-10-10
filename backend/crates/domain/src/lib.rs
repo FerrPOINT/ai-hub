@@ -1,6 +1,8 @@
 pub mod access;
+pub mod admission;
 pub mod error;
 pub mod financial;
 pub mod records;
+pub mod settlement;
 
 pub use sdlc_shared::resource_context::{ExecutionContextV2, NamespaceRef};

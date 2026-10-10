@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+### Реализация 2026-10-10
+
+- Native Rust/Base React foundation, own schema/vault/auth/read ports и generated API.
+- Atomic verification admission/dispatch/recovery и exact settlement/corrections;
+  SQL fixture проверяет конкуренцию двух экземпляров, unknown reserve, audit rollback,
+  idempotent receipt, replacement estimate и настоящий overrun без обрезания.
+- Source S1/S2a в работе; release, live SSO/provider/UI/consumer acceptance pending.
+
 ### Повторная проверка 2026-10-10
 
 - Опубликован source-bound отчёт ревью contracts/dataflow/ecosystem и прототипа:
@@ -19,7 +27,7 @@
 - Архитектура, доступ, модель данных, UI-сценарии и план вертикальных этапов.
 - Критерии разработки/приёмки, трассировка требований и offline gate документации.
 
-Runtime-реализации и выпущенной версии пока нет.
+Выпущенной версии и accepted runtime пока нет.
 
 ### Уточнено
 

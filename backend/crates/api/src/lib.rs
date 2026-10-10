@@ -75,6 +75,7 @@ impl IntoResponse for ApiError {
                 (StatusCode::PRECONDITION_FAILED, "precondition_failed")
             }
             HubError::IdempotencyConflict => (StatusCode::CONFLICT, "idempotency_conflict"),
+            HubError::BudgetExceeded => (StatusCode::TOO_MANY_REQUESTS, "budget_exceeded"),
             HubError::Invalid(_) => (StatusCode::BAD_REQUEST, "invalid_request"),
             HubError::Unavailable | HubError::InstallationMismatch => {
                 (StatusCode::SERVICE_UNAVAILABLE, "unavailable")

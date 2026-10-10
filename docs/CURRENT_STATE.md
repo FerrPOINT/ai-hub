@@ -1,6 +1,6 @@
 # Текущее состояние
 
-Дата: 2026-10-10. Stage: IMPLEMENTING, S1 в работе.
+Дата: 2026-10-10. Stage: IMPLEMENTING, S1 и S2a в работе.
 
 Полная реализация S1–S7 поручена пользователем. В PDLC3 создана отдельная ветка
 `feat/ai-hub-v1-implementation-20261010` на baseline `b266e15`. Добавляются actual
@@ -22,7 +22,10 @@ Cargo/pnpm manifests, own DB-01, central-auth/vault ports, control reads, Rust O
 - SDK baseline/Namespace cohort/operator tooling независимы; Base/Admin docs branches не main/runtime integration.
 - Backend/API/SQL migrations/SSO/live adapters/consumer/restore/cutover не реализованы, execution acceptance not_run.
 
-Текущая веха: S1 настоящего изолированного приложения, затем S2a → S2b → S3…S7.
+Финансовая SQL-граница S2a проверена отдельно: bounded admission, one-send claim,
+unknown hold/restart и atomic receipts/corrections. Control API/forms и live
+provider path ещё не реализованы; [partial evidence](implementation-evidence.json)
+не закрывает целиком FR/TC. Текущая веха: S1 + S2a, затем S2b → S3…S7.
 Действующий Admin /ai, данные, pins и установленный runtime сохраняются до accepted cutover.
 
 ## Повторное ревью 2026-10-10

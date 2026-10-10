@@ -32,7 +32,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | Этап | Фактический статус | Следующий результат |
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
-| S2a | Начат: exact amount/rate/project codecs и disjoint usage; unit checks pass | Atomic budgets/reservations/requests/attempts/ledger/replay до proof I/O |
+| S2a | В реализации: exact codecs; atomic bounded verification admission/dispatch/settlement проверены на PostgreSQL17 | Control API/forms цены и бюджета, pricing-source bindings, payload replay и lifecycle integration |
 | S2b | Не реализован | Connection/catalog/draft/CAS/proof/publication UI/API |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
@@ -79,13 +79,27 @@ financial admission и остальные S4/S7 gates ещё не закрыты
   Namespace identity/confirmed/archived transitions. Reader ещё не подключён к
   живому owner; его observation не выдаёт grant и не заменяет Tracker readback.
 - Fresh PostgreSQL check после `0003_financial_prerequisites`: все три миграции
-  применились, foundation scenario pass. Financial transactions ещё не проверены.
+  применились, foundation scenario pass.
+- Fresh PostgreSQL17 после `0004`–`0006`: один financial scenario pass, 0 ignored.
+  Два независимых PgStore конкурируют за последний reserve и один dispatch claim;
+  foreign grant/model/generation, отсутствующая цена под hard budget, revoked grant,
+  смена connection generation и forged fence отвергаются. Expired sender recovery
+  сохраняет original attempt/held reserve без redispatch. Unknown fact не нулевой;
+  duplicate receipt не меняет totals; confirmed заменяет estimate, refund append-only,
+  actual overrun не обрезается и блокирует новое admission. Forced final audit failures
+  откатывают admission и settlement целиком. Account/model/currency в fixture
+  синтетические; это не live provider qualification и не полный TC-028.
 - Live SSO, owner readers, served UI и CI ещё pending.
 
 `0003_financial_prerequisites` вводит connection/generation/catalog/price/probe,
 requests/attempts/usage/replay, immutable ledger и budget/reservation таблицы.
-Это schema introduction; admission/settlement API и concurrency engine ещё не
-реализованы. FK profile revision присоединяется S2b до public inference.
+`0004` добавляет exact bounded grant/account/currency authority, `0005` —
+неповторяемый dispatch claim и expiry, `0006` — append-only settlement facts и
+effective expense pointer. Application financial port реализован для internal
+verification; provider transport ещё не подключён. Control budget/price API,
+pricing-source timeline, protected response buffer, cancel-before-dispatch и
+recovery unclaimed intent ещё впереди. Public/evaluation admission выключен до
+S3/S6. FK profile revision присоединяется S2b до public inference.
 
 Полные TC остаются `not_run`, когда исполнена только часть oracle. Partial mapping
 и источник каждого результата — [implementation-evidence.json](implementation-evidence.json).

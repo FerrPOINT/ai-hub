@@ -162,7 +162,7 @@ pub enum Category {
     ExplicitOther,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Usage {
     pub categories: BTreeMap<Category, u64>,

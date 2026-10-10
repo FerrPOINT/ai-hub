@@ -5,11 +5,64 @@
   "source_branch": "feat/ai-hub-v1-implementation-20261010",
   "baseline": "b266e158b33e6cc70e02a9df3ba1d21c74b983af",
   "partial_oracles": [
-    { "tests": ["TC-002"], "source": "backend/crates/infrastructure/src/vault.rs", "evidence": "unit_aad_wrong_key_nonce_pass", "remaining": "secret canary whole transport/logs/browser/export plus wrong-key restore" },
-    { "tests": ["TC-018", "TC-019", "TC-035"], "source": "frontend/src/shared/api/client.test.ts", "evidence": "unit_pass", "remaining": "live session/PAT/key/grants/Namespace and browser acceptance" },
-    { "tests": ["TC-010", "TC-025", "TC-038"], "source": "backend/crates/domain/src/financial.rs", "evidence": "6_domain_unit_tests_pass", "remaining": "immutable SQL facts, late settlements, snapshots, project tariff timeline and authorised exports" },
-    { "tests": ["TC-027", "TC-035"], "source": "backend/crates/infrastructure/tests/foundation_pg.rs", "evidence": "actual_postgresql17_fixture_pass", "remaining": "financial concurrency/recovery and actual registry/Tracker qualification" },
-    { "tests": ["TC-030"], "source": "scripts/verify_dependencies.py", "evidence": "exact_clean_sdk_and_cohort_plus_generated_frontend_typecheck_pass", "remaining": "locked production build, operator, image and live served identity" }
+    {
+      "tests": [
+        "TC-002"
+      ],
+      "source": "backend/crates/infrastructure/src/vault.rs",
+      "evidence": "unit_aad_wrong_key_nonce_pass",
+      "remaining": "secret canary whole transport/logs/browser/export plus wrong-key restore"
+    },
+    {
+      "tests": [
+        "TC-018",
+        "TC-019",
+        "TC-035"
+      ],
+      "source": "frontend/src/shared/api/client.test.ts",
+      "evidence": "unit_pass",
+      "remaining": "live session/PAT/key/grants/Namespace and browser acceptance"
+    },
+    {
+      "tests": [
+        "TC-010",
+        "TC-025",
+        "TC-038"
+      ],
+      "source": "backend/crates/domain/src/financial.rs",
+      "evidence": "6_domain_unit_tests_pass",
+      "remaining": "immutable SQL facts, late settlements, snapshots, project tariff timeline and authorised exports"
+    },
+    {
+      "tests": [
+        "TC-027",
+        "TC-035"
+      ],
+      "source": "backend/crates/infrastructure/tests/foundation_pg.rs",
+      "evidence": "actual_postgresql17_fixture_pass",
+      "remaining": "financial concurrency/recovery and actual registry/Tracker qualification"
+    },
+    {
+      "tests": [
+        "TC-030"
+      ],
+      "source": "scripts/verify_dependencies.py",
+      "evidence": "exact_clean_sdk_and_cohort_plus_generated_frontend_typecheck_pass",
+      "remaining": "locked production build, operator, image and live served identity"
+    },
+    {
+      "tests": [
+        "TC-006",
+        "TC-010",
+        "TC-011",
+        "TC-012",
+        "TC-027",
+        "TC-028"
+      ],
+      "source": "backend/crates/infrastructure/tests/financial_pg.rs",
+      "evidence": "actual_postgresql17_admission_claim_recovery_settlement_pass_20261010",
+      "remaining": "control API/forms; pricing-source bindings; cancel/unclaimed restart; real provider I/O; public fallback/SSE/replay; process crash and full S3 oracle"
+    }
   ],
   "required_acceptance": {
     "S1": "in_progress",
