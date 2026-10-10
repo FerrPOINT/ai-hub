@@ -116,6 +116,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/connections/{connection_id}/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["readModelCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/namespaces": {
         parameters: {
             query?: never;
@@ -358,6 +374,17 @@ export interface components {
         BudgetPeriod: "utc_day" | "utc_month";
         /** @enum {string} */
         BudgetScope: "installation" | "project" | "client" | "profile";
+        CatalogPage: {
+            /** Format: date-time */
+            as_of: string;
+            /** Format: uuid */
+            connection_id: string;
+            data_status: string;
+            /** Format: int64 */
+            generation: number;
+            models: components["schemas"]["ModelMetadata"][];
+            next_cursor?: string | null;
+        };
         Connection: {
             display_name: string;
             /** Format: int64 */
@@ -416,6 +443,17 @@ export interface components {
             service_key: string;
             source_revision: string;
             status: string;
+        };
+        ModelMetadata: {
+            capabilities: string[];
+            evidence_status: string;
+            /** Format: int64 */
+            input_limit: number | null;
+            /** Format: date-time */
+            observed_at: string;
+            /** Format: int64 */
+            output_limit: number | null;
+            provider_model_id: string;
         };
         NamespaceBinding: {
             /** Format: int64 */
@@ -1214,6 +1252,71 @@ export interface operations {
                 };
             };
             412: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    readModelCatalog: {
+        parameters: {
+            query?: {
+                q?: string;
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogPage"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

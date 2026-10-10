@@ -126,6 +126,12 @@
       "source": "backend/crates/infrastructure/tests/credential_pg.rs",
       "evidence": "postgresql17_foundation_write_only_generation_aad_canary_revoke_original_replay_and_atomic_audit_pass_20261010",
       "remaining": "whole-app log/UI/export/live secret canary; owned adapter secret context; provider auth qualification; managed login; restore and full TC"
+    },
+    {
+      "tests": ["TC-003", "TC-010", "TC-018", "TC-027", "TC-038"],
+      "source": "backend/crates/infrastructure/tests/catalog_pg.rs",
+      "evidence": "3_exact_decoder_units_and_postgresql17_catalog_generation_snapshot_search_cursor_pass_20261010",
+      "remaining": "durable metadata HTTP refresh/audit; qualified native currency and quote provenance; real account/model; context preferences; UI and full TC"
     }
   ],
   "required_acceptance": {

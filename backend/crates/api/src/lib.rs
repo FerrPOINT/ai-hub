@@ -3,6 +3,7 @@ use aihub_domain::{
     NamespaceRef,
     access::{HumanPrincipal, namespace_filter},
     budgets::{Budget, BudgetInput, BudgetPeriod, BudgetScope},
+    catalog::{CatalogPage, ModelMetadata},
     connections::{
         BillingMode, Connection, ConnectionInput, CredentialInput, CredentialType, ProviderKind,
     },
@@ -479,6 +480,40 @@ pub async fn revoke_credential(
         ),
     ))
 }
+#[utoipa::path(get,path="/api/v1/connections/{connection_id}/models",operation_id="readModelCatalog",security(("CentralAuth"=[])),params(("connection_id"=Uuid,Path),("q"=Option<String>,Query),("limit"=Option<i64>,Query,minimum=1,maximum=100),("cursor"=Option<Uuid>,Query)),responses((status=200,body=CatalogPage),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=503,body=Error)))]
+pub async fn read_catalog(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(id): Path<String>,
+    RawQuery(raw): RawQuery,
+) -> Result<Json<CatalogPage>, ApiError> {
+    let id = Uuid::parse_str(&id).map_err(|_| HubError::Invalid("connection ID"))?;
+    let (query, limit, cursor) = catalog_options(raw.as_deref().unwrap_or(""))?;
+    Ok(Json(
+        state
+            .foundation
+            .catalog(&principal, id, &query, limit, cursor)
+            .await?,
+    ))
+}
+fn catalog_options(raw: &str) -> Result<(String, i64, Option<Uuid>), HubError> {
+    let mut query = None;
+    let mut rest = vec![];
+    for (key, value) in url::form_urlencoded::parse(raw.as_bytes()) {
+        if key == "q" {
+            if query.is_some() {
+                return Err(HubError::Invalid("duplicate catalog query"));
+            }
+            query = Some(value.into_owned())
+        } else {
+            rest.push((key.into_owned(), value.into_owned()))
+        }
+    }
+    let mut encoded = url::form_urlencoded::Serializer::new(String::new());
+    encoded.extend_pairs(rest);
+    let (limit, cursor) = list_options(&encoded.finish(), false)?;
+    Ok((query.unwrap_or_default(), limit, cursor))
+}
 fn list_options(raw: &str, namespace_allowed: bool) -> Result<(i64, Option<Uuid>), HubError> {
     let mut limit = None;
     let mut cursor = None;
@@ -683,7 +718,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,write_credential,revoke_credential),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,write_credential,revoke_credential,read_catalog),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -722,6 +757,10 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
         .route("/api/v1/audit", get(audit))
         .route("/api/v1/prices", get(prices).post(create_price))
         .route("/api/v1/connections", get(connections))
+        .route(
+            "/api/v1/connections/{connection_id}/models",
+            get(read_catalog),
+        )
         .route(
             "/api/v1/connections/{connection_id}/credentials",
             axum::routing::put(write_credential).delete(revoke_credential),

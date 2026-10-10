@@ -32,6 +32,8 @@
   rename сохраняет authorization, material settings создают непроверенную generation.
 - Write-only credential PUT/revoke, keyed secret binding и own generation AAD;
   prepared не означает active, original replay не восстанавливает отозванную auth.
+- Exact OpenRouter metadata decoder, immutable catalog snapshots/search/pagination;
+  advertised data остаётся unverified, missing price не становится нулём.
 
 ### Повторная проверка 2026-10-10
 

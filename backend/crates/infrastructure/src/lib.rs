@@ -1,6 +1,7 @@
 pub mod auth;
 mod budget_control;
 mod cancellation;
+mod catalog_store;
 pub mod config;
 mod connection_control;
 mod control;
@@ -8,6 +9,7 @@ mod credentials;
 pub mod financial;
 pub mod maintenance;
 pub mod namespace_reader;
+pub mod openrouter_metadata;
 pub mod postgres;
 mod pricing_sources;
 pub mod replay;

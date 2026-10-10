@@ -573,3 +573,32 @@ async fn credential_http_denies_read_scope_and_never_echoes_secret_on_errors() {
         "revocation requires fresh strong If-Match"
     );
 }
+
+#[tokio::test]
+async fn catalog_cache_requires_read_scope_and_rejects_broadening_filters() {
+    let (app, _) = fixture();
+    let path = format!("/api/v1/connections/{}/models", Uuid::new_v4());
+    assert_eq!(
+        status(&app, &path, Some("write")).await,
+        StatusCode::FORBIDDEN
+    );
+    assert_eq!(
+        status(&app, &path, Some("foreign")).await,
+        StatusCode::FORBIDDEN
+    );
+    for query in ["q=one&q=two", "limit=0", "namespace_id=bad", "cursor=bad"] {
+        assert_eq!(
+            status(&app, &format!("{path}?{query}"), Some("read")).await,
+            StatusCode::BAD_REQUEST
+        )
+    }
+    assert_eq!(
+        status(
+            &app,
+            &format!("{path}?q=vendor%2Fmodel&limit=100"),
+            Some("read")
+        )
+        .await,
+        StatusCode::SERVICE_UNAVAILABLE
+    );
+}

@@ -73,6 +73,16 @@ pub trait CentralAuthentication: Send + Sync {
 
 #[async_trait]
 pub trait FoundationStore: Send + Sync {
+    async fn catalog_page(
+        &self,
+        _subject: &str,
+        _connection: Uuid,
+        _query: &str,
+        _limit: i64,
+        _cursor: Option<Uuid>,
+    ) -> Result<aihub_domain::catalog::CatalogPage, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn write_credential(
         &self,
         _subject: &str,
@@ -247,6 +257,28 @@ pub struct BudgetFilter {
 }
 
 impl Foundation {
+    pub async fn catalog(
+        &self,
+        principal: &HumanPrincipal,
+        connection: Uuid,
+        query: &str,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<aihub_domain::catalog::CatalogPage, HubError> {
+        principal.require_config(false)?;
+        if connection.is_nil() || query.len() > 256 {
+            return Err(HubError::Invalid("catalog filter"));
+        }
+        self.store
+            .catalog_page(
+                &principal.subject,
+                connection,
+                query,
+                bounded_limit(limit)?,
+                cursor,
+            )
+            .await
+    }
     pub async fn write_credential(
         &self,
         principal: &HumanPrincipal,

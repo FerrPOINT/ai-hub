@@ -33,7 +33,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
 | S2a | В реализации: financial SQL/source guard, control API, basic budget UI, protected results и wired maintenance worker | Price/source forms и milestone runtime/provider evidence |
-| S2b | В реализации: connection control, endpoint allowlist и write-only credential generations | Catalog/context, disable/archive, draft/CAS/proof/publication и UI |
+| S2b | В реализации: connection/credentials, exact OpenRouter metadata decoder и generation-bound cached catalog | Live metadata reader, context, disable/archive, draft/proof/publication и UI |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
 | S5 | Не реализован | Полный operational UI и authorized snapshot/export |
@@ -319,3 +319,29 @@ Connection/Operation JSON, final audit rollback, revoke и original replay бе�
 Seven API access tests pass, error responses не echo secret. Accounts/secret
 синтетические; live Dev key не перенесён, provider I/O 0. Whole-app log/browser/export
 canary, active adapter secret context и managed login остаются S3/S4/S7 gates.
+
+## Catalog decoding и cache — текущий срез
+
+OpenRouter decoder сверён с official [models](https://openrouter.ai/docs/api/api-reference/models/list-all-models-and-their-properties)
+и [key metadata](https://openrouter.ai/docs/api/api-reference/api-keys/get-current-api-key).
+Money number lexemes читаются RawValue без f64; per-token pricing strings переводятся
+в per-million exact decimal. Negative/missing/sub-scale/overflow price остаётся
+unknown; excessive exponent ограничен до BigDecimal allocation. Account label,
+credential fragments и creator identity не сохраняются в DTO. Numeric account
+observations не присваивают currency/tier и не создают paid receipt.
+
+Catalog limits/capabilities — advertised и unverified, не physical/inference proof.
+Internal store проверяет own connection generation и endpoint hash, создаёт
+immutable snapshot. Removed membership не удаляет historical upstream rows.
+GET models читает только stored snapshot, поддерживает q/opaque cursor/limit;
+новая generation не наследует старый catalog. HTTP refresh/operation и pricing
+quote materialization ещё не подключены: нет скрытого external I/O в GET.
+
+Scoped decoder: 3 unit tests pass, включая 20 integer/18 fractional digits,
+exponents, unsupported scale, unknown fee/cache, duplicate model/invalid limits.
+Fresh PostgreSQL17 после `0014`: 1 scenario pass, 0 ignored, 0.54s. Search,
+actor/query cursor, old page после refresh, immutable snapshot, generation/hash
+mismatch и отсутствие qualification/ledger rows проверены. Eight controlled-port
+HTTP access tests pass. Source cache writer ещё внутренний; actual HTTP fetch,
+durable refresh operation/audit, currency witness, valid secret context и live
+account qualification остаются обязательными следующими шагами до model probe.

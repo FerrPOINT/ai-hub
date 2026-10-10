@@ -140,6 +140,16 @@ impl PgStore {
 
 #[async_trait]
 impl FoundationStore for PgStore {
+    async fn catalog_page(
+        &self,
+        subject: &str,
+        connection: Uuid,
+        query: &str,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<aihub_domain::catalog::CatalogPage, HubError> {
+        PgStore::catalog_page(self, subject, connection, query, limit, cursor).await
+    }
     async fn write_credential(
         &self,
         subject: &str,

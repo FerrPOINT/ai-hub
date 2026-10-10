@@ -1057,6 +1057,118 @@
         ]
       }
     },
+    "/api/v1/connections/{connection_id}/models": {
+      "get": {
+        "tags": [],
+        "operationId": "readModelCatalog",
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ]
+      }
+    },
     "/api/v1/namespaces": {
       "get": {
         "tags": [],
@@ -2049,6 +2161,45 @@
           "profile"
         ]
       },
+      "CatalogPage": {
+        "type": "object",
+        "required": [
+          "connection_id",
+          "generation",
+          "models",
+          "as_of",
+          "data_status"
+        ],
+        "properties": {
+          "as_of": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "connection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data_status": {
+            "type": "string"
+          },
+          "generation": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelMetadata"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "Connection": {
         "type": "object",
         "required": [
@@ -2269,6 +2420,49 @@
             "type": "string"
           },
           "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ModelMetadata": {
+        "type": "object",
+        "required": [
+          "provider_model_id",
+          "input_limit",
+          "output_limit",
+          "capabilities",
+          "evidence_status",
+          "observed_at"
+        ],
+        "properties": {
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_status": {
+            "type": "string"
+          },
+          "input_limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "output_limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "provider_model_id": {
             "type": "string"
           }
         }
