@@ -77,6 +77,29 @@ impl aihub_application::MetadataOperations for TestStore {
 }
 #[async_trait]
 impl FoundationStore for TestStore {
+    async fn profile_page(
+        &self,
+        _: &str,
+        _: i64,
+        _: Option<Uuid>,
+    ) -> Result<aihub_domain::records::Page<aihub_domain::profiles::Profile>, HubError> {
+        self.reads.fetch_add(1, Ordering::SeqCst);
+        Ok(aihub_domain::records::Page {
+            items: vec![],
+            next_cursor: None,
+        })
+    }
+    async fn save_profile(
+        &self,
+        _: &str,
+        _: Uuid,
+        _: [u8; 32],
+        _: Option<(Uuid, i64)>,
+        _: &aihub_domain::profiles::ProfileInput,
+    ) -> Result<aihub_domain::profiles::DraftMutation, HubError> {
+        self.reads.fetch_add(1, Ordering::SeqCst);
+        Err(HubError::AlreadyExists)
+    }
     async fn model_context_page(
         &self,
         _: &str,
@@ -139,6 +162,51 @@ impl FoundationStore for TestStore {
 }
 fn fixture() -> (axum::Router, Arc<TestStore>) {
     fixture_with_external(false)
+}
+#[tokio::test]
+async fn profile_scopes_strict_cas_and_payload_precede_storage() {
+    let (app, store) = fixture();
+    assert_eq!(
+        status(&app, "/api/v1/virtual-models", Some("foreign")).await,
+        StatusCode::FORBIDDEN
+    );
+    assert_eq!(
+        status(&app, "/api/v1/virtual-models", Some("read")).await,
+        StatusCode::OK
+    );
+    let body = serde_json::json!({"slug":"test-profile","display_name":"Профиль","mode":"pinned_test","deployments":[{"connection_id":Uuid::new_v4(),"generation":1,"model_id":"vendor/ExactModel"}],"parameters":{},"input_limit":2048,"output_limit":256,"context_limit":4096,"required_capabilities":["text"],"timeout_seconds":120,"max_attempts":1});
+    let path = format!("/api/v1/virtual-models/{}", Uuid::new_v4());
+    for (token, version, extra, expected) in [
+        ("read", "\"1\"", false, StatusCode::FORBIDDEN),
+        ("write", "1", false, StatusCode::BAD_REQUEST),
+        ("write", "W/\"1\"", false, StatusCode::BAD_REQUEST),
+        ("write", "\"0\"", false, StatusCode::BAD_REQUEST),
+        ("write", "\"1\"", true, StatusCode::BAD_REQUEST),
+        ("write", "\"1\"", false, StatusCode::CONFLICT),
+    ] {
+        let mut input = body.clone();
+        if extra {
+            input["active_revision_id"] = serde_json::json!(Uuid::new_v4());
+        }
+        let request = Request::builder()
+            .method("PATCH")
+            .uri(&path)
+            .header("authorization", format!("Bearer {token}"))
+            .header("content-type", "application/json")
+            .header("idempotency-key", Uuid::new_v4().to_string())
+            .header("if-match", version)
+            .body(Body::from(input.to_string()))
+            .unwrap();
+        assert_eq!(
+            app.clone().oneshot(request).await.unwrap().status(),
+            expected
+        );
+    }
+    assert_eq!(
+        store.reads.load(Ordering::SeqCst),
+        2,
+        "only authorized valid draft reaches storage"
+    );
 }
 fn fixture_with_external(external_calls: bool) -> (axum::Router, Arc<TestStore>) {
     let store = Arc::new(TestStore {

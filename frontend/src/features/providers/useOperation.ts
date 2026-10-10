@@ -2,25 +2,27 @@ import { useRef, useState } from 'react';
 import { ApiError } from '@sdlc/ui/lib';
 import { authGeneration, queryClient, type Identity, type OperationLookup, type ConnectionInput } from '../../shared/api/client';
 import { closeUnstarted, lookupOperation, providerKeys, validateSettings, validateContext } from './service';
-export type ProviderAction = 'connection.create' | 'connection.update' | 'credential.write' | 'credential.revoke' | 'catalog.refresh' | 'model-context.write' | 'connection.disable';
+import { validateProfile } from '../models/service';
+export type ProviderAction = 'connection.create' | 'connection.update' | 'credential.write' | 'credential.revoke' | 'catalog.refresh' | 'model-context.write' | 'connection.disable' | 'profile.draft.create' | 'profile.draft.update';
 type SafeIntent = {
     key: string;
     action: ProviderAction;
     resource_id: string | null;
     settings?: ConnectionInput;
     model_context?: import('../../shared/api/client').ModelContextInput;
+    profile?: import('../../shared/api/client').ProfileInput;
 };
-const actions: ProviderAction[] = ['connection.create', 'connection.update', 'credential.write', 'credential.revoke', 'catalog.refresh', 'model-context.write', 'connection.disable'];
+const actions: ProviderAction[] = ['connection.create', 'connection.update', 'credential.write', 'credential.revoke', 'catalog.refresh', 'model-context.write', 'connection.disable', 'profile.draft.create', 'profile.draft.update'];
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const validId = (value: unknown): value is string => typeof value === 'string' && uuid.test(value) && value !== '00000000-0000-0000-0000-000000000000';
 function readIntent(key: string): SafeIntent | null {
     const raw = sessionStorage.getItem(key);
     if (!raw)
         return null;
-    if (raw.length > 4096)
+    if (raw.length > 16384)
         throw new Error('Операция во вкладке повреждена.');
     const value = JSON.parse(raw) as SafeIntent;
-    if (!validId(value.key) || !actions.includes(value.action) || !(value.resource_id === null || validId(value.resource_id)) || Object.keys(value).some(k => !['key', 'action', 'resource_id', 'settings', 'model_context'].includes(k)))
+    if (!validId(value.key) || !actions.includes(value.action) || !(value.resource_id === null || validId(value.resource_id)) || Object.keys(value).some(k => !['key', 'action', 'resource_id', 'settings', 'model_context', 'profile'].includes(k)))
         throw new Error('Операция во вкладке повреждена.');
     if (value.settings) {
         if (!['connection.create', 'connection.update'].includes(value.action) || Object.keys(value.settings).some(k => !['display_name', 'endpoint_policy_ref', 'billing_mode'].includes(k)))
@@ -32,10 +34,15 @@ function readIntent(key: string): SafeIntent | null {
             throw new Error('Операция во вкладке повреждена.');
         validateContext(value.model_context);
     }
+    if (value.profile) {
+        if (!['profile.draft.create', 'profile.draft.update'].includes(value.action) || Object.keys(value.profile).some(k => !['slug', 'display_name', 'mode', 'deployments', 'parameters', 'input_limit', 'output_limit', 'context_limit', 'required_capabilities', 'timeout_seconds', 'max_attempts', 'allowed_overrides'].includes(k)) || value.profile.deployments.some(d => Object.keys(d).some(k => !['connection_id', 'generation', 'model_id'].includes(k))) || Object.keys(value.profile.parameters).some(k => !['temperature', 'top_p', 'reasoning_effort'].includes(k)))
+            throw new Error('Операция во вкладке повреждена.');
+        validateProfile(value.profile);
+    }
     return value;
 }
-export function useProviderOperation(identity: Identity, resource: string, onSuccess: (value: OperationLookup) => void) {
-    const storageKey = `aihub.provider-intent:${identity.installation_id}:${identity.subject}:${resource}`;
+export function useControlOperation(identity: Identity, resource: string, onSuccess: (value: OperationLookup) => void, kind: 'provider' | 'model' = 'provider') {
+    const storageKey = `aihub.${kind === 'model' ? 'model' : 'provider'}-intent:${identity.installation_id}:${identity.subject}:${resource}`;
     const [initial] = useState(() => {
         try {
             return { intent: readIntent(storageKey), error: '' };
@@ -71,17 +78,17 @@ export function useProviderOperation(identity: Identity, resource: string, onSuc
         if (result.operation.status === 'succeeded') {
             setError('');
             onSuccess(result);
-            void queryClient.invalidateQueries({ queryKey: providerKeys.all });
+            void queryClient.invalidateQueries({ queryKey: kind === 'model' ? ['models'] : providerKeys.all });
         }
         else {
             setError(result.operation.safe_error ?? 'Операция не выполнена.');
             setNotice(closed ? 'Позднее выполнение исходного запроса запрещено. Можно создать новую операцию.' : '');
         }
     }
-    async function execute(action: ProviderAction, resource_id: string | null, send: (key: string) => Promise<unknown>, settings?: ConnectionInput, model_context?: import('../../shared/api/client').ModelContextInput) {
+    async function execute(action: ProviderAction, resource_id: string | null, send: (key: string) => Promise<unknown>, settings?: ConnectionInput, model_context?: import('../../shared/api/client').ModelContextInput, profile?: import('../../shared/api/client').ProfileInput) {
         if (locked || busy.current)
             return;
-        const current: SafeIntent = { key: crypto.randomUUID(), action, resource_id, ...(settings ? { settings: { display_name: settings.display_name, endpoint_policy_ref: settings.endpoint_policy_ref, billing_mode: settings.billing_mode } } : {}), ...(model_context ? { model_context: { model_id: model_context.model_id, context_window_tokens: model_context.context_window_tokens } } : {}) };
+        const current: SafeIntent = { key: crypto.randomUUID(), action, resource_id, ...(settings ? { settings: { display_name: settings.display_name, endpoint_policy_ref: settings.endpoint_policy_ref, billing_mode: settings.billing_mode } } : {}), ...(model_context ? { model_context: { model_id: model_context.model_id, context_window_tokens: model_context.context_window_tokens } } : {}), ...(profile ? { profile } : {}) };
         try {
             sessionStorage.setItem(storageKey, JSON.stringify(current));
             setIntent(current);
@@ -111,7 +118,7 @@ export function useProviderOperation(identity: Identity, resource: string, onSuc
                     sessionStorage.removeItem(storageKey);
                     setIntent(null);
                     setStale(cause.status === 412);
-                    setError(cause.status === 412 ? 'Подключение изменено. Ваши значения сохранены; загрузите актуальную версию.' : cause.message);
+                    setError(cause.status === 412 ? (kind === 'model' ? 'Конфигурация изменена. Ваши значения сохранены; загрузите актуальную версию.' : 'Подключение изменено. Ваши значения сохранены; загрузите актуальную версию.') : cause.message);
                 }
                 else
                     setError('Результат операции пока неизвестен. Проверьте исходную операцию; новые изменения заблокированы.');
@@ -147,3 +154,4 @@ export function useProviderOperation(identity: Identity, resource: string, onSuc
     }
     return { intent, initial, pending, locked, error, notice, notFound, stale, setStale, setError, setNotice, execute, recover };
 }
+export const useProviderOperation = useControlOperation;

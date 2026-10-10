@@ -140,6 +140,28 @@ impl PgStore {
 
 #[async_trait]
 impl FoundationStore for PgStore {
+    async fn profile_page(
+        &self,
+        subject: &str,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<aihub_domain::records::Page<aihub_domain::profiles::Profile>, HubError> {
+        self.profile_page_internal(subject, limit, cursor).await
+    }
+    async fn read_profile(&self, id: Uuid) -> Result<aihub_domain::profiles::Profile, HubError> {
+        self.read_profile_internal(id).await
+    }
+    async fn save_profile(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        update: Option<(Uuid, i64)>,
+        input: &aihub_domain::profiles::ProfileInput,
+    ) -> Result<aihub_domain::profiles::DraftMutation, HubError> {
+        self.save_profile_internal(subject, key, binding, update, input)
+            .await
+    }
     async fn disable_connection(
         &self,
         subject: &str,

@@ -83,6 +83,27 @@ pub trait CentralAuthentication: Send + Sync {
 
 #[async_trait]
 pub trait FoundationStore: Send + Sync {
+    async fn profile_page(
+        &self,
+        _subject: &str,
+        _limit: i64,
+        _cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::profiles::Profile>, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn read_profile(&self, _id: Uuid) -> Result<aihub_domain::profiles::Profile, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn save_profile(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+        _update: Option<(Uuid, i64)>,
+        _input: &aihub_domain::profiles::ProfileInput,
+    ) -> Result<aihub_domain::profiles::DraftMutation, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn catalog_page(
         &self,
         _subject: &str,
@@ -321,6 +342,50 @@ pub struct BudgetFilter {
 }
 
 impl Foundation {
+    pub async fn profiles(
+        &self,
+        principal: &HumanPrincipal,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::profiles::Profile>, HubError> {
+        principal.require_config(false)?;
+        self.store
+            .profile_page(&principal.subject, bounded_limit(limit)?, cursor)
+            .await
+    }
+    pub async fn profile(
+        &self,
+        principal: &HumanPrincipal,
+        id: Uuid,
+    ) -> Result<aihub_domain::profiles::Profile, HubError> {
+        principal.require_config(false)?;
+        if id.is_nil() {
+            return Err(HubError::Invalid("profile ID"));
+        }
+        self.store.read_profile(id).await
+    }
+    pub async fn save_profile(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        update: Option<(Uuid, i64)>,
+        input: &aihub_domain::profiles::ProfileInput,
+    ) -> Result<aihub_domain::profiles::DraftMutation, HubError> {
+        principal.require_config(true)?;
+        input.validate()?;
+        if key.is_nil() || update.is_some_and(|(id, v)| id.is_nil() || v < 1 || v == i64::MAX) {
+            return Err(HubError::Invalid("profile CAS"));
+        }
+        let action = if update.is_some() {
+            "profile.draft.update"
+        } else {
+            "profile.draft.create"
+        };
+        let binding=self.bindings.bind(&serde_json::json!({"installation":self.installation_id,"principal":principal.subject,"action":action,"update":update,"input":input}))?;
+        self.store
+            .save_profile(&principal.subject, key, binding, update, input)
+            .await
+    }
     pub async fn model_contexts(
         &self,
         principal: &HumanPrincipal,

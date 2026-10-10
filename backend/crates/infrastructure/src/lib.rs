@@ -16,6 +16,7 @@ pub mod openrouter_metadata;
 mod operation_control;
 pub mod postgres;
 mod pricing_sources;
+mod profiles;
 pub mod replay;
 mod settlement;
 pub mod vault;

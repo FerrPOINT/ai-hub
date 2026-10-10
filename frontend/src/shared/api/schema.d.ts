@@ -308,6 +308,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/virtual-models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listVirtualModels"];
+        put?: never;
+        post: operations["createVirtualModel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/virtual-models/{model_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["readVirtualModel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateVirtualModelDraft"];
+        trace?: never;
+    };
     "/branding/contract": {
         parameters: {
             query?: never;
@@ -454,6 +486,10 @@ export interface components {
         BudgetPeriod: "utc_day" | "utc_month";
         /** @enum {string} */
         BudgetScope: "installation" | "project" | "client" | "profile";
+        /** @enum {string} */
+        CallerOverride: "temperature" | "top_p" | "max_output_tokens" | "reasoning_effort";
+        /** @enum {string} */
+        Capability: "text" | "stream" | "function_tools" | "json_schema" | "responses" | "cancel";
         CatalogPage: {
             /** Format: date-time */
             as_of: string;
@@ -499,6 +535,13 @@ export interface components {
         /** @enum {string} */
         CredentialType: "api_key";
         Currency: string;
+        DeploymentInput: {
+            /** Format: uuid */
+            connection_id: string;
+            /** Format: int64 */
+            generation: number;
+            model_id: string;
+        };
         /** @description Operator-owned allowlist; never read from public connection body or caller metadata. */
         EndpointPolicyInput: {
             allow_loopback: boolean;
@@ -518,6 +561,13 @@ export interface components {
             message: string;
             /** Format: uuid */
             request_id: string;
+        };
+        GenerationParameters: {
+            reasoning_effort?: string;
+            /** Format: double */
+            temperature?: number;
+            /** Format: double */
+            top_p?: number;
         };
         Health: {
             schema_revision?: string | null;
@@ -677,6 +727,41 @@ export interface components {
             id: string;
             /** Format: int64 */
             version: number;
+        };
+        Profile: {
+            /** Format: uuid */
+            active_revision_id: string | null;
+            draft: components["schemas"]["ProfileInput"];
+            /** Format: int64 */
+            draft_version: number;
+            /** Format: uuid */
+            id: string;
+            status: string;
+        };
+        ProfileInput: {
+            allowed_overrides?: components["schemas"]["CallerOverride"][];
+            /** Format: int64 */
+            context_limit: number;
+            deployments: components["schemas"]["DeploymentInput"][];
+            display_name: string;
+            /** Format: int64 */
+            input_limit: number;
+            /** Format: int32 */
+            max_attempts: number;
+            mode: components["schemas"]["ProfileMode"];
+            /** Format: int64 */
+            output_limit: number;
+            parameters: components["schemas"]["GenerationParameters"];
+            required_capabilities: components["schemas"]["Capability"][];
+            slug: string;
+            /** Format: int32 */
+            timeout_seconds: number;
+        };
+        /** @enum {string} */
+        ProfileMode: "development" | "pinned_test";
+        ProfilePage: {
+            items: components["schemas"]["Profile"][];
+            next_cursor: string | null;
         };
         /** @enum {string} */
         ProviderKind: "openai_compatible" | "ollama" | "zai" | "chatgpt_managed";
@@ -2365,6 +2450,291 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicConfig"];
+                };
+            };
+        };
+    };
+    listVirtualModels: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfilePage"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    createVirtualModel: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    ETag?: string;
+                    "X-Operation-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Profile"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    readVirtualModel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                model_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Profile"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateVirtualModelDraft: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+                "If-Match": string;
+            };
+            path: {
+                model_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    ETag?: string;
+                    "X-Operation-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Profile"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            412: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };

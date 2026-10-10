@@ -1,6 +1,6 @@
 # Фактическая реализация AI Hub v1
 
-Дата: 2026-10-10. Ветка: `feat/ai-hub-v1-implementation-20261010`.
+Дата: 2026-10-11. Ветка: `feat/ai-hub-v1-implementation-20261010`.
 Источник задачи: полный S1–S7 implementation; production cutover исключён.
 Baseline Hub: `b266e158b33e6cc70e02a9df3ba1d21c74b983af`.
 
@@ -474,3 +474,44 @@ has_credentials/generation; отдельный revoke сохраняет disable
 13 pass, 0.09s; provider/budget DOM suites: 11 pass. Generated OpenAPI/TypeScript и
 final frontend typecheck pass. Live/account/IAB и
 полный профильный lifecycle ещё pending.
+
+## Черновики виртуальных моделей — 2026-10-11
+
+Domain ProfileInput сохраняет exact ordered connection/generation/model IDs,
+режим, generation parameters, input/output/context bounds, timeout/max attempts,
+required capabilities и explicit caller overrides (default пусто). Pinned test
+требует один deployment и одну попытку; duplicate deployment запрещён.
+Slug остаётся стабильным. Отсутствующий generation parameter не отправляется;
+null отвергается, Top P строго больше 0. Draft не требует квалификации и не
+вызывает provider.
+
+Миграция 0019 вводит собственные virtual_models, immutable draft revisions
+и normalized ordered targets с composite ownership FK. Deferred current-draft FK
+не позволяет сохранить pointer на отсутствующую версию. Mutable active revision
+pointer при сохранении draft не меняется; publication owner ещё не реализован.
+Новый FK probe → own draft использует NOT VALID для сохранения legacy snapshots;
+nonempty validation остаётся gate S7.
+
+Foundation/API предоставляют list/read/create/PATCH draft. Mutation требует
+config.write, UUID Idempotency-Key и strong If-Match при edit; read — config.read.
+Same key возвращает исходный ответ, stale draft CAS — 412, занятый slug — отдельный
+409 already_exists. POST/PATCH возвращают 201, новую draft ETag и operation ID
+по target contract. Save/history/ordered targets/operation/audit — одна transaction.
+
+Base UI /models и /models/:id содержит typed fields, exact cached model selection,
+контекст подключения, reorder и explicit выбор текущего поколения. UI сохраняет
+несекретный draft/key во вкладке; lost reply не повторяет PATCH. 404 readback
+не разрешает новую запись до close-unstarted fence. 412 оставляет draft в форме
+и требует explicit read/rebase; archived state запрещает edit.
+
+Проверки текущего среза фиксируются в implementation-evidence.json. Live SSO,
+profile proof/publication/lifecycle, paid provider calls, собственный served runtime
+и IAB приёмка не подтверждены. S1–S7 остаются незавершёнными.
+
+
+Final scoped evidence этого среза: PostgreSQL17 profile fixture — 1 pass, 0 ignored,
+1.00s; domain profile test — 1 pass, 0.01s; API access — 14 pass, 0.08s.
+Controlled DOM — 13 pass (5 model + 8 provider regression), 9.66s. Rust export,
+TypeScript generation/final typecheck, exported profile contract assertions и
+docs/alignment/design gates pass; документационные regression tests — 39 pass.
+Эти результаты не закрывают live SSO/provider/IAB и весь TC.

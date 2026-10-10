@@ -8,6 +8,7 @@ pub mod financial;
 pub mod model_context;
 pub mod prices;
 pub mod pricing_sources;
+pub mod profiles;
 pub mod records;
 pub mod replay;
 pub mod settlement;

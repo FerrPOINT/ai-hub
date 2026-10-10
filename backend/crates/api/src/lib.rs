@@ -24,6 +24,12 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use utoipa::{OpenApi, ToSchema};
 use uuid::Uuid;
+mod profiles;
+use aihub_domain::profiles::{
+    CallerOverride, Capability, DeploymentInput, GenerationParameters, Profile, ProfileInput,
+    ProfileMode,
+};
+use profiles::ProfilePage;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -85,6 +91,7 @@ impl IntoResponse for ApiError {
                 (StatusCode::PRECONDITION_FAILED, "precondition_failed")
             }
             HubError::IdempotencyConflict => (StatusCode::CONFLICT, "idempotency_conflict"),
+            HubError::AlreadyExists => (StatusCode::CONFLICT, "already_exists"),
             HubError::BudgetExceeded => (StatusCode::TOO_MANY_REQUESTS, "budget_exceeded"),
             HubError::Invalid(_) => (StatusCode::BAD_REQUEST, "invalid_request"),
             HubError::InvalidSemantics(_) => {
@@ -903,7 +910,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,disable_connection,write_credential,revoke_credential,read_catalog,refresh_catalog,operation_key,close_unstarted_operation,endpoint_policies,model_contexts,save_model_context),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata,MetadataRefreshInput,OperationLookup,EndpointPolicyInput,EndpointPolicyPage,ModelContextInput,ModelContextPreference,ModelContextPage)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(profiles::list_profiles,profiles::read_profile,profiles::create_profile,profiles::update_profile,live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,disable_connection,write_credential,revoke_credential,read_catalog,refresh_catalog,operation_key,close_unstarted_operation,endpoint_policies,model_contexts,save_model_context),components(schemas(Profile,ProfileInput,ProfileMode,DeploymentInput,GenerationParameters,Capability,CallerOverride,ProfilePage,Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata,MetadataRefreshInput,OperationLookup,EndpointPolicyInput,EndpointPolicyPage,ModelContextInput,ModelContextPreference,ModelContextPage)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -941,6 +948,14 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
         .route("/api/v1/namespaces", get(namespaces))
         .route("/api/v1/audit", get(audit))
         .route("/api/v1/prices", get(prices).post(create_price))
+        .route(
+            "/api/v1/virtual-models",
+            get(profiles::list_profiles).post(profiles::create_profile),
+        )
+        .route(
+            "/api/v1/virtual-models/{model_id}",
+            get(profiles::read_profile).patch(profiles::update_profile),
+        )
         .route("/api/v1/connections", get(connections))
         .route(
             "/api/v1/connections/{connection_id}/models",

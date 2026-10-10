@@ -1,6 +1,6 @@
 # Текущее состояние
 
-Дата: 2026-10-10. Stage: IMPLEMENTING, S1 и S2a в работе.
+Дата: 2026-10-11. Stage: IMPLEMENTING, S1/S2a/S2b в работе.
 
 Полная реализация S1–S7 поручена пользователем. В PDLC3 создана отдельная ветка
 `feat/ai-hub-v1-implementation-20261010` на baseline `b266e15`. Добавляются actual
@@ -51,3 +51,8 @@ Control prices/budgets API
 замечаний к документации и дизайну нет. Ранее собранные 179 states не объявлены
 повторно выполненными этим ревью. Реализация и main/runtime integration остаются
 отдельными gates.
+
+В S2b добавлена собственная граница virtual model drafts: typed config,
+immutable draft history, ordered targets, CAS/idempotency и Base формы
+/models и /models/:id. Публикация и live proof остаются незакрытыми; actual
+результаты среза перечислены в IMPLEMENTATION_STATUS/implementation-evidence.

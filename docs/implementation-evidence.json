@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "partial_implementation",
-  "date": "2026-10-10",
+  "date": "2026-10-11",
   "source_branch": "feat/ai-hub-v1-implementation-20261010",
   "baseline": "b266e158b33e6cc70e02a9df3ba1d21c74b983af",
   "partial_oracles": [
@@ -193,6 +193,44 @@
     "ui_provider_and_budget_regression": {"passed": 11},
     "generated_contract": "rust_openapi_typescript_and_final_typecheck_pass",
     "remaining": "live/account/SSO/IAB; profile enable/rollback/archive; process crash/restore and full TC"
+  },
+  "profile_draft_oracles": {
+    "date": "2026-10-11",
+    "status": "partial_implementation",
+    "tests": [
+      "TC-004",
+      "TC-006",
+      "TC-018",
+      "TC-027",
+      "TC-039",
+      "TC-040"
+    ],
+    "profile_pg": {
+      "source": "backend/crates/infrastructure/tests/profile_pg.rs",
+      "passed": 1,
+      "ignored": 0,
+      "seconds": 1.0
+    },
+    "domain": {
+      "source": "backend/crates/domain/src/profiles.rs",
+      "passed": 1,
+      "seconds": 0.01
+    },
+    "ui_controlled_dom": {
+      "source": "frontend/src/features/models/Models.test.tsx",
+      "model_tests": 5,
+      "provider_regression_tests": 8,
+      "passed": 13,
+      "duration_seconds": 9.66
+    },
+    "api": {
+      "passed": 14,
+      "seconds": 0.08,
+      "source": "backend/crates/api/tests/access.rs",
+      "mode": "in_process_test_auth_store"
+    },
+    "generated_contract": "rust_openapi_typescript_and_final_typecheck_pass",
+    "remaining": "bootstrap verification and account currency witness; exact profile proof/publication/revisions/rollback/disable/enable/archive; live SSO/account/runtime/IAB; full TC"
   },
   "required_acceptance": {
     "S1": "in_progress",
