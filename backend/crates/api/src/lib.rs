@@ -5,6 +5,7 @@ use aihub_domain::{
     budgets::{Budget, BudgetInput, BudgetPeriod, BudgetScope},
     error::HubError,
     prices::{PriceInput, PriceRevision, PriceUnit},
+    pricing_sources::{PricingDataStatus, PricingMode, PricingSourceInput, PricingSourceRevision},
     records::{AuditEvent, Health, Identity, NamespaceBinding, Operation},
 };
 use axum::{
@@ -79,6 +80,9 @@ impl IntoResponse for ApiError {
             HubError::IdempotencyConflict => (StatusCode::CONFLICT, "idempotency_conflict"),
             HubError::BudgetExceeded => (StatusCode::TOO_MANY_REQUESTS, "budget_exceeded"),
             HubError::Invalid(_) => (StatusCode::BAD_REQUEST, "invalid_request"),
+            HubError::InvalidSemantics(_) => {
+                (StatusCode::UNPROCESSABLE_ENTITY, "invalid_semantics")
+            }
             HubError::Unavailable | HubError::InstallationMismatch => {
                 (StatusCode::SERVICE_UNAVAILABLE, "unavailable")
             }
@@ -114,6 +118,56 @@ pub struct AuditPage {
 pub struct PricePage {
     pub items: Vec<PriceRevision>,
     pub next_cursor: Option<String>,
+}
+#[derive(Serialize, ToSchema)]
+pub struct PricingSourcePage {
+    pub items: Vec<PricingSourceRevision>,
+    pub next_cursor: Option<String>,
+}
+#[utoipa::path(get,path="/api/v1/pricing-sources",operation_id="listPricingSources",security(("CentralAuth"=[])),params(("limit"=Option<i64>,Query,minimum=1,maximum=100),("cursor"=Option<Uuid>,Query)),responses((status=200,body=PricingSourcePage),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=503,body=Error)))]
+pub async fn pricing_sources(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    RawQuery(query): RawQuery,
+) -> Result<Json<PricingSourcePage>, ApiError> {
+    let (limit, cursor) = list_options(query.as_deref().unwrap_or(""), false)?;
+    let page = state
+        .foundation
+        .pricing_sources(&principal, limit, cursor)
+        .await?;
+    Ok(Json(PricingSourcePage {
+        items: page.items,
+        next_cursor: page.next_cursor,
+    }))
+}
+#[utoipa::path(post,path="/api/v1/pricing-sources",operation_id="createPricingSourceRevision",security(("CentralAuth"=[])),params(("Idempotency-Key"=Uuid,Header)),request_body=PricingSourceInput,responses((status=201,body=PricingSourceRevision),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=409,body=Error),(status=412,body=Error),(status=422,body=Error),(status=503,body=Error)))]
+pub async fn create_pricing_source(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    headers: HeaderMap,
+    body: Result<Json<PricingSourceInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<
+    (
+        StatusCode,
+        [(String, String); 1],
+        Json<PricingSourceRevision>,
+    ),
+    ApiError,
+> {
+    principal.require_config(true)?;
+    let key = mutation_key(&headers)?;
+    let input = body
+        .map_err(|_| HubError::Invalid("pricing source payload"))?
+        .0;
+    let result = state
+        .foundation
+        .create_pricing_source(&principal, key, &input)
+        .await?;
+    Ok((
+        StatusCode::CREATED,
+        [("x-operation-id".into(), result.operation_id.to_string())],
+        Json(result.value),
+    ))
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
@@ -497,7 +551,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -535,6 +589,10 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
         .route("/api/v1/namespaces", get(namespaces))
         .route("/api/v1/audit", get(audit))
         .route("/api/v1/prices", get(prices).post(create_price))
+        .route(
+            "/api/v1/pricing-sources",
+            get(pricing_sources).post(create_pricing_source),
+        )
         .route("/api/v1/budgets", get(budgets).post(create_budget))
         .route(
             "/api/v1/budgets/{budget_id}",

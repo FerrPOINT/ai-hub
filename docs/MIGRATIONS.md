@@ -16,7 +16,7 @@ Production admission выключен до successful explicit migrate/readiness
 new state → switch; downgrade только если старый binary умеет читать актуальную schema.
 Rollback binary не откатывает facts и не освобождает unknown reserves.
 Миграция с irreversible data transformation требует own backup/restore rehearsal.
-Actual migrations `0001`–`0009` применились на own disposable PostgreSQL17;
+Actual migrations `0001`–`0010` применились на own disposable PostgreSQL17;
 foundation и financial evidence отражены в IMPLEMENTATION_STATUS. Все новые
 миграции квалифицировались только на disposable fixture, не на installed PDLC DB.
 Upgrade/nonempty restore остаются S7 gates; их PASS не выводится из fresh install.
@@ -34,3 +34,9 @@ dedupe. Nonempty upgrade/constraint validation остаются отдельны
 `0009` вводит immutable bounded queue deadline новых intents. Старый deadline
 не угадывается: legacy unclaimed state допускает uncertainty recovery, но не
 новый dispatch claim. Это не terminal no-billing witness и не release reserve.
+
+`0010` добавляет stable source policies, immutable revisions и structural catalog
+origin с own FKs. Current tier хранится в connection generation, legacy tier
+остаётся unknown. Eligible catalog view не считает human quote labels evidence.
+Financial snapshot FK/consumer guard присоединяется до первого probe; fresh SQL
+fixture не означает квалифицированную nonempty migration или live catalog.

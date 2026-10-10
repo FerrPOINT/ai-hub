@@ -14,6 +14,8 @@ pub enum HubError {
     BudgetExceeded,
     #[error("Некорректный запрос: {0}")]
     Invalid(&'static str),
+    #[error("Некорректная семантика: {0}")]
+    InvalidSemantics(&'static str),
     #[error("Сервис временно недоступен")]
     Unavailable,
     #[error("Не подтверждена идентичность установки или схема")]

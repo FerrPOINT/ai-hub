@@ -32,7 +32,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | Этап | Фактический статус | Следующий результат |
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
-| S2a | В реализации: financial SQL, control prices/budgets, basic budget UI, protected result buffer и cancel/recovery ports | Price/source forms, pricing-source timeline и runtime lifecycle worker |
+| S2a | В реализации: financial SQL, control prices/budgets/sources, basic budget UI, protected result buffer и cancel/recovery ports | Source bindings в admission/dispatch, price/source forms и runtime lifecycle worker |
 | S2b | Не реализован | Connection/catalog/draft/CAS/proof/publication UI/API |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
@@ -151,7 +151,7 @@ requests/attempts/usage/replay, immutable ledger и budget/reservation табл�
 effective expense pointer; `0008` — frozen wire mode и encrypted result receipts.
 Application financial port реализован для internal
 verification; provider transport ещё не подключён. Price forms,
-pricing-source timeline и runtime lifecycle worker ещё впереди. Public/evaluation admission выключен до
+source binding в financial admission/dispatch и runtime lifecycle worker ещё впереди. Public/evaluation admission выключен до
 S3/S6. FK profile revision присоединяется S2b до public inference.
 
 ## Protected results — текущий срез
@@ -205,3 +205,27 @@ rejection, cancel/claim race, immutable deadline, expiry/no redispatch и untouc
 live neighbor с прежним request ID. Прежние settlement/replay assertions сохранены.
 `cargo check --locked -p aihub-api --tests` pass. Actual process crash, transport
 cancel, public authentication и runtime scheduler остаются `not_run`.
+
+## Pricing sources — текущий срез
+
+Добавлены `GET/POST /api/v1/pricing-sources`, typed required nullable fields,
+Idempotency-Key/HMAC operation replay, CAS по connection/model/currency и atomic audit.
+Immutable revisions имеют unique start и half-open intervals. Resolver выбирает
+последнюю started revision; expired revision сохраняет ID с unknown quote, без
+older fallback. Future source меняет policy version, но не текущий effective ID.
+Manual binding проверяет exact quote tuple, current generation tier и allowed window;
+несоответствие — 422. Уже созданная несвязанная quote не удаляется при failed binding.
+
+Auto требует structural catalog origin и current qualified pricing reader/native
+currency/account generation/adapter/endpoint. Свободный текст price.source не даёт
+этих прав. Catalog observation и data status показываются отдельно от settings.
+Существующий legacy billing tier не угадывается из имени или billing_mode.
+
+Fresh PostgreSQL17 после `0010`: 1 scenario pass, 0 ignored, 0.90s. Assertions:
+concurrent operation replay/CAS, exact connection/currency neighbors, expiry no
+fallback, original readback после новых revisions, unique start, immutable rows,
+final audit rollback и auto rejection/qualification/invalidation. Catalog/account
+fixtures синтетические; ledger entries 0, provider calls 0. Five API access tests
+pass (controlled authentication ports). Financial engine ещё использует прежний
+internal quote intent: обязательный source snapshot/version guard добавляется
+следующим integrated slice до первого probe. Поэтому полный TC-038/S2a не закрыт.

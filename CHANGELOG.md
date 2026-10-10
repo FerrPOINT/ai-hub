@@ -22,6 +22,8 @@
 - Owned cancellation через common settlement engine; after-dispatch intent
   сохраняет резерв. Immutable queue deadline и bounded unclaimed recovery
   запрещают новый send после expiry/restart.
+- Pricing-source GET/POST и immutable CAS timeline; exact quote/tier/currency
+  bindings, expired source identity без fallback и qualified catalog provenance.
 
 ### Повторная проверка 2026-10-10
 

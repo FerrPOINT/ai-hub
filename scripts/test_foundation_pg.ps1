@@ -1,4 +1,4 @@
-param([ValidateSet('foundation_pg','financial_pg','control_pg','budget_pg')][string]$TestName='foundation_pg')
+param([ValidateSet('foundation_pg','financial_pg','control_pg','budget_pg','pricing_pg')][string]$TestName='foundation_pg')
 $ErrorActionPreference = 'Stop'
 $hubRepo = Split-Path $PSScriptRoot -Parent
 $hubWorkspace = Split-Path $hubRepo -Parent

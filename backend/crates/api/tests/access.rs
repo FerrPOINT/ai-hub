@@ -330,3 +330,96 @@ async fn budget_http_requires_exact_scope_pair_decimal_and_strong_cas() {
         );
     }
 }
+
+#[tokio::test]
+async fn source_control_requires_write_scope_key_and_explicit_nullable_fields() {
+    let (app, _) = fixture();
+    let input = serde_json::json!({"connection_id":Uuid::new_v4(),"model_id":"model","currency":"USD","mode":"manual","manual_price_revision_id":Uuid::new_v4(),"expected_version":0,"effective_from":"2026-10-10T00:00:00Z","effective_to":null});
+    for (token, key, body, expected) in [
+        (
+            "read",
+            Uuid::new_v4().to_string(),
+            input.clone(),
+            StatusCode::FORBIDDEN,
+        ),
+        (
+            "foreign",
+            Uuid::new_v4().to_string(),
+            input.clone(),
+            StatusCode::FORBIDDEN,
+        ),
+        (
+            "write",
+            Uuid::nil().to_string(),
+            input.clone(),
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            Uuid::new_v4().to_string(),
+            {
+                let mut b = input.clone();
+                b.as_object_mut().unwrap().remove("effective_to");
+                b
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            Uuid::new_v4().to_string(),
+            {
+                let mut b = input.clone();
+                b.as_object_mut()
+                    .unwrap()
+                    .remove("manual_price_revision_id");
+                b
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            Uuid::new_v4().to_string(),
+            {
+                let mut b = input.clone();
+                b["expected_version"] = serde_json::json!(-1);
+                b
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            Uuid::new_v4().to_string(),
+            input.clone(),
+            StatusCode::SERVICE_UNAVAILABLE,
+        ),
+    ] {
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/pricing-sources")
+                    .header("authorization", format!("Bearer {token}"))
+                    .header("content-type", "application/json")
+                    .header("idempotency-key", key)
+                    .body(Body::from(serde_json::to_vec(&body).unwrap()))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), expected);
+        assert_eq!(
+            response.headers().get("content-type").unwrap(),
+            "application/json"
+        );
+    }
+    assert_eq!(
+        status(
+            &app,
+            "/api/v1/pricing-sources?namespace_id=bad",
+            Some("read")
+        )
+        .await,
+        StatusCode::BAD_REQUEST
+    );
+}

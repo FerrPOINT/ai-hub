@@ -794,6 +794,203 @@
         ]
       }
     },
+    "/api/v1/pricing-sources": {
+      "get": {
+        "tags": [],
+        "operationId": "listPricingSources",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricingSourcePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [],
+        "operationId": "createPricingSourceRevision",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PricingSourceInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricingSourceRevision"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ]
+      }
+    },
     "/api/v1/public/config": {
       "get": {
         "tags": [],
@@ -1520,6 +1717,133 @@
         "enum": [
           "per_million_tokens"
         ]
+      },
+      "PricingDataStatus": {
+        "type": "string",
+        "enum": [
+          "complete",
+          "stale",
+          "unavailable"
+        ]
+      },
+      "PricingMode": {
+        "type": "string",
+        "enum": [
+          "manual",
+          "provider_auto"
+        ]
+      },
+      "PricingSourceInput": {
+        "type": "object",
+        "required": [
+          "connection_id",
+          "model_id",
+          "currency",
+          "mode",
+          "manual_price_revision_id",
+          "expected_version",
+          "effective_from",
+          "effective_to"
+        ],
+        "properties": {
+          "connection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effective_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "expected_version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "manual_price_revision_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/PricingMode"
+          },
+          "model_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PricingSourcePage": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PricingSourceRevision"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "PricingSourceRevision": {
+        "type": "object",
+        "required": [
+          "id",
+          "config",
+          "version",
+          "actor_subject",
+          "created_at",
+          "data_status"
+        ],
+        "properties": {
+          "actor_subject": {
+            "type": "string"
+          },
+          "catalog_observed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "config": {
+            "$ref": "#/components/schemas/PricingSourceInput"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "data_status": {
+            "$ref": "#/components/schemas/PricingDataStatus"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
       },
       "PublicConfig": {
         "type": "object",

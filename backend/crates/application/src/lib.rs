@@ -64,6 +64,23 @@ pub trait CentralAuthentication: Send + Sync {
 
 #[async_trait]
 pub trait FoundationStore: Send + Sync {
+    async fn pricing_source_page(
+        &self,
+        _subject: &str,
+        _limit: i64,
+        _cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::pricing_sources::PricingSourceRevision>, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn create_pricing_source(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+        _input: &aihub_domain::pricing_sources::PricingSourceInput,
+    ) -> Result<aihub_domain::pricing_sources::PricingSourceMutation, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn budget_page(
         &self,
         _subject: &str,
@@ -174,6 +191,33 @@ pub struct BudgetFilter {
 }
 
 impl Foundation {
+    pub async fn pricing_sources(
+        &self,
+        principal: &HumanPrincipal,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::pricing_sources::PricingSourceRevision>, HubError> {
+        principal.require_config(false)?;
+        self.store
+            .pricing_source_page(&principal.subject, bounded_limit(limit)?, cursor)
+            .await
+    }
+    pub async fn create_pricing_source(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        input: &aihub_domain::pricing_sources::PricingSourceInput,
+    ) -> Result<aihub_domain::pricing_sources::PricingSourceMutation, HubError> {
+        principal.require_config(true)?;
+        input.validate()?;
+        if key.is_nil() {
+            return Err(HubError::Invalid("pricing source operation key"));
+        }
+        let binding=self.bindings.bind(&serde_json::json!({"installation_id":self.installation_id,"principal":principal.subject,"action":"pricing-source.create","input":input}))?;
+        self.store
+            .create_pricing_source(&principal.subject, key, binding, input)
+            .await
+    }
     pub async fn budgets(
         &self,
         principal: &HumanPrincipal,

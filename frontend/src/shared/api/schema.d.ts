@@ -116,6 +116,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pricing-sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listPricingSources"];
+        put?: never;
+        post: operations["createPricingSourceRevision"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/config": {
         parameters: {
             query?: never;
@@ -368,6 +384,42 @@ export interface components {
         };
         /** @enum {string} */
         PriceUnit: "per_million_tokens";
+        /** @enum {string} */
+        PricingDataStatus: "complete" | "stale" | "unavailable";
+        /** @enum {string} */
+        PricingMode: "manual" | "provider_auto";
+        PricingSourceInput: {
+            /** Format: uuid */
+            connection_id: string;
+            currency: components["schemas"]["Currency"];
+            /** Format: date-time */
+            effective_from: string;
+            /** Format: date-time */
+            effective_to: string | null;
+            /** Format: int64 */
+            expected_version: number;
+            /** Format: uuid */
+            manual_price_revision_id: string | null;
+            mode: components["schemas"]["PricingMode"];
+            model_id: string;
+        };
+        PricingSourcePage: {
+            items: components["schemas"]["PricingSourceRevision"][];
+            next_cursor?: string | null;
+        };
+        PricingSourceRevision: {
+            actor_subject: string;
+            /** Format: date-time */
+            catalog_observed_at?: string | null;
+            config: components["schemas"]["PricingSourceInput"];
+            /** Format: date-time */
+            created_at: string;
+            data_status: components["schemas"]["PricingDataStatus"];
+            /** Format: uuid */
+            id: string;
+            /** Format: int64 */
+            version: number;
+        };
         PublicConfig: {
             auth_issuer: string;
             branding_url?: string | null;
@@ -880,6 +932,141 @@ export interface operations {
                 };
             };
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listPricingSources: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PricingSourcePage"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    createPricingSourceRevision: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingSourceInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PricingSourceRevision"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            412: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

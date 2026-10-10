@@ -4,6 +4,7 @@ pub mod budgets;
 pub mod error;
 pub mod financial;
 pub mod prices;
+pub mod pricing_sources;
 pub mod records;
 pub mod replay;
 pub mod settlement;

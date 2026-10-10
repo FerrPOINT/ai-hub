@@ -25,6 +25,7 @@ Cargo/pnpm manifests, own DB-01, central-auth/vault ports, control reads, Rust O
 Финансовая SQL-граница S2a проверена отдельно: bounded admission, one-send claim,
 unknown hold/restart, atomic receipts/corrections и protected encrypted result buffer.
 Добавлены owned cancel и expired unclaimed recovery ports; runtime worker ещё не подключён.
+Pricing-source control/CAS/resolver проверены отдельно; financial source binding ещё pending.
 Control prices/budgets API
 и basic budget UI реализованы; price forms и live provider path ещё впереди.
 [Partial evidence](implementation-evidence.json)
