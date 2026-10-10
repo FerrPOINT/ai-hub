@@ -435,12 +435,12 @@ impl FoundationStore for PgStore {
     }
 
     async fn operation(&self, subject: &str, id: Uuid) -> Result<Operation, HubError> {
-        let row = sqlx::query("SELECT id,state,resource_id,version FROM operations WHERE installation_id=$1 AND id=$2 AND principal_kind='human' AND principal_id=$3").bind(self.installation_id).bind(id).bind(subject).fetch_optional(&self.pool).await.map_err(|_| HubError::Unavailable)?.ok_or(HubError::NotFound)?;
+        let row = sqlx::query("SELECT id,state,resource_id,version,safe_result->>'safe_error' AS safe_error FROM operations WHERE installation_id=$1 AND id=$2 AND principal_kind='human' AND principal_id=$3").bind(self.installation_id).bind(id).bind(subject).fetch_optional(&self.pool).await.map_err(|_| HubError::Unavailable)?.ok_or(HubError::NotFound)?;
         Ok(Operation {
             id: row.get("id"),
             status: row.get("state"),
             resource_id: row.get("resource_id"),
-            safe_error: None,
+            safe_error: row.get("safe_error"),
             version: row.get("version"),
         })
     }

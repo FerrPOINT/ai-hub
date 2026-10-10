@@ -248,4 +248,14 @@ control auth/UUID key/CAS/reason, sync 200 TariffActivation с cancellation witn
 ProjectCharge имеет cost_source_state и guarded nullable source UUID: unconfigured
 не создаёт fake revision. StatisticsFilters общая для всех statistics/export paths,
 с full dimensions/timezone и opaque IDs. ServiceInferenceInput discriminated по protocol;
-ChatInput/ResponsesInput mismatch отклоняется до I/O. Runtime API пока отсутствует.
+ChatInput/ResponsesInput mismatch отклоняется до I/O. Это target contract;
+реализованная subset API хранится отдельно в openapi/openapi.json.
+
+## Реализованный metadata refresh
+
+POST `/api/v1/connections/{connection_id}/models/refresh` принимает только
+`expected_generation` и UUID `Idempotency-Key`, требует config-write scope и
+`external_calls=true`. 202 возвращает собственную Operation; pending/unknown
+читается через GET операции. Disabled external calls отклоняются до intent/HTTP.
+Same-key повтор при enabled calls читает исходную operation. GET models остаётся
+cached read. Metadata не заменяет verification/probe и не разрешает inference.

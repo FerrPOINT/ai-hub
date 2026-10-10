@@ -16,6 +16,7 @@ pub struct MaintenanceStats {
     pub expired_dispatches: u64,
     pub expired_payloads: u64,
     pub expired_snapshots: u64,
+    pub expired_metadata: u64,
     pub failed_tasks: u32,
 }
 fn record(stats: &mut MaintenanceStats, task: &'static str, result: Result<u64, HubError>) -> u64 {
@@ -57,6 +58,11 @@ impl MaintenanceWorker {
             "dispatch",
             self.store.recover_expired_dispatches().await,
         );
+        stats.expired_metadata = record(
+            &mut stats,
+            "metadata",
+            self.store.recover_expired_metadata().await,
+        );
         stats.expired_payloads = record(
             &mut stats,
             "payload",
@@ -85,7 +91,7 @@ impl MaintenanceWorker {
                 changed=stop.changed()=>{if changed.is_err() || *stop.borrow() {break}},
                 _=interval.tick()=>{
                     match self.run_once().await {
-                        Ok(stats) if stats.cancellations+stats.expired_intents+stats.expired_dispatches+stats.expired_payloads+stats.expired_snapshots>0 || stats.failed_tasks>0=>tracing::info!(?stats,"AI Hub maintenance cycle"),
+                        Ok(stats) if stats.cancellations+stats.expired_intents+stats.expired_dispatches+stats.expired_payloads+stats.expired_snapshots+stats.expired_metadata>0 || stats.failed_tasks>0=>tracing::info!(?stats,"AI Hub maintenance cycle"),
                         Ok(_)=>(),
                         Err(_)=>tracing::warn!(task="readiness","AI Hub maintenance unavailable; no unchecked mutation"),
                     }

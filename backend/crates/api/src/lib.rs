@@ -3,7 +3,7 @@ use aihub_domain::{
     NamespaceRef,
     access::{HumanPrincipal, namespace_filter},
     budgets::{Budget, BudgetInput, BudgetPeriod, BudgetScope},
-    catalog::{CatalogPage, ModelMetadata},
+    catalog::{CatalogPage, MetadataRefreshInput, ModelMetadata},
     connections::{
         BillingMode, Connection, ConnectionInput, CredentialInput, CredentialType, ProviderKind,
     },
@@ -26,6 +26,7 @@ use uuid::Uuid;
 #[derive(Clone)]
 pub struct AppState {
     pub foundation: Foundation,
+    pub metadata: std::sync::Arc<dyn aihub_application::MetadataOperations>,
     pub external_calls: bool,
     pub auth_issuer: String,
     pub public_origin: String,
@@ -514,6 +515,34 @@ fn catalog_options(raw: &str) -> Result<(String, i64, Option<Uuid>), HubError> {
     let (limit, cursor) = list_options(&encoded.finish(), false)?;
     Ok((query.unwrap_or_default(), limit, cursor))
 }
+#[utoipa::path(post,path="/api/v1/connections/{connection_id}/models/refresh",operation_id="refreshModelCatalog",security(("CentralAuth"=[])),params(("connection_id"=Uuid,Path),("Idempotency-Key"=Uuid,Header)),request_body=MetadataRefreshInput,responses((status=202,body=Operation),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=409,body=Error),(status=412,body=Error),(status=422,body=Error),(status=503,body=Error)))]
+pub async fn refresh_catalog(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(id): Path<String>,
+    headers: HeaderMap,
+    body: Result<Json<MetadataRefreshInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<(StatusCode, Json<Operation>), ApiError> {
+    principal.require_config(true)?;
+    if !state.external_calls {
+        return Err(HubError::Unavailable.into());
+    }
+    let key = mutation_key(&headers)?;
+    let id = Uuid::parse_str(&id).map_err(|_| HubError::Invalid("connection ID"))?;
+    let input = body.map_err(|_| HubError::Invalid("metadata payload"))?.0;
+    if input.expected_generation < 1 {
+        return Err(HubError::Invalid("connection generation").into());
+    }
+    Ok((
+        StatusCode::ACCEPTED,
+        Json(
+            state
+                .metadata
+                .refresh(&principal, key, id, input.expected_generation)
+                .await?,
+        ),
+    ))
+}
 fn list_options(raw: &str, namespace_allowed: bool) -> Result<(i64, Option<Uuid>), HubError> {
     let mut limit = None;
     let mut cursor = None;
@@ -718,7 +747,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,write_credential,revoke_credential,read_catalog),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,write_credential,revoke_credential,read_catalog,refresh_catalog),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata,MetadataRefreshInput)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -760,6 +789,10 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
         .route(
             "/api/v1/connections/{connection_id}/models",
             get(read_catalog),
+        )
+        .route(
+            "/api/v1/connections/{connection_id}/models/refresh",
+            axum::routing::post(refresh_catalog),
         )
         .route(
             "/api/v1/connections/{connection_id}/credentials",

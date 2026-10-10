@@ -67,7 +67,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     store.ready().await?;
     let maintenance = MaintenanceWorker::new(store.clone(), vault.clone())?;
+    let metadata = Arc::new(
+        aihub_infrastructure::metadata_refresh::MetadataRefresh::new(store.clone(), vault.clone())?,
+    );
     let state = AppState {
+        metadata,
         foundation: Foundation {
             installation_id: config.installation_id,
             auth: Arc::new(CentralAuth::default()),

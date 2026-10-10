@@ -34,6 +34,9 @@
   prepared не означает active, original replay не восстанавливает отозванную auth.
 - Exact OpenRouter metadata decoder, immutable catalog snapshots/search/pagination;
   advertised data остаётся unverified, missing price не становится нулём.
+- Durable OpenRouter metadata refresh: generation-bound operation до HTTP,
+  bounded HTTPS reads, atomic sanitized cache/audit/readback и unknown recovery.
+  Metadata success не активирует inference и не подтверждает currency.
 
 ### Повторная проверка 2026-10-10
 

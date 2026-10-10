@@ -37,6 +37,12 @@ pub struct CatalogPage {
     pub data_status: String,
     pub next_cursor: Option<String>,
 }
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct MetadataRefreshInput {
+    #[schema(minimum = 1)]
+    pub expected_generation: i64,
+}
 /// No Debug/Serialize: provider key metadata may contain credential fragments and account identities.
 pub struct AccountObservation {
     pub limit: Option<Amount>,

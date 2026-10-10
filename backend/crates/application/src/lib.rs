@@ -5,6 +5,16 @@ use aihub_domain::{
     records::{AuditEvent, Identity, NamespaceBinding, Operation, Page},
 };
 use async_trait::async_trait;
+#[async_trait]
+pub trait MetadataOperations: Send + Sync {
+    async fn refresh(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        connection: Uuid,
+        expected_generation: i64,
+    ) -> Result<Operation, HubError>;
+}
 use std::sync::Arc;
 use uuid::Uuid;
 

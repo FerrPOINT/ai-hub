@@ -134,6 +134,32 @@
       "remaining": "durable metadata HTTP refresh/audit; qualified native currency and quote provenance; real account/model; context preferences; UI and full TC"
     }
   ],
+  "metadata_refresh_oracles": {
+    "status": "partial_implementation",
+    "tests": ["TC-001", "TC-002", "TC-003", "TC-018", "TC-027", "TC-028"],
+    "postgresql17": {
+      "source": "backend/crates/infrastructure/tests/metadata_pg.rs",
+      "passed": 1,
+      "ignored": 0,
+      "seconds": 0.77,
+      "behavior": "single_claim_concurrency_original_readback_generation_rotation_atomic_audit_owner_binding_unknown_recovery_immutable_canary"
+    },
+    "bounded_transport": {
+      "source": "backend/crates/infrastructure/src/metadata_http.rs",
+      "passed": 3,
+      "seconds": 0.67,
+      "behavior": "owned_dns_public_ip_redirect_oversize_no_retry"
+    },
+    "api": {
+      "source": "backend/crates/api/tests/access.rs",
+      "passed": 9,
+      "seconds": 0.06,
+      "behavior": "write_scope_external_opt_in_and_strict_payload_before_metadata_intent"
+    },
+    "catalog_regression": {"passed": 1, "ignored": 0, "seconds": 1.08},
+    "generated_contract": "rust_openapi_typescript_regeneration_and_typecheck_pass",
+    "remaining": "live authenticated account/currency witness; quote materialization; inference capability proof; context/UI; process crash/restore and full TC acceptance"
+  },
   "required_acceptance": {
     "S1": "in_progress",
     "S2a": "in_progress",

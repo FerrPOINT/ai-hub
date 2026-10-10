@@ -28,7 +28,8 @@ unknown hold/restart, atomic receipts/corrections и protected encrypted result 
 Pricing-source control/CAS/resolver и mandatory financial source guard проверены
 на isolated SQL fixtures; forms и served runtime/provider evidence ещё pending.
 Начат S2b connection control/operator allowlist и write-only credential lifecycle;
-exact decoder и cached catalog добавлены; live reader/managed auth/qualification ещё pending.
+exact decoder, cached catalog и durable metadata reader добавлены;
+live account/currency/managed auth/qualification ещё pending.
 Control prices/budgets API
 и basic budget UI реализованы; price forms и live provider path ещё впереди.
 [Partial evidence](implementation-evidence.json)

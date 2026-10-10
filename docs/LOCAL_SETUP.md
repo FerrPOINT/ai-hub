@@ -9,6 +9,7 @@ python scripts/materialize_dependencies.py
 python scripts/verify_dependencies.py
 ./scripts/rust.ps1 -CargoArgs @('check','--locked','-p','aihub-api')
 ./scripts/test_foundation_pg.ps1
+./scripts/test_foundation_pg.ps1 -TestName metadata_pg
 ./scripts/rust.ps1 -CargoArgs @('run','--locked','-p','aihub-api','--','export-openapi','openapi/openapi.json')
 pnpm --dir frontend openapi:generate
 pnpm --dir frontend typecheck

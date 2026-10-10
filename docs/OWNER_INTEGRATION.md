@@ -28,3 +28,10 @@ Qualification policy: максимум пять коротких вызовов,
 валюта/аккаунт/model/rates проверяются до dispatch, paid calls пока 0.
 Существующие Octo/Admin credentials/state и runtime не переключаются.
 Остальные обязательные provider accounts пока не разрешены/не квалифицированы.
+
+Official [Support](https://openrouter.ai/support) описывает credits как USD.
+Это reference для отдельного currency reader contract, не live account witness:
+authenticated statement и generation-bound proof ещё нужны. Endpoint
+[GET credits](https://openrouter.ai/docs/api/api-reference/credits/get-credits)
+требует management key; inference key не расширяется до management ради проверки.
+Текущий metadata reader использует только GET key/models и сохраняет currency unknown.

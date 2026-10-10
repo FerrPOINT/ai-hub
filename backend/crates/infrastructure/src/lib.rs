@@ -8,6 +8,8 @@ mod control;
 mod credentials;
 pub mod financial;
 pub mod maintenance;
+mod metadata_http;
+pub mod metadata_refresh;
 pub mod namespace_reader;
 pub mod openrouter_metadata;
 pub mod postgres;

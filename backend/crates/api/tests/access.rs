@@ -63,6 +63,19 @@ struct TestStore {
     reads: AtomicUsize,
 }
 #[async_trait]
+impl aihub_application::MetadataOperations for TestStore {
+    async fn refresh(
+        &self,
+        _: &HumanPrincipal,
+        _: Uuid,
+        _: Uuid,
+        _: i64,
+    ) -> Result<Operation, HubError> {
+        self.reads.fetch_add(1, Ordering::SeqCst);
+        Err(HubError::Unavailable)
+    }
+}
+#[async_trait]
 impl FoundationStore for TestStore {
     async fn ready(&self) -> Result<(), HubError> {
         Ok(())
@@ -91,11 +104,15 @@ impl FoundationStore for TestStore {
     }
 }
 fn fixture() -> (axum::Router, Arc<TestStore>) {
+    fixture_with_external(false)
+}
+fn fixture_with_external(external_calls: bool) -> (axum::Router, Arc<TestStore>) {
     let store = Arc::new(TestStore {
         reads: AtomicUsize::new(0),
     });
     let app = router(
         AppState {
+            metadata: store.clone(),
             foundation: Foundation {
                 installation_id: Uuid::new_v4(),
                 auth: Arc::new(TestAuth),
@@ -103,7 +120,7 @@ fn fixture() -> (axum::Router, Arc<TestStore>) {
                 bindings: Arc::new(TestBinding),
                 secrets: Arc::new(TestBinding),
             },
-            external_calls: false,
+            external_calls,
             auth_issuer: "http://localhost:8101".into(),
             public_origin: "http://localhost:8192".into(),
             admin_origin: None,
@@ -111,6 +128,61 @@ fn fixture() -> (axum::Router, Arc<TestStore>) {
         2097152,
     );
     (app, store)
+}
+#[tokio::test]
+async fn metadata_refresh_requires_write_scope_and_external_opt_in_before_intent() {
+    let (app, store) = fixture();
+    for (token, expected) in [
+        ("read", StatusCode::FORBIDDEN),
+        ("foreign", StatusCode::FORBIDDEN),
+        ("write", StatusCode::SERVICE_UNAVAILABLE),
+    ] {
+        let request = Request::builder()
+            .method("POST")
+            .uri(format!(
+                "/api/v1/connections/{}/models/refresh",
+                Uuid::new_v4()
+            ))
+            .header("authorization", format!("Bearer {token}"))
+            .header("content-type", "application/json")
+            .header("Idempotency-Key", Uuid::new_v4().to_string())
+            .body(Body::from(r#"{"expected_generation":2}"#))
+            .unwrap();
+        assert_eq!(
+            app.clone().oneshot(request).await.unwrap().status(),
+            expected
+        );
+    }
+    assert_eq!(store.reads.load(Ordering::SeqCst), 0);
+    let (app, store) = fixture_with_external(true);
+    for (body, expected) in [
+        (r#"{"expected_generation":0}"#, StatusCode::BAD_REQUEST),
+        (
+            r#"{"expected_generation":2,"url":"https://evil.example"}"#,
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            r#"{"expected_generation":2}"#,
+            StatusCode::SERVICE_UNAVAILABLE,
+        ),
+    ] {
+        let request = Request::builder()
+            .method("POST")
+            .uri(format!(
+                "/api/v1/connections/{}/models/refresh",
+                Uuid::new_v4()
+            ))
+            .header("authorization", "Bearer write")
+            .header("content-type", "application/json")
+            .header("Idempotency-Key", Uuid::new_v4().to_string())
+            .body(Body::from(body))
+            .unwrap();
+        assert_eq!(
+            app.clone().oneshot(request).await.unwrap().status(),
+            expected
+        );
+    }
+    assert_eq!(store.reads.load(Ordering::SeqCst), 1);
 }
 async fn status(app: &axum::Router, path: &str, token: Option<&str>) -> StatusCode {
     let mut request = Request::builder().uri(path);

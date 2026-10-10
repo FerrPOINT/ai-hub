@@ -15,6 +15,31 @@ impl PgStore {
         endpoint_hash: &str,
         observation: &CatalogObservation,
     ) -> Result<Uuid, HubError> {
+        let mut tx = self
+            .pool
+            .begin()
+            .await
+            .map_err(|e| db_failure(e, line!()))?;
+        let id = self
+            .store_catalog_locked(
+                &mut tx,
+                connection,
+                expected_generation,
+                endpoint_hash,
+                observation,
+            )
+            .await?;
+        tx.commit().await.map_err(|e| db_failure(e, line!()))?;
+        Ok(id)
+    }
+    pub(crate) async fn store_catalog_locked(
+        &self,
+        tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        connection: Uuid,
+        expected_generation: i64,
+        endpoint_hash: &str,
+        observation: &CatalogObservation,
+    ) -> Result<Uuid, HubError> {
         if connection.is_nil()
             || expected_generation < 1
             || observation.models.len() > 1000
@@ -23,20 +48,15 @@ impl PgStore {
         {
             return Err(HubError::Invalid("catalog observation"));
         }
-        let mut tx = self
-            .pool
-            .begin()
-            .await
-            .map_err(|e| db_failure(e, line!()))?;
         let row=sqlx::query("SELECT c.generation,g.endpoint_policy_hash FROM connections c JOIN connection_generations g ON g.connection_id=c.id AND g.generation=c.generation WHERE c.installation_id=$1 AND c.id=$2 FOR UPDATE OF c,g")
-            .bind(self.installation_id).bind(connection).fetch_optional(&mut *tx).await.map_err(|e|db_failure(e,line!()))?.ok_or(HubError::NotFound)?;
+            .bind(self.installation_id).bind(connection).fetch_optional(&mut **tx).await.map_err(|e|db_failure(e,line!()))?.ok_or(HubError::NotFound)?;
         if row.get::<i64, _>("generation") != expected_generation
             || row.get::<String, _>("endpoint_policy_hash") != endpoint_hash
         {
             return Err(HubError::PreconditionFailed);
         }
         let clock: DateTime<Utc> = sqlx::query_scalar("SELECT clock_timestamp()")
-            .fetch_one(&mut *tx)
+            .fetch_one(&mut **tx)
             .await
             .map_err(|e| db_failure(e, line!()))?;
         if observation.observed_at > clock
@@ -71,14 +91,13 @@ impl PgStore {
         }
         let id = Uuid::new_v4();
         sqlx::query("INSERT INTO catalog_snapshots(id,installation_id,connection_id,generation,source_digest,models,observed_at) VALUES($1,$2,$3,$4,$5,$6,$7)")
-            .bind(id).bind(self.installation_id).bind(connection).bind(expected_generation).bind(&observation.digest).bind(serde_json::to_value(models).map_err(|_|HubError::Invalid("catalog models"))?).bind(observation.observed_at).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
+            .bind(id).bind(self.installation_id).bind(connection).bind(expected_generation).bind(&observation.digest).bind(serde_json::to_value(models).map_err(|_|HubError::Invalid("catalog models"))?).bind(observation.observed_at).execute(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;
         for model in &observation.models {
             sqlx::query("INSERT INTO upstream_models(id,connection_id,generation,provider_model_id,input_limit,output_limit,metadata,observed_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(connection_id,generation,provider_model_id) DO UPDATE SET input_limit=EXCLUDED.input_limit,output_limit=EXCLUDED.output_limit,metadata=EXCLUDED.metadata,observed_at=EXCLUDED.observed_at")
-                .bind(Uuid::new_v4()).bind(connection).bind(expected_generation).bind(&model.metadata.provider_model_id).bind(model.metadata.input_limit).bind(model.metadata.output_limit).bind(serde_json::to_value(&model.metadata).map_err(|_|HubError::Invalid("model metadata"))?).bind(observation.observed_at).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
+                .bind(Uuid::new_v4()).bind(connection).bind(expected_generation).bind(&model.metadata.provider_model_id).bind(model.metadata.input_limit).bind(model.metadata.output_limit).bind(serde_json::to_value(&model.metadata).map_err(|_|HubError::Invalid("model metadata"))?).bind(observation.observed_at).execute(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;
         }
         // Old rows are historical; the current immutable snapshot controls membership.
-        sqlx::query("UPDATE connection_generations SET catalog_snapshot_id=$3 WHERE connection_id=$1 AND generation=$2").bind(connection).bind(expected_generation).bind(id).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
-        tx.commit().await.map_err(|e| db_failure(e, line!()))?;
+        sqlx::query("UPDATE connection_generations SET catalog_snapshot_id=$3 WHERE connection_id=$1 AND generation=$2").bind(connection).bind(expected_generation).bind(id).execute(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;
         Ok(id)
     }
     pub(crate) async fn catalog_page(

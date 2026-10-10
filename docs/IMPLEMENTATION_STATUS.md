@@ -33,7 +33,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
 | S2a | В реализации: financial SQL/source guard, control API, basic budget UI, protected results и wired maintenance worker | Price/source forms и milestone runtime/provider evidence |
-| S2b | В реализации: connection/credentials, exact OpenRouter metadata decoder и generation-bound cached catalog | Live metadata reader, context, disable/archive, draft/proof/publication и UI |
+| S2b | В реализации: connection/credentials, exact OpenRouter decoder, cached catalog и durable metadata refresh | Live account/currency qualification, context, disable/archive, draft/proof/publication и UI |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
 | S5 | Не реализован | Полный operational UI и authorized snapshot/export |
@@ -334,14 +334,46 @@ Catalog limits/capabilities — advertised и unverified, не physical/inferenc
 Internal store проверяет own connection generation и endpoint hash, создаёт
 immutable snapshot. Removed membership не удаляет historical upstream rows.
 GET models читает только stored snapshot, поддерживает q/opaque cursor/limit;
-новая generation не наследует старый catalog. HTTP refresh/operation и pricing
-quote materialization ещё не подключены: нет скрытого external I/O в GET.
+новая generation не наследует старый catalog. GET не выполняет external I/O;
+explicit HTTP refresh описан ниже. Pricing quote materialization ещё не подключена.
 
 Scoped decoder: 3 unit tests pass, включая 20 integer/18 fractional digits,
 exponents, unsupported scale, unknown fee/cache, duplicate model/invalid limits.
 Fresh PostgreSQL17 после `0014`: 1 scenario pass, 0 ignored, 0.54s. Search,
 actor/query cursor, old page после refresh, immutable snapshot, generation/hash
 mismatch и отсутствие qualification/ledger rows проверены. Eight controlled-port
-HTTP access tests pass. Source cache writer ещё внутренний; actual HTTP fetch,
-durable refresh operation/audit, currency witness, valid secret context и live
-account qualification остаются обязательными следующими шагами до model probe.
+HTTP access tests pass. Это cache-only oracle; actual HTTP/account/currency
+qualification, context preferences и UI остаются отдельными следующими gates.
+
+## Durable metadata refresh — текущий срез
+
+POST models/refresh требует config-write principal, own UUID idempotency key,
+expected generation и external_calls=true. До HTTP сохраняются pending operation,
+immutable generation/endpoint/fence/60s lease и audit. Same-key readback возвращает
+исходную operation, не новый claim. Reader поддерживает только owned OpenRouter
+preset: HTTPS, два bounded GET key/models, public DNS addresses, без proxy/redirects
+и application retry. Одна lifecycle-managed reqwest pool; timeout 20s на GET,
+account body 64 KiB, catalog 2 MiB/1000 моделей. Raw credential/account body не
+логируется; Bearer header sensitive, private buffers Zeroizing.
+
+Catalog snapshot, sanitized account observation, terminal operation и audit пишутся
+одной транзакцией. Changed generation/revoked key/expired fence не принимают поздний
+ответ. Immutable owner binding account→catalog дополнительно проверяет installation/
+connection/generation в SQL. Readback возвращает сохранённую safe error.
+Maintenance переводит expired metadata intent в unknown; повторного HTTP нет.
+Management/expired key отвергается. Account numbers сохраняются exact strings с
+currency_status=unqualified; metadata success не активирует auth, не создаёт цену,
+runtime qualification, receipt или ledger. Paid model endpoint здесь отсутствует.
+
+Final fresh PostgreSQL17 после `0015`/`0016`: 1 scenario pass, 0 ignored, 0.77s —
+concurrent one-claim, original readback, generation rotation, atomic audit rollback,
+unknown recovery, SQL owner binding, immutable facts и secret canary.
+Controlled transport: 3 scoped tests pass, 0.67s — unowned DNS/internal/transition
+IP denied; redirects, content-length/chunked overflow и 503 без retries проверены
+на synthetic loopback HTTP server. Plaintext loopback разрешён только в test code;
+production builder HTTPS-only. Nine API access tests pass, 0.06s: write scope,
+external opt-in до intent, zero/unknown payload fields и readback boundaries.
+Fresh cached-catalog regression после shared transaction helper: 1 pass, 0 ignored,
+1.08s. Rust OpenAPI export, regenerated TypeScript и frontend typecheck pass.
+Live Dev account/currency/model qualification ещё pending.
+Provider HTTP/model calls в этой сессии: 0.
