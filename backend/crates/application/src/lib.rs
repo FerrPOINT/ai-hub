@@ -42,6 +42,25 @@ pub trait CentralAuthentication: Send + Sync {
 
 #[async_trait]
 pub trait FoundationStore: Send + Sync {
+    async fn budget_page(
+        &self,
+        _subject: &str,
+        _filter: &BudgetFilter,
+        _limit: i64,
+        _cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::budgets::Budget>, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn write_budget(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+        _update: Option<(Uuid, i64)>,
+        _policy: &aihub_domain::budgets::BudgetInput,
+    ) -> Result<aihub_domain::budgets::BudgetMutation, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn price_page(
         &self,
         _subject: &str,
@@ -126,7 +145,55 @@ pub struct Foundation {
     pub bindings: Arc<dyn OperationBinding>,
 }
 
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct BudgetFilter {
+    pub namespace: Option<NamespaceRef>,
+    pub unbound_only: bool,
+}
+
 impl Foundation {
+    pub async fn budgets(
+        &self,
+        principal: &HumanPrincipal,
+        filter: &BudgetFilter,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::budgets::Budget>, HubError> {
+        principal.require_config(false)?;
+        if filter.unbound_only && filter.namespace.is_some() {
+            return Err(HubError::Invalid("binding filter"));
+        }
+        if let Some(namespace) = &filter.namespace {
+            self.store
+                .require_namespace(&principal.subject, namespace, "metadata.read")
+                .await?;
+        }
+        self.store
+            .budget_page(&principal.subject, filter, bounded_limit(limit)?, cursor)
+            .await
+    }
+    pub async fn write_budget(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        update: Option<(Uuid, i64)>,
+        policy: &aihub_domain::budgets::BudgetInput,
+    ) -> Result<aihub_domain::budgets::BudgetMutation, HubError> {
+        principal.require_config(true)?;
+        if key.is_nil() || update.is_some_and(|(id, version)| id.is_nil() || version < 1) {
+            return Err(HubError::Invalid("budget operation"));
+        }
+        policy.validate(self.installation_id)?;
+        let action = if update.is_some() {
+            "budget.update"
+        } else {
+            "budget.create"
+        };
+        let binding=self.bindings.bind(&serde_json::json!({"installation_id":self.installation_id,"principal":principal.subject,"action":action,"update":update,"policy":policy}))?;
+        self.store
+            .write_budget(&principal.subject, key, binding, update, policy)
+            .await
+    }
     pub async fn prices(
         &self,
         principal: &HumanPrincipal,

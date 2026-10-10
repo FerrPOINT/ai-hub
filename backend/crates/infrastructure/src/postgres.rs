@@ -140,6 +140,27 @@ impl PgStore {
 
 #[async_trait]
 impl FoundationStore for PgStore {
+    async fn budget_page(
+        &self,
+        subject: &str,
+        filter: &aihub_application::BudgetFilter,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::budgets::Budget>, HubError> {
+        self.budget_page_internal(subject, filter, limit, cursor)
+            .await
+    }
+    async fn write_budget(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        update: Option<(Uuid, i64)>,
+        policy: &aihub_domain::budgets::BudgetInput,
+    ) -> Result<aihub_domain::budgets::BudgetMutation, HubError> {
+        self.write_budget_internal(subject, key, binding, update, policy)
+            .await
+    }
     async fn price_page(
         &self,
         subject: &str,

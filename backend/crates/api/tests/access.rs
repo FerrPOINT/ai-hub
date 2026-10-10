@@ -239,3 +239,94 @@ async fn price_mutation_rejects_wrong_scope_invalid_headers_and_decimal_numbers(
         );
     }
 }
+
+#[tokio::test]
+async fn budget_http_requires_exact_scope_pair_decimal_and_strong_cas() {
+    let (app, _) = fixture();
+    let policy = serde_json::json!({"scope_type":"client","scope_id":Uuid::new_v4(),"currency":"USD","period":"utc_day","hard_limit":"0.10","warning_thresholds":[80,95],"namespace":null});
+    let path = format!("/api/v1/budgets/{}", Uuid::new_v4());
+    for (token, versions, expected) in [
+        ("read", vec!["\"1\""], StatusCode::FORBIDDEN),
+        ("foreign", vec!["\"1\""], StatusCode::FORBIDDEN),
+        ("write", vec![], StatusCode::BAD_REQUEST),
+        ("write", vec!["1"], StatusCode::BAD_REQUEST),
+        ("write", vec!["W/\"1\""], StatusCode::BAD_REQUEST),
+        ("write", vec!["\"0\""], StatusCode::BAD_REQUEST),
+        ("write", vec!["\"-1\""], StatusCode::BAD_REQUEST),
+        ("write", vec!["\"1\"", "\"2\""], StatusCode::BAD_REQUEST),
+        ("write", vec!["\"1\""], StatusCode::SERVICE_UNAVAILABLE),
+    ] {
+        let mut request = Request::builder()
+            .method("PATCH")
+            .uri(&path)
+            .header("authorization", format!("Bearer {token}"))
+            .header("content-type", "application/json")
+            .header("idempotency-key", Uuid::new_v4().to_string());
+        for version in versions {
+            request = request.header("if-match", version);
+        }
+        let response = app
+            .clone()
+            .oneshot(
+                request
+                    .body(Body::from(serde_json::to_vec(&policy).unwrap()))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), expected);
+        assert_eq!(
+            response.headers().get("content-type").unwrap(),
+            "application/json"
+        );
+    }
+    for body in [
+        {
+            let mut b = policy.clone();
+            b["hard_limit"] = serde_json::json!(0.1);
+            b
+        },
+        {
+            let mut b = policy.clone();
+            b["warning_thresholds"] = serde_json::json!([80, 80]);
+            b
+        },
+        {
+            let mut b = policy.clone();
+            b.as_object_mut().unwrap().remove("namespace");
+            b
+        },
+        {
+            let mut b = policy.clone();
+            b["namespace"] = serde_json::json!({"registry_instance_id":Uuid::new_v4(),"namespace_id":Uuid::new_v4()});
+            b
+        },
+    ] {
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/budgets")
+                    .header("authorization", "Bearer write")
+                    .header("content-type", "application/json")
+                    .header("idempotency-key", Uuid::new_v4().to_string())
+                    .body(Body::from(serde_json::to_vec(&body).unwrap()))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+    for query in [
+        "binding=bad",
+        "binding=all&binding=unbound",
+        "namespace_id=bad",
+        "binding=unbound&registry_instance_id=00000000-0000-0000-0000-000000000001&namespace_id=00000000-0000-0000-0000-000000000002",
+    ] {
+        assert_eq!(
+            status(&app, &format!("/api/v1/budgets?{query}"), Some("read")).await,
+            StatusCode::BAD_REQUEST
+        );
+    }
+}

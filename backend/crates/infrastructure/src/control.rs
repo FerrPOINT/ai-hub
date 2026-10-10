@@ -43,6 +43,33 @@ fn quote(row: &sqlx::postgres::PgRow) -> Result<PriceRevision, HubError> {
 }
 
 impl PgStore {
+    pub(crate) async fn begin_control_operation(
+        &self,
+        tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        action: &str,
+    ) -> Result<(Uuid, Option<serde_json::Value>), HubError> {
+        if key.is_nil() || subject.is_empty() {
+            return Err(HubError::Invalid("control operation"));
+        }
+        let operation = Uuid::new_v4();
+        let row=sqlx::query("INSERT INTO operations(id,installation_id,principal_kind,principal_id,idempotency_key,binding_hmac,action,state,expires_at) VALUES($1,$2,'human',$3,$4,$5,$6,'pending',now()+interval '30 days') ON CONFLICT(installation_id,principal_kind,principal_id,idempotency_key) DO UPDATE SET id=operations.id RETURNING *,expires_at>now() AS replay_valid")
+            .bind(operation).bind(self.installation_id).bind(subject).bind(key).bind(binding.as_slice()).bind(action).fetch_one(&mut **tx).await.map_err(|err|db_failure(err,line!()))?;
+        if row.get::<Vec<u8>, _>("binding_hmac").as_slice() != binding
+            || row.get::<String, _>("action") != action
+            || !row.get::<bool, _>("replay_valid")
+        {
+            return Err(HubError::IdempotencyConflict);
+        }
+        let stored: Uuid = row.get("id");
+        if stored != operation {
+            let safe: Option<serde_json::Value> = row.get("safe_result");
+            return Ok((stored, Some(safe.ok_or(HubError::Unavailable)?)));
+        }
+        Ok((operation, None))
+    }
     pub(crate) async fn price_page_internal(
         &self,
         subject: &str,
@@ -75,20 +102,11 @@ impl PgStore {
             .begin()
             .await
             .map_err(|err| db_failure(err, line!()))?;
-        let operation = Uuid::new_v4();
-        let row=sqlx::query("INSERT INTO operations(id,installation_id,principal_kind,principal_id,idempotency_key,binding_hmac,action,state,expires_at) VALUES($1,$2,'human',$3,$4,$5,'price.create','pending',now()+interval '30 days') ON CONFLICT(installation_id,principal_kind,principal_id,idempotency_key) DO UPDATE SET id=operations.id RETURNING *,expires_at>now() AS replay_valid")
-            .bind(operation).bind(self.installation_id).bind(subject).bind(key).bind(binding.as_slice()).fetch_one(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
-        if row.get::<Vec<u8>, _>("binding_hmac").as_slice() != binding
-            || row.get::<String, _>("action") != "price.create"
-            || !row.get::<bool, _>("replay_valid")
-        {
-            return Err(HubError::IdempotencyConflict);
-        }
-        if row.get::<Uuid, _>("id") != operation {
-            let safe: Option<serde_json::Value> = row.get("safe_result");
-            let result = serde_json::from_value(safe.ok_or(HubError::Unavailable)?)
-                .map_err(|_| HubError::Unavailable)?;
-            return Ok(result);
+        let (operation, replay) = self
+            .begin_control_operation(&mut tx, subject, key, binding, "price.create")
+            .await?;
+        if let Some(replay) = replay {
+            return serde_json::from_value(replay).map_err(|_| HubError::Unavailable);
         }
         sqlx::query("SELECT id FROM connections WHERE installation_id=$1 AND id=$2 AND status<>'archived' FOR SHARE")
             .bind(self.installation_id).bind(price.connection_id).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::NotFound)?;

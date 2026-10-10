@@ -71,7 +71,19 @@
       ],
       "source": "backend/crates/infrastructure/tests/control_pg.rs",
       "evidence": "actual_postgresql17_price_control_concurrency_snapshot_pass_and_3_api_access_tests",
-      "remaining": "budget and pricing source forms; qualified connection/model; live SSO/browser and inference use of prices"
+      "remaining": "price and pricing source forms; qualified connection/model; live SSO/browser and inference use of prices"
+    },
+    {
+      "tests": ["TC-012", "TC-018", "TC-024", "TC-027", "TC-035"],
+      "source": "backend/crates/infrastructure/tests/budget_pg.rs",
+      "evidence": "actual_postgresql17_budget_control_cas_namespace_balances_audit_pass_and_4_api_access_tests",
+      "remaining": "profile budget owner; unconfigured pricing source timeline; notifications; exact consumer/provider gate; nonempty upgrade/restore and full oracle"
+    },
+    {
+      "tests": ["TC-018", "TC-024", "TC-032", "TC-035"],
+      "source": "frontend/src/features/budgets/Budgets.test.tsx",
+      "evidence": "3_controlled_transport_ui_tests_pass_unknown_reload_then_revocation_replay_preserved_and_412_draft_rebase",
+      "remaining": "price/client/profile forms; live SSO and own served runtime; final IAB all routes/themes/viewports and edge states"
     }
   ],
   "required_acceptance": {

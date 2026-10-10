@@ -16,7 +16,11 @@ Production admission выключен до successful explicit migrate/readiness
 new state → switch; downgrade только если старый binary умеет читать актуальную schema.
 Rollback binary не откатывает facts и не освобождает unknown reserves.
 Миграция с irreversible data transformation требует own backup/restore rehearsal.
-Actual migrations `0001`–`0006` применились на own disposable PostgreSQL17;
+Actual migrations `0001`–`0007` применились на own disposable PostgreSQL17;
 foundation и financial evidence отражены в IMPLEMENTATION_STATUS. Все новые
 миграции квалифицировались только на disposable fixture, не на installed PDLC DB.
 Upgrade/nonempty restore остаются S7 gates; их PASS не выводится из fresh install.
+
+`0007` включает Namespace binding в budget uniqueness, сохраняет существующие
+policy IDs/балансы и запрещает изменение identity. Calendar periods и CAS
+изменения cap проверены control fixture отдельно от финансового settlement.

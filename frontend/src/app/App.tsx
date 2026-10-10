@@ -4,7 +4,8 @@ import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import { beginSso, completeSso, endSso, type SsoConfig } from '@sdlc/ui/sso'
 import { PlatformProvider } from '@sdlc/ui/lib'
 import { PlatformServicesProvider, AppShell, Button, Card, DashboardLayout, ErrorState, ListPage, LoadingState, NamespacePicker, ResourceStateView, resourceErrorState } from '@sdlc/ui/ui'
-import { Activity, FileClock, Settings } from 'lucide-react'
+import { Activity, FileClock, Settings, Wallet } from 'lucide-react'
+import { Budgets } from '../features/budgets/Budgets'
 import { authGeneration, blockSilentRefresh, canSilentRefresh, client, useAuth, queryClient, listNamespaceBindings, type PublicConfig, type Identity, type Version, type AuditPage } from '../shared/api/client'
 import { contextFromSearch, namespaceQueryKey, selectedNamespaceUrl } from '../shared/namespace'
 
@@ -78,8 +79,8 @@ function ProtectedApp({ config }: { config: SsoConfig }) {
     setLogoutPending(true); blockSilentRefresh(); queryClient.clear(); useAuth.getState().logout()
     endSso(config)
   }
-  return <AppShell currentServiceKey="ai-hub" title="AI Hub" navigation={[{ to: '/', label: 'Обзор', icon: Activity }, { to: '/audit', label: 'Аудит', icon: FileClock }, { to: '/settings', label: 'Настройки', icon: Settings }]} account={{ label: useAuth.getState().displayName ?? identity.data.subject, onLogout: logout, pending: logoutPending }} context={<NamespacePicker value={selected} loading={namespaces.isPending} unavailable={namespaces.isError || context.invalid} options={(namespaces.isError ? [] : namespaces.data ?? []).map(binding => ({ value: `${binding.namespace.registry_instance_id}/${binding.namespace.namespace_id}`, label: binding.label }))} onChange={value => navigate(selectedNamespaceUrl(location.pathname, location.search, value))} />}>
-    {context.invalid ? <ResourceStateView state={{ kind: 'error', message: 'Некорректная UUID-пара Namespace в адресе.' }} /> : <Routes><Route path="/" element={<FoundationOverview />} /><Route path="/settings" element={<FoundationOverview settings />} /><Route path="/audit" element={<Audit />} /><Route path="*" element={<ResourceStateView state={{ kind: 'not-found' }} />} /></Routes>}
+  return <AppShell currentServiceKey="ai-hub" title="AI Hub" navigation={[{ to: '/', label: 'Обзор', icon: Activity }, { to: '/budgets', label: 'Бюджеты', icon: Wallet }, { to: '/audit', label: 'Аудит', icon: FileClock }, { to: '/settings', label: 'Настройки', icon: Settings }]} account={{ label: useAuth.getState().displayName ?? identity.data.subject, onLogout: logout, pending: logoutPending }} context={<NamespacePicker value={selected} loading={namespaces.isPending} unavailable={namespaces.isError || context.invalid} options={(namespaces.isError ? [] : namespaces.data ?? []).map(binding => ({ value: `${binding.namespace.registry_instance_id}/${binding.namespace.namespace_id}`, label: binding.label }))} onChange={value => navigate(selectedNamespaceUrl(location.pathname, location.search, value))} />}>
+    {context.invalid ? <ResourceStateView state={{ kind: 'error', message: 'Некорректная UUID-пара Namespace в адресе.' }} /> : <Routes><Route path="/" element={<FoundationOverview />} /><Route path="/settings" element={<FoundationOverview settings />} /><Route path="/budgets" element={<Budgets key={`${identity.data.subject}/${namespaceQueryKey(location.search).join('/')}`} identity={identity.data} namespaces={namespaces.data} />} /><Route path="/audit" element={<Audit />} /><Route path="*" element={<ResourceStateView state={{ kind: 'not-found' }} />} /></Routes>}
   </AppShell>
 }
 

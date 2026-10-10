@@ -1,7 +1,8 @@
-use aihub_application::Foundation;
+use aihub_application::{BudgetFilter, Foundation};
 use aihub_domain::{
     NamespaceRef,
     access::{HumanPrincipal, namespace_filter},
+    budgets::{Budget, BudgetInput, BudgetPeriod, BudgetScope},
     error::HubError,
     prices::{PriceInput, PriceRevision, PriceUnit},
     records::{AuditEvent, Health, Identity, NamespaceBinding, Operation},
@@ -113,6 +114,129 @@ pub struct AuditPage {
 pub struct PricePage {
     pub items: Vec<PriceRevision>,
     pub next_cursor: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+pub struct BudgetPage {
+    pub items: Vec<Budget>,
+    pub next_cursor: Option<String>,
+}
+
+fn budget_options(raw: &str) -> Result<(BudgetFilter, i64, Option<Uuid>), HubError> {
+    let namespace = namespace_filter(raw)?;
+    let mut binding = None;
+    let mut rest = vec![];
+    for (key, value) in url::form_urlencoded::parse(raw.as_bytes()) {
+        if key == "binding" {
+            if binding.is_some() || !matches!(value.as_ref(), "all" | "unbound") {
+                return Err(HubError::Invalid("binding filter"));
+            }
+            binding = Some(value.into_owned());
+        } else {
+            rest.push((key.into_owned(), value.into_owned()));
+        }
+    }
+    let mut encoded = url::form_urlencoded::Serializer::new(String::new());
+    encoded.extend_pairs(rest);
+    let (limit, cursor) = list_options(&encoded.finish(), true)?;
+    let filter = BudgetFilter {
+        namespace,
+        unbound_only: binding.as_deref() == Some("unbound"),
+    };
+    if filter.unbound_only && filter.namespace.is_some() {
+        return Err(HubError::Invalid("binding filter"));
+    }
+    Ok((filter, limit, cursor))
+}
+
+fn budget_version(headers: &HeaderMap) -> Result<i64, HubError> {
+    let mut values = headers.get_all("if-match").iter();
+    let raw = values
+        .next()
+        .ok_or(HubError::Invalid("If-Match required"))?
+        .to_str()
+        .map_err(|_| HubError::Invalid("If-Match"))?;
+    if values.next().is_some() {
+        return Err(HubError::Invalid("duplicate If-Match"));
+    }
+    let raw = raw
+        .strip_prefix('"')
+        .and_then(|v| v.strip_suffix('"'))
+        .filter(|v| !v.is_empty() && v.bytes().all(|b| b.is_ascii_digit()))
+        .ok_or(HubError::Invalid("strong quoted If-Match version"))?;
+    let version = raw
+        .parse::<i64>()
+        .map_err(|_| HubError::Invalid("If-Match version"))?;
+    if version < 1 {
+        return Err(HubError::Invalid("If-Match version"));
+    }
+    Ok(version)
+}
+
+#[utoipa::path(get,path="/api/v1/budgets",operation_id="listBudgets",security(("CentralAuth"=[])),params(("limit"=Option<i64>,Query,minimum=1,maximum=100),("cursor"=Option<Uuid>,Query),("registry_instance_id"=Option<Uuid>,Query),("namespace_id"=Option<Uuid>,Query),("binding"=Option<String>,Query)),responses((status=200,body=BudgetPage),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=503,body=Error)))]
+pub async fn budgets(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    RawQuery(query): RawQuery,
+) -> Result<Json<BudgetPage>, ApiError> {
+    let (filter, limit, cursor) = budget_options(query.as_deref().unwrap_or(""))?;
+    let page = state
+        .foundation
+        .budgets(&principal, &filter, limit, cursor)
+        .await?;
+    Ok(Json(BudgetPage {
+        items: page.items,
+        next_cursor: page.next_cursor,
+    }))
+}
+
+type BudgetResponse = (StatusCode, [(String, String); 2], Json<Budget>);
+fn budget_response(result: aihub_domain::budgets::BudgetMutation) -> BudgetResponse {
+    (
+        StatusCode::CREATED,
+        [
+            ("x-operation-id".into(), result.operation_id.to_string()),
+            ("etag".into(), format!("\"{}\"", result.value.version)),
+        ],
+        Json(result.value),
+    )
+}
+#[utoipa::path(post,path="/api/v1/budgets",operation_id="createBudget",security(("CentralAuth"=[])),params(("Idempotency-Key"=Uuid,Header)),request_body=BudgetInput,responses((status=201,body=Budget),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=409,body=Error),(status=412,body=Error),(status=503,body=Error)))]
+pub async fn create_budget(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    headers: HeaderMap,
+    body: Result<Json<BudgetInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<BudgetResponse, ApiError> {
+    principal.require_config(true)?;
+    let key = mutation_key(&headers)?;
+    let policy = body.map_err(|_| HubError::Invalid("budget payload"))?.0;
+    Ok(budget_response(
+        state
+            .foundation
+            .write_budget(&principal, key, None, &policy)
+            .await?,
+    ))
+}
+#[utoipa::path(patch,path="/api/v1/budgets/{budget_id}",operation_id="updateBudget",security(("CentralAuth"=[])),params(("budget_id"=Uuid,Path),("Idempotency-Key"=Uuid,Header),("If-Match"=String,Header)),request_body=BudgetInput,responses((status=201,body=Budget),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=409,body=Error),(status=412,body=Error),(status=503,body=Error)))]
+pub async fn update_budget(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(id): Path<String>,
+    headers: HeaderMap,
+    body: Result<Json<BudgetInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<BudgetResponse, ApiError> {
+    principal.require_config(true)?;
+    let key = mutation_key(&headers)?;
+    let version = budget_version(&headers)?;
+    let id = Uuid::parse_str(&id).map_err(|_| HubError::Invalid("budget UUID"))?;
+    let policy = body.map_err(|_| HubError::Invalid("budget payload"))?.0;
+    Ok(budget_response(
+        state
+            .foundation
+            .write_budget(&principal, key, Some((id, version)), &policy)
+            .await?,
+    ))
 }
 
 fn mutation_key(headers: &HeaderMap) -> Result<Uuid, HubError> {
@@ -373,7 +497,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -411,6 +535,11 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
         .route("/api/v1/namespaces", get(namespaces))
         .route("/api/v1/audit", get(audit))
         .route("/api/v1/prices", get(prices).post(create_price))
+        .route("/api/v1/budgets", get(budgets).post(create_budget))
+        .route(
+            "/api/v1/budgets/{budget_id}",
+            axum::routing::patch(update_budget),
+        )
         .route("/api/v1/operations/{operation_id}", get(operation))
         .route("/openapi.json", get(openapi))
         .fallback(not_found)

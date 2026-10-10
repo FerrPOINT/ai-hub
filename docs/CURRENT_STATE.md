@@ -23,8 +23,9 @@ Cargo/pnpm manifests, own DB-01, central-auth/vault ports, control reads, Rust O
 - Backend/API/SQL migrations/SSO/live adapters/consumer/restore/cutover не реализованы, execution acceptance not_run.
 
 Финансовая SQL-граница S2a проверена отдельно: bounded admission, one-send claim,
-unknown hold/restart и atomic receipts/corrections. Control API/forms и live
-provider path ещё не реализованы; [partial evidence](implementation-evidence.json)
+unknown hold/restart и atomic receipts/corrections. Control prices/budgets API
+и basic budget UI реализованы; price forms и live provider path ещё впереди.
+[Partial evidence](implementation-evidence.json)
 не закрывает целиком FR/TC. Текущая веха: S1 + S2a, затем S2b → S3…S7.
 Действующий Admin /ai, данные, pins и установленный runtime сохраняются до accepted cutover.
 

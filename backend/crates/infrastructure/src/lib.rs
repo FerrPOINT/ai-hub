@@ -1,4 +1,5 @@
 pub mod auth;
+mod budget_control;
 pub mod config;
 mod control;
 pub mod financial;

@@ -13,6 +13,10 @@
 - Source S1/S2a в работе; release, live SSO/provider/UI/consumer acceptance pending.
 - Control prices GET/POST: decimal quote, keyed operation replay, actor-bound cursor
   и atomic audit; quote не публикует профиль и не запускает provider.
+- Control budgets GET/POST/PATCH: exact cap, immutable identity, CAS/idempotency,
+  UUID-пара проекта и derived client Namespace; расходы/резервы сохраняются.
+- Base budget screen: exact totals, cap/threshold forms, dirty/pending guards,
+  исходная операция после unknown/reload/revocation и явный rebase после 412.
 
 ### Повторная проверка 2026-10-10
 

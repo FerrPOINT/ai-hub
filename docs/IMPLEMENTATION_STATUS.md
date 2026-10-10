@@ -32,7 +32,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | Этап | Фактический статус | Следующий результат |
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
-| S2a | В реализации: exact codecs; atomic bounded verification admission/dispatch/settlement проверены на PostgreSQL17 | Control API/forms цены и бюджета, pricing-source bindings, payload replay и lifecycle integration |
+| S2a | В реализации: financial SQL, control prices/budgets и basic budget UI | Price forms, pricing-source bindings, payload replay и lifecycle integration |
 | S2b | Не реализован | Connection/catalog/draft/CAS/proof/publication UI/API |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
@@ -108,14 +108,48 @@ cursor привязан к actor/limit и не включает новые quote
 HTTP access: 3 tests pass, включая wrong PAT scope/nil key/decimal number/negative fee.
 Required nullable fields и unknown fee: domain unit pass. Rust-generated OpenAPI
 и generated TypeScript consumer/typecheck pass для этого actual subset.
-Budget API/forms и подключение этих quotes к S2b proof ещё впереди.
+Price forms и подключение этих quotes к S2b proof ещё впереди.
+
+## Control budgets — текущий срез
+
+Добавлены `GET/POST /api/v1/budgets` и `PATCH /api/v1/budgets/{budget_id}`.
+Exact decimal cap и warning thresholds сохраняются вместе с operation/readback/audit.
+Изменение требует strong quoted `If-Match` и UUID Idempotency-Key; currency,
+period и scope immutable. Понижение cap не переписывает charged/reserved balances;
+remaining может быть отрицательным после overrun или понижения лимита.
+
+Project scope разрешается по точной registry/Namespace UUID-паре в verified binding.
+Client scope получает Namespace из сохранённой client record, без caller override.
+Installation/project/client policies требуют актуальный product grant; profile
+policy выключен до создания owner table S2b. Свой installation UUID не является
+универсальным разрешением читать проектные бюджеты.
+
+`0007_budget_identity` исправляет own uniqueness: одинаковый Tracker UUID в двух
+registry не объединяет policies; existing policy IDs/balances сохраняются.
+Own PostgreSQL17 fixture: concurrent create один результат, concurrent CAS один
+победитель, исходный replay после следующего update, сохранение расходов/резервов,
+negative remaining, two-registry neighbor, derived client Namespace, current grant
+revocation on frozen cursor, UTC day/calendar month и rollback final audit — pass.
+Финансовые balances для control fixture синтетические; реальные reserve/settle
+проверены отдельным financial fixture. Полный TC и live UI acceptance остаются открыты.
+
+Rust-generated OpenAPI/TypeScript consumer/typecheck pass; HTTP access 4 tests pass.
+Shared operation helper сохранил price-control regression: own PostgreSQL fixture pass.
+Base `/budgets` показывает authorized pages и exact string totals, создаёт budget
+для установки/выбранного проекта и редактирует существующий cap/thresholds.
+Creation client/profile picker остаётся на owner APIs S2b/S3. Form имеет dirty guard,
+pending lock, strong CAS и сохраняемый во вкладке non-secret mutation intent.
+Unknown reply/reload/последующий 403 сохраняют исходные key/body до readback;
+412 оставляет пользовательские значения и требует явной загрузки текущей версии.
+Три controlled transport UI tests pass, включая decimal beyond floating precision.
+Это не IAB или live SSO evidence. Browser/runtime acceptance выполняется на milestone.
 
 `0003_financial_prerequisites` вводит connection/generation/catalog/price/probe,
 requests/attempts/usage/replay, immutable ledger и budget/reservation таблицы.
 `0004` добавляет exact bounded grant/account/currency authority, `0005` —
 неповторяемый dispatch claim и expiry, `0006` — append-only settlement facts и
 effective expense pointer. Application financial port реализован для internal
-verification; provider transport ещё не подключён. Control budget/price API,
+verification; provider transport ещё не подключён. Price forms,
 pricing-source timeline, protected response buffer, cancel-before-dispatch и
 recovery unclaimed intent ещё впереди. Public/evaluation admission выключен до
 S3/S6. FK profile revision присоединяется S2b до public inference.
