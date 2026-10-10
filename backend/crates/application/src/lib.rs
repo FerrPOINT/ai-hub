@@ -212,6 +212,16 @@ pub trait FoundationStore: Send + Sync {
         limit: i64,
     ) -> Result<Vec<AuditEvent>, HubError>;
     async fn operation(&self, subject: &str, id: Uuid) -> Result<Operation, HubError>;
+    async fn disable_connection(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+        _id: Uuid,
+        _expected: i64,
+    ) -> Result<Operation, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn model_context_page(
         &self,
         _subject: &str,
@@ -484,6 +494,22 @@ impl Foundation {
         }
         let kind = self.store.read_connection(id).await?.provider_kind;
         self.save_connection(principal, key, kind, Some((id, version)), input)
+            .await
+    }
+    pub async fn disable_connection(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        id: Uuid,
+        expected: i64,
+    ) -> Result<Operation, HubError> {
+        principal.require_config(true)?;
+        if id.is_nil() || key.is_nil() || expected < 1 {
+            return Err(HubError::Invalid("connection disable"));
+        }
+        let binding=self.bindings.bind(&serde_json::json!({"installation":self.installation_id,"principal":principal.subject,"action":"connection.disable","connection":id,"expected":expected}))?;
+        self.store
+            .disable_connection(&principal.subject, key, binding, id, expected)
             .await
     }
     pub async fn pricing_sources(

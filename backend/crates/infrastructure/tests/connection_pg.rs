@@ -236,4 +236,97 @@ async fn connection_endpoint_cas_generation_label_and_atomic_audit() {
             .unwrap(),
         0
     );
+    sqlx::raw_sql("DROP TRIGGER reject_connection_audit ON audit_events; DROP FUNCTION reject_connection_audit();").execute(&store.pool).await.unwrap();
+    let disable_key = Uuid::new_v4();
+    let disable_binding = [17; 32];
+    let disabled = store
+        .disable_connection(
+            "actor",
+            disable_key,
+            disable_binding,
+            one.value.id,
+            updated.value.version,
+        )
+        .await
+        .unwrap();
+    assert_eq!(disabled.status, "succeeded");
+    assert_eq!(disabled.resource_id, Some(one.value.id));
+    let state = store.read_connection(one.value.id).await.unwrap();
+    assert_eq!(state.status, "disabled");
+    assert_eq!(state.generation, 2);
+    assert_eq!(state.version, updated.value.version + 1);
+    assert_eq!(
+        store
+            .disable_connection(
+                "actor",
+                disable_key,
+                disable_binding,
+                one.value.id,
+                updated.value.version
+            )
+            .await
+            .unwrap()
+            .id,
+        disabled.id
+    );
+    assert!(matches!(
+        store
+            .disable_connection("actor", disable_key, [18; 32], one.value.id, state.version)
+            .await,
+        Err(HubError::IdempotencyConflict)
+    ));
+    assert!(matches!(
+        store
+            .disable_connection(
+                "actor",
+                Uuid::new_v4(),
+                [19; 32],
+                one.value.id,
+                updated.value.version
+            )
+            .await,
+        Err(HubError::PreconditionFailed)
+    ));
+    let repeat = store
+        .disable_connection(
+            "actor",
+            Uuid::new_v4(),
+            [20; 32],
+            one.value.id,
+            state.version,
+        )
+        .await
+        .unwrap();
+    assert_eq!(repeat.status, "succeeded");
+    assert_eq!(
+        store.read_connection(one.value.id).await.unwrap().version,
+        state.version,
+        "already disabled is no config rewrite"
+    );
+    assert_eq!(
+        store.read_connection(peer.value.id).await.unwrap().status,
+        "authorization_unknown",
+        "same display name is not disable target"
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>(
+            "SELECT count(*) FROM connection_generations WHERE connection_id=$1"
+        )
+        .bind(one.value.id)
+        .fetch_one(&store.pool)
+        .await
+        .unwrap(),
+        2
+    );
+    sqlx::raw_sql("CREATE FUNCTION reject_disable_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='connection.disable' THEN RAISE EXCEPTION 'fixture audit unavailable'; END IF; RETURN NEW; END; $$; CREATE TRIGGER reject_disable_audit BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION reject_disable_audit();").execute(&store.pool).await.unwrap();
+    assert!(
+        store
+            .disable_connection("actor", Uuid::new_v4(), [21; 32], peer.value.id, 1)
+            .await
+            .is_err()
+    );
+    assert_eq!(
+        store.read_connection(peer.value.id).await.unwrap().status,
+        "authorization_unknown"
+    );
 }

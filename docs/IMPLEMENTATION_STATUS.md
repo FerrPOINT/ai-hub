@@ -450,3 +450,27 @@ UI context editor использует exact model GET/ETag и общий safe o
 model-specific 412/rebase. Rust OpenAPI export, generated TypeScript и final
 frontend typecheck pass. IAB/live proof,
 own runtime, профильный draft/publication и полный S1–S7 acceptance ещё pending.
+
+## Connection disable — 2026-10-11
+
+DELETE connection с own UUID key и strong If-Match атомарно меняет только status/
+version и пишет safe operation/audit. Generation, ciphertext, cached catalog,
+context revisions, proof history и финансовые facts сохраняются. Already disabled
+с новым ключом возвращает success без нового config version; same-key replay
+возвращает original operation. Stale CAS и audit failure не меняют connection.
+Enable/rollback/archive остаются lifecycle virtual profile по FR-004/ROUTING;
+connection archive status/несогласованный endpoint не добавляются.
+
+UI требует подтверждения, хранит safe operation key и после lost reply делает
+readback, не второй DELETE. 412 предлагает explicit fresh connection version.
+Connection PostgreSQL17: 1 pass, 0 ignored, 0.75s — CAS/replay/no-op, same-name
+neighbor и rollback. Financial suite: 1 pass, 0 ignored, 14.85s — disabled denies
+fresh admission/queued claim, dispatched settlement сохраняется. Fixture helper
+после disable больше не пытается менять pricing; frozen intent проверяет тот же
+guard без обхода. Credential/API/generated/IAB gates отмечаются отдельно.
+
+Credential fixture: 1 pass, 0 ignored, 0.71s — disable сохраняет ciphertext count,
+has_credentials/generation; отдельный revoke сохраняет disabled state. Final API:
+13 pass, 0.09s; provider/budget DOM suites: 11 pass. Generated OpenAPI/TypeScript и
+final frontend typecheck pass. Live/account/IAB и
+полный профильный lifecycle ещё pending.

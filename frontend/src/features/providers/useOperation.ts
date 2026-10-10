@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { ApiError } from '@sdlc/ui/lib';
 import { authGeneration, queryClient, type Identity, type OperationLookup, type ConnectionInput } from '../../shared/api/client';
 import { closeUnstarted, lookupOperation, providerKeys, validateSettings, validateContext } from './service';
-export type ProviderAction = 'connection.create' | 'connection.update' | 'credential.write' | 'credential.revoke' | 'catalog.refresh' | 'model-context.write';
+export type ProviderAction = 'connection.create' | 'connection.update' | 'credential.write' | 'credential.revoke' | 'catalog.refresh' | 'model-context.write' | 'connection.disable';
 type SafeIntent = {
     key: string;
     action: ProviderAction;
@@ -10,7 +10,7 @@ type SafeIntent = {
     settings?: ConnectionInput;
     model_context?: import('../../shared/api/client').ModelContextInput;
 };
-const actions: ProviderAction[] = ['connection.create', 'connection.update', 'credential.write', 'credential.revoke', 'catalog.refresh', 'model-context.write'];
+const actions: ProviderAction[] = ['connection.create', 'connection.update', 'credential.write', 'credential.revoke', 'catalog.refresh', 'model-context.write', 'connection.disable'];
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const validId = (value: unknown): value is string => typeof value === 'string' && uuid.test(value) && value !== '00000000-0000-0000-0000-000000000000';
 function readIntent(key: string): SafeIntent | null {

@@ -391,6 +391,44 @@ async fn credential_write_only_generation_revoke_replay_and_atomic_audit() {
             .catalog_refresh_supported,
         "generic compatible endpoint is not OpenRouter metadata support"
     );
+    let before_disable = FoundationStore::read_connection(&*store, conn.id)
+        .await
+        .unwrap();
+    let cipher_count: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM credential_versions WHERE connection_id=$1")
+            .bind(conn.id)
+            .fetch_one(&store.pool)
+            .await
+            .unwrap();
+    foundation
+        .disable_connection(&principal, Uuid::new_v4(), conn.id, before_disable.version)
+        .await
+        .unwrap();
+    let disabled = FoundationStore::read_connection(&*store, conn.id)
+        .await
+        .unwrap();
+    assert_eq!(disabled.status, "disabled");
+    assert_eq!(disabled.generation, before_disable.generation);
+    assert!(disabled.has_credentials);
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>(
+            "SELECT count(*) FROM credential_versions WHERE connection_id=$1"
+        )
+        .bind(conn.id)
+        .fetch_one(&store.pool)
+        .await
+        .unwrap(),
+        cipher_count
+    );
+    foundation
+        .revoke_credential(&principal, Uuid::new_v4(), conn.id, disabled.version)
+        .await
+        .unwrap();
+    let revoked_disabled = FoundationStore::read_connection(&*store, conn.id)
+        .await
+        .unwrap();
+    assert_eq!(revoked_disabled.status, "disabled");
+    assert!(!revoked_disabled.has_credentials);
     assert_eq!(
         sqlx::query_scalar::<_, i64>("SELECT count(*) FROM ledger_entries")
             .fetch_one(&store.pool)

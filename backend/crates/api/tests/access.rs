@@ -303,6 +303,30 @@ async fn model_context_scope_and_exact_zero_version_precede_storage() {
     assert_eq!(store.reads.load(Ordering::SeqCst), 0);
 }
 #[tokio::test]
+async fn connection_disable_requires_write_key_and_strong_current_version() {
+    let (app, store) = fixture();
+    let path = format!("/api/v1/connections/{}", Uuid::new_v4());
+    for (token, version, expected) in [
+        ("read", "\"1\"", StatusCode::FORBIDDEN),
+        ("write", "1", StatusCode::BAD_REQUEST),
+        ("write", "\"0\"", StatusCode::BAD_REQUEST),
+    ] {
+        let request = Request::builder()
+            .method("DELETE")
+            .uri(&path)
+            .header("authorization", format!("Bearer {token}"))
+            .header("If-Match", version)
+            .header("Idempotency-Key", Uuid::new_v4().to_string())
+            .body(Body::empty())
+            .unwrap();
+        assert_eq!(
+            app.clone().oneshot(request).await.unwrap().status(),
+            expected
+        );
+    }
+    assert_eq!(store.reads.load(Ordering::SeqCst), 0);
+}
+#[tokio::test]
 async fn exact_context_absence_has_zero_etag_while_collection_has_no_cas_etag() {
     let (app, store) = fixture();
     let path = format!("/api/v1/connections/{}/model-contexts", Uuid::new_v4());

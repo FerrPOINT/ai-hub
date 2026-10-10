@@ -283,3 +283,8 @@ Model context GET/PUT реализованы: exact model_id до 256 bytes, con
 1..4294967295; null/missing preference не physical default. Exact GET ETag "0"
 фиксирует отсутствие; collection cursor не precondition. PUT uses own key и
 strong If-Match, original result readback и atomic model-specific proof invalidation.
+
+DELETE `/api/v1/connections/{connection_id}` реализует disable (202 Operation):
+config write, UUID key, strong current If-Match. Не удаляет connection/credentials/
+history, не отзывает authorization и не отменяет уже отправленный provider call.
+Disabled state блокирует новый financial admission и dispatch claim.

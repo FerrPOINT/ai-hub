@@ -182,6 +182,18 @@
     "generated_contract": "rust_openapi_typescript_and_final_typecheck_pass",
     "remaining": "full profile draft/proof/publication; actual provider/context qualification; process crash/restore; IAB themes/viewports/states and full TC"
   },
+  "connection_disable_oracles": {
+    "date": "2026-10-11",
+    "status": "partial_implementation",
+    "tests": ["TC-001", "TC-018", "TC-019", "TC-027", "TC-028"],
+    "connection_pg": {"passed": 1, "ignored": 0, "seconds": 0.75},
+    "financial_pg": {"passed": 1, "ignored": 0, "seconds": 14.85},
+    "credential_pg": {"passed": 1, "ignored": 0, "seconds": 0.71},
+    "api": {"passed": 13, "seconds": 0.09},
+    "ui_provider_and_budget_regression": {"passed": 11},
+    "generated_contract": "rust_openapi_typescript_and_final_typecheck_pass",
+    "remaining": "live/account/SSO/IAB; profile enable/rollback/archive; process crash/restore and full TC"
+  },
   "required_acceptance": {
     "S1": "in_progress",
     "S2a": "in_progress",

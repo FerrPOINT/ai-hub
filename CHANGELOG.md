@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+### Реализация 2026-10-11
+
+- Connection disable с CAS/keyed readback/audit, сохранением credentials/history
+  и запретом нового admission/dispatch. UI confirmation и lost reply recovery.
+  Profile enable/rollback/archive и live/IAB acceptance остаются отдельными gates.
+
 ### Реализация 2026-10-10
 
 - Native Rust/Base React foundation, own schema/vault/auth/read ports и generated API.

@@ -3,7 +3,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router';
 import { Button, Card, DetailPage, FormField, Input, ResourceStateView, Tabs, TabsList, TabsTrigger, TabsContent, UnsavedChangesGuard, resourceErrorState } from '@sdlc/ui/ui';
 import { client, type CatalogPage, type ConnectionInput, type Identity, type Version } from '../../shared/api/client';
-import { connectionStatus, kindLabel, listPresets, providerKeys, readCatalog, readConnection, refreshCatalog, revokeCredential, saveConnection, validateSettings, writeCredential } from './service';
+import { connectionStatus, kindLabel, listPresets, providerKeys, readCatalog, readConnection, refreshCatalog, revokeCredential, saveConnection, validateSettings, writeCredential, disableConnection } from './service';
 import { useProviderOperation } from './useOperation';
 import { SettingsFields } from './SettingsFields';
 import { OperationStatus } from './OperationStatus';
@@ -21,13 +21,21 @@ export function ConnectionDetails({ identity }: {
     const [draft, setDraft] = useState<ConnectionInput | null>(null);
     const [editVersion, setEditVersion] = useState<number | null>(null);
     const [revoke, setRevoke] = useState(false);
+    const [disabling, setDisabling] = useState(false);
     const [contextModel, setContextModel] = useState<string | null>(null);
-    const operation = useProviderOperation(identity, id, result => { if (result.action === 'connection.update') {
-        setDraft(null);
-        setEditVersion(null);
-    } if (result.action === 'credential.revoke')
-        setRevoke(false); if (result.action === 'model-context.write')
-        setContextModel(null); operation.setNotice(result.action === 'model-context.write' ? 'Контекст модели сохранён; прежний proof недействителен.' : result.action === 'credential.write' ? 'Ключ сохранён; требуется проверка аккаунта и модели.' : result.action === 'credential.revoke' ? 'Ключ отозван.' : result.action === 'catalog.refresh' ? 'Каталог обновлён; возможности моделей требуют проверки.' : 'Настройки сохранены.'); });
+    const operation = useProviderOperation(identity, id, result => {
+        if (result.action === 'connection.update') {
+            setDraft(null);
+            setEditVersion(null);
+        }
+        if (result.action === 'credential.revoke')
+            setRevoke(false);
+        if (result.action === 'model-context.write')
+            setContextModel(null);
+        if (result.action === 'connection.disable')
+            setDisabling(false);
+        operation.setNotice(result.action === 'connection.disable' ? 'Подключение отключено; история сохранена.' : result.action === 'model-context.write' ? 'Контекст модели сохранён; прежний proof недействителен.' : result.action === 'credential.write' ? 'Ключ сохранён; требуется проверка аккаунта и модели.' : result.action === 'credential.revoke' ? 'Ключ отозван.' : result.action === 'catalog.refresh' ? 'Каталог обновлён; возможности моделей требуют проверки.' : 'Настройки сохранены.');
+    });
     const connection = useQuery({ queryKey: providerKeys.detail(id), queryFn: ({ signal }) => readConnection(id, signal), enabled: readable });
     const value = connection.isError ? undefined : connection.data;
     const presets = useQuery({ queryKey: providerKeys.presets(), queryFn: ({ signal }) => listPresets(signal), enabled: readable || writable });
@@ -39,7 +47,7 @@ export function ConnectionDetails({ identity }: {
     const models = catalog.isError ? [] : catalog.data?.pages.flatMap(p => p.models) ?? [];
     const effectiveDraft = draft ?? operation.intent?.settings;
     const selectedContext = contextModel ?? operation.intent?.model_context?.model_id;
-    const dirty = !!draft || !!secret || !!operation.intent || revoke || !!selectedContext;
+    const dirty = !!draft || !!secret || !!operation.intent || revoke || disabling || !!selectedContext;
     function parameter(key: string, input: string) {
         const next = new URLSearchParams(params);
         if (input)
@@ -132,8 +140,23 @@ export function ConnectionDetails({ identity }: {
             operation.setError(error instanceof Error ? error.message : 'Не удалось обновить каталог.');
         }
     }
+    async function reloadDisableVersion() { const result = await connection.refetch(); if (result.data && !result.isError) {
+        operation.setStale(false);
+        operation.setNotice(`Актуальная версия подключения ${result.data.version}. Отключение ещё не выполнено.`);
+    }
+    else {
+        operation.setError("Не удалось прочитать текущую версию подключения.");
+    } }
+    async function disable() { if (!value)
+        return; try {
+        const current = safeVersion(value.version);
+        await operation.execute("connection.disable", id, key => disableConnection(key, id, current));
+    }
+    catch (error) {
+        operation.setError(error instanceof Error ? error.message : "Не удалось отключить подключение.");
+    } }
     const state = !readable ? { kind: 'permission-denied' as const } : connection.isPending ? { kind: 'loading' as const } : connection.isError ? resourceErrorState(connection.error, () => void connection.refetch()) : { kind: 'ready' as const };
-    return <><UnsavedChangesGuard when={dirty}/><DetailPage title={value?.display_name ?? 'Подключение'} context={value ? kindLabel[value.provider_kind] : 'Проверка подключения'} actions={<Link className="text-accent underline" to={`/providers${location.search}`}>К подключениям</Link>} state={state} aside={value && <Card className="p-5"><h2 className="mb-4 font-semibold">Состояние подключения</h2><dl className="hub-facts text-sm"><dt>Авторизация</dt><dd>{connectionStatus(value)}</dd><dt>Ключ</dt><dd>{value.has_credentials ? 'Сохранён' : 'Не задан'}</dd><dt>Квота</dt><dd>Не подтверждена</dd><dt>Валюта</dt><dd>Неизвестна</dd><dt>Версия ключа</dt><dd>{value.generation}</dd><dt>Версия настроек</dt><dd>{value.version}</dd></dl><p className="mt-4 text-sm text-text-secondary">Каталог описывает модели. Доступ к inference подтверждается отдельной проверкой.</p></Card>}>
+    return <><UnsavedChangesGuard when={dirty}/><DetailPage title={value?.display_name ?? 'Подключение'} context={value ? kindLabel[value.provider_kind] : 'Проверка подключения'} actions={<Link className="text-accent underline" to={`/providers${location.search}`}>К подключениям</Link>} state={state} aside={value && <Card className="p-5"><h2 className="mb-4 font-semibold">Состояние подключения</h2>{writable && value.status !== "disabled" && <div className="mb-4">{disabling ? <><p className="mb-3 text-sm">Отключить новые запросы? Уже отправленные вызовы и история сохранятся.</p><div className="flex flex-wrap gap-3">{operation.stale ? <Button disabled={operation.locked} onClick={() => void reloadDisableVersion()}>Загрузить версию подключения</Button> : <Button disabled={operation.locked} onClick={() => void disable()}>Подтвердить отключение</Button>}<Button variant="outline" disabled={operation.locked} onClick={() => setDisabling(false)}>Отмена</Button></div></> : <Button variant="outline" disabled={operation.locked} onClick={() => setDisabling(true)}>Отключить подключение</Button>}</div>}<dl className="hub-facts text-sm"><dt>Авторизация</dt><dd>{connectionStatus(value)}</dd><dt>Ключ</dt><dd>{value.has_credentials ? 'Сохранён' : 'Не задан'}</dd><dt>Квота</dt><dd>Не подтверждена</dd><dt>Валюта</dt><dd>Неизвестна</dd><dt>Версия ключа</dt><dd>{value.generation}</dd><dt>Версия настроек</dt><dd>{value.version}</dd></dl><p className="mt-4 text-sm text-text-secondary">Каталог описывает модели. Доступ к inference подтверждается отдельной проверкой.</p></Card>}>
     {value && <><Tabs value={tab} onValueChange={value => parameter('provider_tab', value)}><TabsList aria-label="Раздел подключения"><TabsTrigger value="catalog">Каталог</TabsTrigger><TabsTrigger value="connection">Авторизация и настройки</TabsTrigger></TabsList><TabsContent value="catalog"><Card className="mt-4 p-5"><div className="mb-4 flex flex-wrap items-end gap-4"><FormField id="catalog-search" label="Поиск модели">{attrs => <Input {...attrs} value={query} maxLength={256} onChange={e => parameter('catalog_q', e.target.value)}/>}</FormField>{writable && <Button disabled={operation.locked || !value.has_credentials || !value.catalog_refresh_supported || !["enabled", "authorization_unknown"].includes(value.status) || !version.data?.external_calls} onClick={() => void refresh()}>Обновить каталог</Button>}</div>{version.isError ? <ResourceStateView state={resourceErrorState(version.error, () => void version.refetch())}/> : version.data && !version.data.external_calls && <p className="mb-4 text-sm text-text-secondary">Внешние вызовы выключены.</p>}{!value.catalog_refresh_supported && <p className="mb-4 text-sm text-text-secondary">Обновление каталога для этого подключения пока недоступно.</p>}{catalog.isPending ? <ResourceStateView state={{ kind: 'loading' }}/> : catalog.isError ? <ResourceStateView state={resourceErrorState(catalog.error, () => void catalog.refetch())}/> : <><p className="mb-4 text-sm text-text-secondary">{metadata?.data_status === 'partial' ? 'Каталог ещё не получен' : `${metadata?.data_status === 'stale' ? 'Устаревший каталог' : 'Каталог'} · ${new Date(metadata?.as_of ?? '').toLocaleString('ru-RU')}`}</p>{models.length === 0 ? <ResourceStateView state={{ kind: 'empty', message: query ? 'Модели не найдены' : 'В каталоге пока нет моделей' }}/> : <div className="grid min-w-0 gap-3">{models.map(model => <section key={model.provider_model_id} className="min-w-0 border-b border-border py-3"><h2 className="break-all font-semibold">{model.provider_model_id}</h2><p className="mt-2 text-sm text-text-secondary">Объявленный контекст: {model.input_limit?.toLocaleString('ru-RU') ?? 'Неизвестен'} · Выход: {model.output_limit?.toLocaleString('ru-RU') ?? 'Неизвестен'}</p><p className="mt-2 break-words text-sm text-text-secondary">Возможности требуют проверки · {model.capabilities.length ? model.capabilities.join(', ') : 'Не заявлены'}</p>{writable && <Button variant="outline" className="mt-3" disabled={operation.locked || !!selectedContext} onClick={() => { operation.setStale(false); operation.setError(""); setContextModel(model.provider_model_id); }}>Настроить контекст</Button>}</section>)}</div>}{catalog.hasNextPage && <Button className="mt-4" disabled={catalog.isFetchingNextPage} onClick={() => void catalog.fetchNextPage()}>Показать ещё</Button>}</>}</Card></TabsContent>
     <TabsContent value="connection"><div className="mt-4 grid min-w-0 gap-4"><Card className="p-5"><h2 className="mb-4 text-lg font-semibold">Ключ подключения</h2>{value.provider_kind === 'chatgpt_managed' ? <p>Для ChatGPT требуется собственная managed authorization. Запись API-ключа недоступна.</p> : <form onSubmit={e => { e.preventDefault(); void credential(); }} aria-busy={operation.pending}><fieldset disabled={!writable || operation.locked} className="border-0 p-0"><FormField id="connection-secret" label="API-ключ" required hint="Ключ передаётся один раз и не сохраняется во вкладке.">{attrs => <Input {...attrs} type="password" autoComplete="off" spellCheck={false} autoCapitalize="none" value={secret} maxLength={16384} onChange={e => setSecret(e.target.value)}/>}</FormField><Button className="mt-4" disabled={!secret}>Сохранить ключ</Button></fieldset></form>}{writable && value.has_credentials && <div className="mt-4">{revoke ? <><p className="mb-3 text-sm">Отозвать ключ подключения? История и финансовые записи сохранятся.</p><div className="flex flex-wrap gap-3"><Button disabled={operation.locked} onClick={() => void withdraw()}>Подтвердить отзыв</Button><Button variant="outline" disabled={operation.locked} onClick={() => setRevoke(false)}>Отмена</Button></div></> : <Button variant="outline" disabled={operation.locked} onClick={() => setRevoke(true)}>Отозвать ключ</Button>}</div>}</Card>
     <Card className="p-5"><h2 className="mb-4 text-lg font-semibold">Настройки подключения</h2>{effectiveDraft ? <form aria-busy={operation.pending} onSubmit={e => { e.preventDefault(); void save(); }}><SettingsFields prefix="provider-edit" value={effectiveDraft} onChange={setDraft} presets={(presets.data ?? []).filter(p => p.provider_kind === value.provider_kind)} disabled={operation.locked || !writable}/><div className="mt-4 flex flex-wrap gap-3">{operation.stale ? <Button type="button" disabled={operation.locked} onClick={() => void rebase()}>Загрузить актуальную версию</Button> : <Button disabled={operation.locked || !writable || editVersion === null}>Сохранить настройки</Button>}<Button type="button" variant="outline" disabled={operation.locked} onClick={() => { setDraft(null); setEditVersion(null); operation.setError(''); }}>Отмена</Button></div></form> : <><dl className="hub-facts text-sm"><dt>Endpoint</dt><dd>{presets.data?.find(p => p.policy_ref === value.settings.endpoint_policy_ref)?.base_url ?? 'Не удалось подтвердить адрес'}</dd><dt>Способ учёта</dt><dd>{({ unknown: 'Не подтверждён', metered: 'По использованию API', subscription: 'Подписка', local: 'Локальные вычисления' })[value.settings.billing_mode]}</dd></dl>{writable && <Button className="mt-4" variant="outline" disabled={operation.locked || !presets.data} onClick={edit}>Изменить настройки</Button>}</>}{presets.isError && <ResourceStateView state={resourceErrorState(presets.error, () => void presets.refetch())}/>}</Card></div></TabsContent></Tabs>{selectedContext && <ModelContextEditor key={selectedContext} connection={id} model={selectedContext} operation={operation} writable={writable} onClose={() => setContextModel(null)}/>}<OperationStatus operation={operation}/></>}

@@ -41,6 +41,55 @@ fn connection(row: &sqlx::postgres::PgRow) -> Result<Connection, HubError> {
     })
 }
 impl PgStore {
+    pub(crate) async fn disable_connection_internal(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        id: Uuid,
+        expected: i64,
+    ) -> Result<aihub_domain::records::Operation, HubError> {
+        if id.is_nil() || expected < 1 {
+            return Err(HubError::Invalid("connection disable"));
+        }
+        let mut tx = self
+            .pool
+            .begin()
+            .await
+            .map_err(|e| db_failure(e, line!()))?;
+        let (operation, replay) = self
+            .begin_control_operation(&mut tx, subject, key, binding, "connection.disable")
+            .await?;
+        if let Some(replay) = replay {
+            return serde_json::from_value(replay).map_err(|_| HubError::Unavailable);
+        }
+        let row = sqlx::query(
+            "SELECT status,version FROM connections WHERE installation_id=$1 AND id=$2 FOR UPDATE",
+        )
+        .bind(self.installation_id)
+        .bind(id)
+        .fetch_optional(&mut *tx)
+        .await
+        .map_err(|e| db_failure(e, line!()))?
+        .ok_or(HubError::NotFound)?;
+        if row.get::<i64, _>("version") != expected {
+            return Err(HubError::PreconditionFailed);
+        }
+        if row.get::<String, _>("status") != "disabled" {
+            sqlx::query("UPDATE connections SET status='disabled',version=version+1 WHERE installation_id=$1 AND id=$2").bind(self.installation_id).bind(id).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
+        }
+        let result = aihub_domain::records::Operation {
+            id: operation,
+            status: "succeeded".into(),
+            resource_id: Some(id),
+            safe_error: None,
+            version: 2,
+        };
+        sqlx::query("UPDATE operations SET state='succeeded',resource_id=$3,safe_result=$4,version=version+1,updated_at=clock_timestamp() WHERE installation_id=$1 AND id=$2").bind(self.installation_id).bind(operation).bind(id).bind(serde_json::to_value(&result).map_err(|_|HubError::Unavailable)?).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
+        sqlx::query("INSERT INTO audit_events(id,installation_id,actor,action,object_id,operation_id,reason) VALUES($1,$2,$3,'connection.disable',$4,$5,'Отключён новый admission и dispatch; история сохранена')").bind(Uuid::new_v4()).bind(self.installation_id).bind(subject).bind(id.to_string()).bind(operation).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
+        tx.commit().await.map_err(|e| db_failure(e, line!()))?;
+        Ok(result)
+    }
     pub async fn configure_endpoints(
         &self,
         policies: &[EndpointPolicyInput],

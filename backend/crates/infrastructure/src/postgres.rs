@@ -140,6 +140,17 @@ impl PgStore {
 
 #[async_trait]
 impl FoundationStore for PgStore {
+    async fn disable_connection(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        id: Uuid,
+        expected: i64,
+    ) -> Result<Operation, HubError> {
+        self.disable_connection_internal(subject, key, binding, id, expected)
+            .await
+    }
     async fn model_context_page(
         &self,
         subject: &str,

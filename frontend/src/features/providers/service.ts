@@ -49,8 +49,11 @@ export function validateSettings(input: ConnectionInput) {
 }
 export const kindLabel: Record<Connection['provider_kind'], string> = { openai_compatible: 'Совместимый API', ollama: 'Ollama', zai: 'Z.AI', chatgpt_managed: 'ChatGPT' };
 export function connectionStatus(value: Connection) { return value.status === 'disabled' ? 'Отключено' : value.status === 'revoked' ? 'Ключ отозван' : value.status === 'enabled' ? 'Авторизация подтверждена' : 'Авторизация требует проверки'; }
-export function validateContext(input: import('../../shared/api/client').ModelContextInput) { if (!input.model_id || new TextEncoder().encode(input.model_id).length > 256 || /[\u0000-\u001f\u007f]/.test(input.model_id) || !Number.isInteger(input.context_window_tokens) || input.context_window_tokens < 1 || input.context_window_tokens > 4294967295)
-    throw new Error('Укажите точный model ID и целый контекст от 1 до 4294967295 токенов.'); }
+export function disableConnection(key: string, id: string, version: number) { return client.request<Operation>(`/api/v1/connections/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }); }
+export function validateContext(input: import('../../shared/api/client').ModelContextInput) {
+    if (!input.model_id || new TextEncoder().encode(input.model_id).length > 256 || /[\u0000-\u001f\u007f]/.test(input.model_id) || !Number.isInteger(input.context_window_tokens) || input.context_window_tokens < 1 || input.context_window_tokens > 4294967295)
+        throw new Error('Укажите точный model ID и целый контекст от 1 до 4294967295 токенов.');
+}
 export async function readModelContext(id: string, model: string, signal?: AbortSignal) {
     const response = await client.raw(`/api/v1/connections/${encodeURIComponent(id)}/model-contexts?${new URLSearchParams({ model_id: model })}`, { signal });
     const page = await response.json() as import('../../shared/api/client').ModelContextPage;

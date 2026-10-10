@@ -34,6 +34,8 @@ live account/currency/managed auth/qualification ещё pending.
 lookup/no-send close поддерживают recovery после reload без хранения secret.
 Saved model context/CAS/history реализованы; financial snapshot и claim проверяют
 context revision, legacy unqualified proof не допускается к новому dispatch.
+Connection disable/API/UI подтверждение/readback реализованы; credentials и
+generation сохраняются, свежий admission/queued claim заблокирован.
 Control prices/budgets API
 и basic budget UI реализованы; price forms и live provider path ещё впереди.
 [Partial evidence](implementation-evidence.json)

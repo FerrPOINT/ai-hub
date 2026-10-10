@@ -1256,6 +1256,59 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         fresh_context_claim.deployment_snapshot["model_context"]["context_window_tokens"],
         2000
     );
+    let disable_intent =
+        fixture_intent(&store, connection, price, fresh_context_qualification).await;
+    let disable_queued = store.reserve(&disable_intent).await.unwrap();
+    let before_disable = store.read_connection(connection).await.unwrap();
+    store
+        .disable_connection(
+            "fixture-worker",
+            Uuid::new_v4(),
+            [31; 32],
+            connection,
+            before_disable.version,
+        )
+        .await
+        .unwrap();
+    assert!(matches!(
+        store
+            .claim_dispatch(disable_queued.attempt_id, Uuid::new_v4(), 30)
+            .await,
+        Err(HubError::PreconditionFailed)
+    ));
+    let after_disable = AdmissionIntent {
+        idempotency_key: Uuid::new_v4(),
+        payload_hmac: [32; 32],
+        ..disable_intent.clone()
+    };
+    assert!(matches!(
+        store.reserve(&after_disable).await,
+        Err(HubError::Forbidden)
+    ));
+    let after_disable_settlement = SettlementFact {
+        attempt_id: fresh_context_claim.attempt_id,
+        authority: SettlementAuthority::Dispatch {
+            owner_id: fresh_context_claim.owner_id,
+            fence: fresh_context_claim.fence,
+        },
+        source: "synthetic-v1".into(),
+        source_event_id: "late-after-connection-disable".into(),
+        acceptance: Acceptance::Accepted,
+        terminal: TerminalState::Completed,
+        usage: Some(Usage::normalized(50, 0, 10, "synthetic-v1".into()).unwrap()),
+        receipt: None,
+    };
+    store.settle(&after_disable_settlement).await.unwrap();
+    assert_eq!(
+        store.read_connection(connection).await.unwrap().generation,
+        before_disable.generation
+    );
+    // Only restore the controlled fixture for the independent small-context oracle below.
+    sqlx::query("UPDATE connections SET status='enabled' WHERE id=$1")
+        .bind(connection)
+        .execute(&store.pool)
+        .await
+        .unwrap();
     let small = store
         .save_model_context(
             "fixture-worker",
