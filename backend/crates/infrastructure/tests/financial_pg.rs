@@ -1,11 +1,14 @@
-use aihub_application::{FinancialAdmission, FoundationStore};
+use aihub_application::{FinancialAdmission, FoundationStore, ResultDelivery};
+use aihub_domain::replay::{ReplayOutcome, ReplayProtocol, ResultPayload, ResultReader};
 use aihub_domain::{
     admission::{AdmissionIntent, Purpose, PurposeBounds},
     error::HubError,
     financial::{Amount, Currency, Usage},
 };
-use aihub_infrastructure::postgres::PgStore;
+use aihub_infrastructure::{postgres::PgStore, replay::ProtectedResults, vault::Vault};
+use std::sync::Arc;
 use uuid::Uuid;
+use zeroize::Zeroizing;
 
 async fn fixture_intent(
     store: &PgStore,
@@ -35,9 +38,11 @@ async fn fixture_intent(
         .bind(grant).bind(store.installation_id).bind(client).bind(serde_json::to_value(bounds).unwrap()).execute(&store.pool).await.unwrap();
     sqlx::query("INSERT INTO operations(id,installation_id,principal_kind,principal_id,idempotency_key,binding_hmac,action,state,expires_at) VALUES($1,$2,'internal','fixture-worker',$1,$3,'verify','pending',now()+interval '30 days')").bind(op).bind(store.installation_id).bind(vec![7_u8;32]).execute(&store.pool).await.unwrap();
     let usage = Usage::normalized(100, 0, 50, "qualified-synthetic-fixture".into()).unwrap();
-    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":price,"qualification_id":qualification,"upper_usage":usage});
+    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":price,"qualification_id":qualification,"upper_usage":usage,"protocol":"chat_completions","streaming":false});
     sqlx::query("INSERT INTO probe_snapshots(id,installation_id,operation_id,scope,config_hash,configuration) VALUES($1,$2,$3,'connection_model',$4,$5)").bind(probe).bind(store.installation_id).bind(op).bind("1".repeat(64)).bind(serde_json::json!({"targets":[target]})).execute(&store.pool).await.unwrap();
     AdmissionIntent {
+        protocol: aihub_domain::replay::ReplayProtocol::ChatCompletions,
+        streaming: false,
         client_id: client,
         grant_id: grant,
         principal_id: "fixture-worker".into(),
@@ -63,7 +68,8 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
     let _ = tracing_subscriber::fmt().with_test_writer().try_init();
     let dsn = std::env::var("AIHUB_TEST_DATABASE_URL").expect("explicit isolated fixture DSN");
     let installation = Uuid::new_v4();
-    let store = PgStore::connect(&dsn, installation, vec![7; 32])
+    let vault = Arc::new(Vault::new(vec![7; 32]).unwrap());
+    let store = PgStore::connect(&dsn, installation, vault.fingerprint())
         .await
         .unwrap();
     store.migrate().await.unwrap();
@@ -117,7 +123,7 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         price_revision_id: None,
         ..fixture_intent(&store, connection, price, qualification).await
     };
-    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":null,"qualification_id":qualification,"upper_usage":no_price.upper_usage});
+    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":null,"qualification_id":qualification,"upper_usage":no_price.upper_usage,"protocol":no_price.protocol,"streaming":no_price.streaming});
     let no_price_probe = Uuid::new_v4();
     sqlx::query("INSERT INTO probe_snapshots(id,installation_id,operation_id,scope,config_hash,configuration) SELECT $1,installation_id,operation_id,scope,config_hash,$2 FROM probe_snapshots WHERE id=$3")
         .bind(no_price_probe).bind(serde_json::json!({"targets":[target]})).bind(no_price.probe_snapshot_id).execute(&store.pool).await.unwrap();
@@ -149,7 +155,7 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         );
     }
     sqlx::raw_sql("DROP TRIGGER reject_fixture_reserve_audit ON audit_events; DROP FUNCTION reject_fixture_reserve_audit();").execute(&store.pool).await.unwrap();
-    let second_store = PgStore::connect(&dsn, installation, vec![7; 32])
+    let second_store = PgStore::connect(&dsn, installation, vault.fingerprint())
         .await
         .unwrap();
     let (first, second) = tokio::join!(store.reserve(&one), second_store.reserve(&two));
@@ -188,6 +194,22 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
     assert!(replay.replay);
     assert_eq!(replay.request_id, receipt.request_id);
     assert_eq!(replay.attempt_id, receipt.attempt_id);
+    assert!(matches!(
+        store
+            .reserve(&AdmissionIntent {
+                streaming: true,
+                ..winner.clone()
+            })
+            .await,
+        Err(HubError::IdempotencyConflict)
+    ));
+    assert!(
+        sqlx::query("UPDATE requests SET streaming=true WHERE id=$1")
+            .bind(receipt.request_id)
+            .execute(&store.pool)
+            .await
+            .is_err()
+    );
     let changed = AdmissionIntent {
         payload_hmac: [8; 32],
         ..fixture_intent(&store, connection, price, qualification).await
@@ -260,7 +282,7 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         .execute(&store.pool)
         .await
         .unwrap();
-    let restarted = PgStore::connect(&dsn, installation, vec![7; 32])
+    let restarted = PgStore::connect(&dsn, installation, vault.fingerprint())
         .await
         .unwrap();
     restarted.ready().await.unwrap();
@@ -298,10 +320,46 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         usage: None,
         receipt: None,
     };
-    let pending_result = restarted.settle(&pending).await.unwrap();
+    let delivery = ProtectedResults::new(
+        Arc::new(
+            PgStore::connect(&dsn, installation, vault.fingerprint())
+                .await
+                .unwrap(),
+        ),
+        vault.clone(),
+    )
+    .unwrap();
+    let unknown_body = ResultPayload {
+        protocol: ReplayProtocol::ChatCompletions,
+        status_code: 502,
+        body: Zeroizing::new(br#"{"error":{"code":"provider_unconfirmed"}}"#.to_vec()),
+    };
+    let pending_result = delivery
+        .settle_with_result(&pending, &unknown_body, 86400)
+        .await
+        .unwrap();
     assert_eq!(pending_result.amount, None);
     assert_eq!(pending_result.confidence, "unknown");
     assert!(restarted.settle(&pending).await.unwrap().duplicate);
+    let winner_read_grant = Uuid::new_v4();
+    sqlx::query("UPDATE clients SET scopes='[\"infer\",\"read_result\"]' WHERE id=$1")
+        .bind(winner.client_id)
+        .execute(&store.pool)
+        .await
+        .unwrap();
+    sqlx::query("INSERT INTO grants(id,installation_id,principal_id,client_id,project_binding,action,bounds,expires_at) VALUES($1,$2,'fixture-worker',$3,'installation','read_result','{}',now()+interval '1 hour')").bind(winner_read_grant).bind(installation).bind(winner.client_id).execute(&store.pool).await.unwrap();
+    let winner_reader = ResultReader {
+        client_id: winner.client_id,
+        principal_id: "fixture-worker".into(),
+        grant_id: winner_read_grant,
+    };
+    assert!(matches!(
+        delivery
+            .read_result(&winner_reader, receipt.request_id)
+            .await
+            .unwrap(),
+        ReplayOutcome::Unknown
+    ));
     let pending_hold: String =
         sqlx::query_scalar("SELECT state FROM reservations WHERE attempt_id=$1")
             .bind(claim.attempt_id)
@@ -422,12 +480,133 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         usage: Some(Usage::normalized(50, 0, 10, "synthetic-qualified-usage".into()).unwrap()),
         receipt: None,
     };
-    let estimated = store.settle(&estimated_fact).await.unwrap();
+    let body = ResultPayload {
+        protocol: ReplayProtocol::ChatCompletions,
+        status_code: 200,
+        body: Zeroizing::new(
+            b"{ \"object\": \"chat.completion\", \"id\":\"result-canary\", \"choices\":[] }\n"
+                .to_vec(),
+        ),
+    };
+    let wrong_protocol = ResultPayload {
+        protocol: ReplayProtocol::Responses,
+        status_code: 200,
+        body: Zeroizing::new(body.body.to_vec()),
+    };
+    assert!(matches!(
+        delivery
+            .settle_with_result(&estimated_fact, &wrong_protocol, 2)
+            .await,
+        Err(HubError::PreconditionFailed)
+    ));
+    assert!(matches!(
+        delivery
+            .settle_with_result(&estimated_fact, &body, 86401)
+            .await,
+        Err(HubError::Invalid(_))
+    ));
+    // Last-statement failure must leave no reply receipt/ciphertext or expense transition.
+    sqlx::raw_sql("CREATE FUNCTION reject_reply_fixture_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='request.settle' THEN RAISE EXCEPTION 'fixture final audit unavailable'; END IF; RETURN NEW; END; $$; CREATE TRIGGER reject_reply_fixture_audit BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION reject_reply_fixture_audit();").execute(&store.pool).await.unwrap();
+    assert!(
+        delivery
+            .settle_with_result(&estimated_fact, &body, 2)
+            .await
+            .is_err()
+    );
+    let rolled_back:(i64,i64,i64)=sqlx::query_as("SELECT (SELECT count(*) FROM replay_receipts WHERE request_id=$1),(SELECT count(*) FROM replay_payloads WHERE request_id=$1),(SELECT count(*) FROM attempt_expenses WHERE attempt_id=$2)").bind(estimate_admission.request_id).bind(estimated_fact.attempt_id).fetch_one(&store.pool).await.unwrap();
+    assert_eq!(rolled_back, (0, 0, 0));
+    sqlx::raw_sql("DROP TRIGGER reject_reply_fixture_audit ON audit_events; DROP FUNCTION reject_reply_fixture_audit();").execute(&store.pool).await.unwrap();
+    let estimated = delivery
+        .settle_with_result(&estimated_fact, &body, 2)
+        .await
+        .unwrap();
     assert_eq!(estimated.confidence, "estimated");
     assert_eq!(
         estimated.amount.unwrap().to_string(),
         "0.000180000000000000"
     );
+    assert!(
+        delivery
+            .settle_with_result(&estimated_fact, &body, 86400)
+            .await
+            .unwrap()
+            .duplicate
+    );
+    let changed_body = ResultPayload {
+        protocol: body.protocol,
+        status_code: 200,
+        body: Zeroizing::new(br#"{"id":"different-result"}"#.to_vec()),
+    };
+    assert!(matches!(
+        delivery
+            .settle_with_result(&estimated_fact, &changed_body, 2)
+            .await,
+        Err(HubError::IdempotencyConflict)
+    ));
+    let reader = ResultReader {
+        client_id: loser.client_id,
+        principal_id: loser.principal_id.clone(),
+        grant_id: loser.grant_id,
+    };
+    assert!(matches!(
+        delivery
+            .read_result(&reader, estimate_admission.request_id)
+            .await,
+        Err(HubError::Forbidden)
+    ));
+    sqlx::query("UPDATE clients SET scopes='[\"infer\",\"read_result\"]' WHERE id=$1")
+        .bind(loser.client_id)
+        .execute(&store.pool)
+        .await
+        .unwrap();
+    assert!(
+        matches!(
+            delivery
+                .read_result(&reader, estimate_admission.request_id)
+                .await,
+            Err(HubError::Forbidden)
+        ),
+        "verification/metadata grant is not result authority"
+    );
+    let result_grant = Uuid::new_v4();
+    sqlx::query("INSERT INTO grants(id,installation_id,principal_id,client_id,project_binding,action,bounds,expires_at) VALUES($1,$2,'fixture-worker',$3,'installation','read_result','{}',now()+interval '1 hour')").bind(result_grant).bind(installation).bind(loser.client_id).execute(&store.pool).await.unwrap();
+    let reader = ResultReader {
+        grant_id: result_grant,
+        ..reader
+    };
+    let ReplayOutcome::Available(replayed) = delivery
+        .read_result(&reader, estimate_admission.request_id)
+        .await
+        .unwrap()
+    else {
+        panic!("fresh own result unavailable")
+    };
+    assert_eq!(&*replayed.body, &*body.body);
+    assert_eq!(replayed.status_code, 200);
+    assert!(matches!(
+        delivery
+            .read_result(&winner_reader, estimate_admission.request_id)
+            .await,
+        Err(HubError::NotFound)
+    ));
+    let safe_fields:String=sqlx::query_scalar("SELECT (SELECT jsonb_agg(to_jsonb(e))::text FROM audit_events e)||(SELECT jsonb_agg(to_jsonb(o))::text FROM operations o)||(SELECT jsonb_agg(to_jsonb(l))::text FROM ledger_entries l)").fetch_one(&store.pool).await.unwrap();
+    assert!(!safe_fields.contains("result-canary"));
+    sqlx::query("UPDATE grants SET revoked_at=now() WHERE id=$1")
+        .bind(result_grant)
+        .execute(&store.pool)
+        .await
+        .unwrap();
+    assert!(matches!(
+        delivery
+            .read_result(&reader, estimate_admission.request_id)
+            .await,
+        Err(HubError::Forbidden)
+    ));
+    sqlx::query("UPDATE grants SET revoked_at=NULL WHERE id=$1")
+        .bind(result_grant)
+        .execute(&store.pool)
+        .await
+        .unwrap();
     let estimate_receipt = SettlementFact {
         source_event_id: "estimate-receipt".into(),
         receipt: Some(ProviderCharge {
@@ -451,6 +630,43 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
     assert_eq!(
         total, "0.000600000000000000",
         "confirmed replaces estimate instead of double charging"
+    );
+    sqlx::query("SELECT pg_sleep(2.1)")
+        .execute(&store.pool)
+        .await
+        .unwrap();
+    assert!(matches!(
+        delivery
+            .read_result(&reader, estimate_admission.request_id)
+            .await
+            .unwrap(),
+        ReplayOutcome::Expired
+    ));
+    assert_eq!(delivery.purge_expired_results(100).await.unwrap(), 1);
+    assert!(
+        delivery
+            .settle_with_result(&estimated_fact, &body, 86400)
+            .await
+            .unwrap()
+            .duplicate
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM replay_payloads WHERE request_id=$1")
+            .bind(estimate_admission.request_id)
+            .fetch_one(&store.pool)
+            .await
+            .unwrap(),
+        0,
+        "expired response cannot be recreated by replay"
+    );
+    assert!(
+        sqlx::query(
+            "UPDATE replay_receipts SET expires_at=now()+interval '1 day' WHERE request_id=$1"
+        )
+        .bind(estimate_admission.request_id)
+        .execute(&store.pool)
+        .await
+        .is_err()
     );
     assert!(
         sqlx::query("UPDATE settlement_facts SET fact='{}'")

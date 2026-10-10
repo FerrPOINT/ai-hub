@@ -5,5 +5,6 @@ mod control;
 pub mod financial;
 pub mod namespace_reader;
 pub mod postgres;
+pub mod replay;
 mod settlement;
 pub mod vault;

@@ -61,7 +61,7 @@
       ],
       "source": "backend/crates/infrastructure/tests/financial_pg.rs",
       "evidence": "actual_postgresql17_admission_claim_recovery_settlement_pass_20261010",
-      "remaining": "control API/forms; pricing-source bindings; cancel/unclaimed restart; real provider I/O; public fallback/SSE/replay; process crash and full S3 oracle"
+      "remaining": "price/source forms; pricing-source bindings; cancel/unclaimed restart; real provider I/O; public fallback/SSE/result endpoint; process crash and full S3 oracle"
     },
     {
       "tests": [
@@ -84,6 +84,12 @@
       "source": "frontend/src/features/budgets/Budgets.test.tsx",
       "evidence": "3_controlled_transport_ui_tests_pass_unknown_reload_then_revocation_replay_preserved_and_412_draft_rebase",
       "remaining": "price/client/profile forms; live SSO and own served runtime; final IAB all routes/themes/viewports and edge states"
+    },
+    {
+      "tests": ["TC-002", "TC-010", "TC-011", "TC-018", "TC-027", "TC-028"],
+      "source": "backend/crates/infrastructure/tests/financial_pg.rs",
+      "evidence": "postgresql17_protected_result_atomic_settlement_grant_revocation_expiry_no_resurrection_pass_20261010",
+      "remaining": "full signed key/public result API; actual provider body normalization and worker; stream/cancel/process crash; live secret canary/restore and full acceptance"
     }
   ],
   "required_acceptance": {

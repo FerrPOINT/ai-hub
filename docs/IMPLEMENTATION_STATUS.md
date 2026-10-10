@@ -32,7 +32,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | Этап | Фактический статус | Следующий результат |
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
-| S2a | В реализации: financial SQL, control prices/budgets и basic budget UI | Price forms, pricing-source bindings, payload replay и lifecycle integration |
+| S2a | В реализации: financial SQL, control prices/budgets, basic budget UI и protected result buffer | Price/source forms, cancel и unclaimed intent recovery |
 | S2b | Не реализован | Connection/catalog/draft/CAS/proof/publication UI/API |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
@@ -148,11 +148,35 @@ Unknown reply/reload/последующий 403 сохраняют исходн�
 requests/attempts/usage/replay, immutable ledger и budget/reservation таблицы.
 `0004` добавляет exact bounded grant/account/currency authority, `0005` —
 неповторяемый dispatch claim и expiry, `0006` — append-only settlement facts и
-effective expense pointer. Application financial port реализован для internal
+effective expense pointer; `0008` — frozen wire mode и encrypted result receipts.
+Application financial port реализован для internal
 verification; provider transport ещё не подключён. Price forms,
-pricing-source timeline, protected response buffer, cancel-before-dispatch и
+pricing-source timeline, cancel-before-dispatch и
 recovery unclaimed intent ещё впереди. Public/evaluation admission выключен до
 S3/S6. FK profile revision присоединяется S2b до public inference.
+
+## Protected results — текущий срез
+
+Добавлен internal `ResultDelivery` port: settlement и encrypted JSON result
+сохраняются одной SQL transaction. AES-GCM AAD связывает installation/request,
+protocol и HTTP status; keyed binding сохраняет exact bytes. Body не имеет
+Debug/Serialize, хранится отдельно от audit/operations/ledger и ограничен 2 MiB.
+Формат и stream flag заморожены в admission/probe; legacy wire mode не угадывается.
+Protocol-specific response normalization, HTTP result endpoint и worker wiring — S3.
+
+Отдельный current `read_result` grant требует exact principal/client/project/
+Namespace binding и enabled client scope. Metadata/verification grant не даёт
+content. Unknown/in-progress/stream возвращают metadata outcome без reply.
+Payload TTL максимум 24h; immutable replay receipt остаётся после bounded purge,
+поэтому duplicate/late settlement не продлевает TTL и не пересоздаёт content.
+
+Fresh PostgreSQL17 financial fixture после `0008`: 1 scenario pass, 0 ignored,
+8.41s. Сохранены прежние admission/concurrency/recovery/receipt/correction oracles.
+Новые assertions: immutable wire mode, wrong protocol/TTL, atomic final audit
+rollback без reply или expense, exact byte replay, changed body conflict, separate
+scope/grant, foreign client, revocation, unknown hold, no plaintext in safe fields,
+expiry/purge и запрет resurrection. Provider accounts/body синтетические;
+это partial S2a/TC evidence, не live provider/result API или полный TC-028.
 
 Полные TC остаются `not_run`, когда исполнена только часть oracle. Partial mapping
 и источник каждого результата — [implementation-evidence.json](implementation-evidence.json).

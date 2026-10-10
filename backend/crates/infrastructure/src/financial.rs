@@ -230,13 +230,18 @@ impl FinancialAdmission for PgStore {
             .bind(self.installation_id).bind(intent.client_id).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::Forbidden)?;
         let project: String = client.get("project_binding");
         let namespace: Option<Uuid> = client.get("namespace_binding_id");
-        let previous=sqlx::query("SELECT r.id,r.state,r.principal_id,r.payload_hmac,r.grant_id,a.id AS attempt_id,a.currency,a.upper_provider_cost FROM requests r JOIN attempts a ON a.installation_id=r.installation_id AND a.request_id=r.id AND a.ordinal=1 WHERE r.installation_id=$1 AND r.client_id=$2 AND r.idempotency_key=$3")
+        let previous=sqlx::query("SELECT r.id,r.state,r.principal_id,r.payload_hmac,r.grant_id,r.wire_protocol,r.streaming,a.id AS attempt_id,a.currency,a.upper_provider_cost FROM requests r JOIN attempts a ON a.installation_id=r.installation_id AND a.request_id=r.id AND a.ordinal=1 WHERE r.installation_id=$1 AND r.client_id=$2 AND r.idempotency_key=$3")
             .bind(self.installation_id).bind(intent.client_id).bind(intent.idempotency_key).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
         if let Some(previous) = previous {
             let hash: Vec<u8> = previous.get("payload_hmac");
             if hash.as_slice() != intent.payload_hmac
                 || previous.get::<String, _>("principal_id") != intent.principal_id
                 || previous.get::<Uuid, _>("grant_id") != intent.grant_id
+                || previous
+                    .get::<Option<String>, _>("wire_protocol")
+                    .as_deref()
+                    != Some(intent.protocol.as_str())
+                || previous.get::<Option<bool>, _>("streaming") != Some(intent.streaming)
             {
                 return Err(HubError::IdempotencyConflict);
             }
@@ -292,7 +297,7 @@ impl FinancialAdmission for PgStore {
         let probe=sqlx::query("SELECT configuration,draft_model_id,operation_id FROM probe_snapshots WHERE installation_id=$1 AND id=$2")
             .bind(self.installation_id).bind(intent.probe_snapshot_id).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::NotFound)?;
         let configuration: serde_json::Value = probe.get("configuration");
-        let target = serde_json::json!({"connection_id":intent.connection_id,"generation":intent.generation,"model_id":intent.model_id,"tier":intent.tier,"price_revision_id":intent.price_revision_id,"qualification_id":intent.qualification_id,"upper_usage":intent.upper_usage});
+        let target = serde_json::json!({"connection_id":intent.connection_id,"generation":intent.generation,"model_id":intent.model_id,"tier":intent.tier,"price_revision_id":intent.price_revision_id,"qualification_id":intent.qualification_id,"upper_usage":intent.upper_usage,"protocol":intent.protocol,"streaming":intent.streaming});
         if !configuration
             .get("targets")
             .and_then(|v| v.as_array())
@@ -386,8 +391,8 @@ impl FinancialAdmission for PgStore {
                 period_ids.push(row.get::<Uuid, _>("id"));
             }
         }
-        sqlx::query("INSERT INTO requests(id,installation_id,client_id,grant_id,principal_id,project_binding,request_kind,probe_snapshot_id,idempotency_key,payload_hmac,state,namespace_binding_id,operation_id) VALUES($1,$2,$3,$4,$5,$6,'verification',$7,$8,$9,'admitted',$10,$11)")
-            .bind(request_id).bind(self.installation_id).bind(intent.client_id).bind(intent.grant_id).bind(&intent.principal_id).bind(&project).bind(intent.probe_snapshot_id).bind(intent.idempotency_key).bind(intent.payload_hmac.as_slice()).bind(namespace).bind(probe.get::<Uuid,_>("operation_id")).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
+        sqlx::query("INSERT INTO requests(id,installation_id,client_id,grant_id,principal_id,project_binding,request_kind,probe_snapshot_id,idempotency_key,payload_hmac,state,namespace_binding_id,operation_id,wire_protocol,streaming) VALUES($1,$2,$3,$4,$5,$6,'verification',$7,$8,$9,'admitted',$10,$11,$12,$13)")
+            .bind(request_id).bind(self.installation_id).bind(intent.client_id).bind(intent.grant_id).bind(&intent.principal_id).bind(&project).bind(intent.probe_snapshot_id).bind(intent.idempotency_key).bind(intent.payload_hmac.as_slice()).bind(namespace).bind(probe.get::<Uuid,_>("operation_id")).bind(intent.protocol.as_str()).bind(intent.streaming).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
         let deployment = serde_json::json!({"target":target,"price":price,"qualified_capabilities":qualification.get::<serde_json::Value,_>("capabilities"),"cost_source_state":if intent.price_revision_id.is_some(){"configured"}else{"unconfigured"},"adapter_revision":qualification.get::<String,_>("adapter_revision"),"endpoint_policy_hash":qualification.get::<String,_>("endpoint_policy_hash")});
         sqlx::query("INSERT INTO attempts(id,installation_id,request_id,ordinal,connection_id,generation,deployment_snapshot,state,accepted,qualification_id,upper_provider_cost,currency) VALUES($1,$2,$3,1,$4,$5,$6,'intended','not_accepted',$7,$8,$9)")
             .bind(attempt_id).bind(self.installation_id).bind(request_id).bind(intent.connection_id).bind(intent.generation).bind(deployment).bind(intent.qualification_id).bind(upper.map(decimal).transpose()?).bind(currency.to_string()).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;

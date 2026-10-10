@@ -17,6 +17,8 @@
   UUID-пара проекта и derived client Namespace; расходы/резервы сохраняются.
 - Base budget screen: exact totals, cap/threshold forms, dirty/pending guards,
   исходная операция после unknown/reload/revocation и явный rebase после 412.
+- Protected result delivery port: frozen protocol/stream mode, atomic settlement
+  и encrypted body, отдельный read_result grant и TTL без content resurrection.
 
 ### Повторная проверка 2026-10-10
 

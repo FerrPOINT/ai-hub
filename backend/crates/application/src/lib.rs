@@ -13,6 +13,22 @@ pub trait OperationBinding: Send + Sync {
 }
 
 #[async_trait]
+pub trait ResultDelivery: Send + Sync {
+    async fn settle_with_result(
+        &self,
+        fact: &aihub_domain::settlement::SettlementFact,
+        payload: &aihub_domain::replay::ResultPayload,
+        ttl_seconds: u32,
+    ) -> Result<aihub_domain::settlement::SettlementReceipt, HubError>;
+    async fn read_result(
+        &self,
+        reader: &aihub_domain::replay::ResultReader,
+        request_id: Uuid,
+    ) -> Result<aihub_domain::replay::ReplayOutcome, HubError>;
+    async fn purge_expired_results(&self, limit: i64) -> Result<u64, HubError>;
+}
+
+#[async_trait]
 pub trait FinancialAdmission: Send + Sync {
     async fn reserve(
         &self,

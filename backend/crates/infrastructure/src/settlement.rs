@@ -25,6 +25,13 @@ impl PgStore {
         &self,
         fact: &SettlementFact,
     ) -> Result<SettlementReceipt, HubError> {
+        self.settle_fact_and_result(fact, None).await
+    }
+    pub(crate) async fn settle_fact_and_result(
+        &self,
+        fact: &SettlementFact,
+        result: Option<&crate::replay::EncryptedResult>,
+    ) -> Result<SettlementReceipt, HubError> {
         if fact.attempt_id.is_nil()
             || fact.owner_id.is_nil()
             || fact.fence.is_nil()
@@ -56,12 +63,31 @@ impl PgStore {
             .fetch_one(&mut *tx)
             .await
             .map_err(|err| db_failure(err, line!()))?;
-        sqlx::query("SELECT id FROM requests WHERE installation_id=$1 AND id=$2 FOR UPDATE")
+        let request=sqlx::query("SELECT id,state,wire_protocol,streaming FROM requests WHERE installation_id=$1 AND id=$2 FOR UPDATE")
             .bind(self.installation_id)
             .bind(context.get::<Uuid, _>("id"))
             .fetch_one(&mut *tx)
             .await
             .map_err(|err| db_failure(err, line!()))?;
+        if let Some(result) = result {
+            if request.get::<Option<String>, _>("wire_protocol").as_deref()
+                != Some(result.protocol.as_str())
+                || request.get::<Option<bool>, _>("streaming") != Some(false)
+                || (fact.terminal == aihub_domain::settlement::TerminalState::Completed)
+                    != (result.status < 300)
+            {
+                return Err(HubError::PreconditionFailed);
+            }
+            let already_stored =
+                crate::replay::check_existing(&mut tx, context.get("id"), result).await?;
+            if matches!(
+                request.get::<String, _>("state").as_str(),
+                "completed" | "failed" | "cancelled"
+            ) && !already_stored
+            {
+                return Err(HubError::PreconditionFailed);
+            }
+        }
         let attempt =
             sqlx::query("SELECT *,dispatch_lease_until>now() AS lease_valid FROM attempts WHERE installation_id=$1 AND id=$2 FOR UPDATE")
                 .bind(self.installation_id)
@@ -92,6 +118,11 @@ impl PgStore {
         if let Some(previous) = previous_fact {
             if previous.get::<serde_json::Value, _>("fact") != json {
                 return Err(HubError::IdempotencyConflict);
+            }
+            if let Some(result) = result {
+                if !crate::replay::check_existing(&mut tx, context.get("id"), result).await? {
+                    return Err(HubError::PreconditionFailed);
+                }
             }
             return Ok(SettlementReceipt {
                 ledger_id: previous.get("ledger_id"),
@@ -249,6 +280,10 @@ impl PgStore {
             .bind(self.installation_id).bind(fact.attempt_id).bind(state).bind(accepted).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
         sqlx::query("UPDATE requests SET state=$3,finished_at=CASE WHEN $3='unknown' THEN NULL ELSE now() END,version=version+1 WHERE installation_id=$1 AND id=$2")
             .bind(self.installation_id).bind(context.get::<Uuid,_>("id")).bind(state).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
+        if let Some(result) = result {
+            crate::replay::persist(&mut tx, self.installation_id, context.get("id"), result)
+                .await?;
+        }
         sqlx::query("INSERT INTO audit_events(id,installation_id,actor,action,object_id,namespace_binding_id,reason,operation_id) VALUES($1,$2,$3,'request.settle',$4,$5,'Atomic expense and terminal fact',$6)")
             .bind(Uuid::new_v4()).bind(self.installation_id).bind(context.get::<String,_>("principal_id")).bind(fact.attempt_id.to_string()).bind(context.get::<Option<Uuid>,_>("namespace_binding_id")).bind(context.get::<Uuid,_>("operation_id")).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
         tx.commit().await.map_err(|err| db_failure(err, line!()))?;
