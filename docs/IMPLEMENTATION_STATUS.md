@@ -33,7 +33,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
 | S2a | В реализации: financial SQL/source guard, control API, basic budget UI, protected results и wired maintenance worker | Price/source forms и milestone runtime/provider evidence |
-| S2b | В реализации: connection/credentials/catalog, durable metadata refresh, own operation recovery и начат UI подключений | Live account/currency qualification, model context, lifecycle, draft/proof/publication и полный UI |
+| S2b | В реализации: connection/credentials/catalog, metadata refresh, operation recovery, saved model context и начат UI подключений | Live account/context/currency qualification, lifecycle, draft/proof/publication и полный UI |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
 | S5 | Не реализован | Полный operational UI и authorized snapshot/export |
@@ -421,3 +421,32 @@ actor, audit rollback и snapshot presets. Compatible non-OpenRouter endpoint н
 Metadata PostgreSQL17 regression после shared availability predicate: 1 pass,
 0 ignored, 0.80s; exact OpenRouter preset объявляет reader support, сохраняя
 authorization_unknown и отсутствие runtime qualifications/ledger.
+
+## Model context — текущий срез
+
+Configured context хранится по exact connection/model ID, независимо от credential
+generation и catalog membership. Нет default physical bound. Допустимы 1..4294967295
+токенов; model ID до 256 bytes согласован с actual catalog вместо design-only 120.
+Case/имя модели не нормализуются. Mutable pointer с strong CAS ссылается на immutable
+revision и own operation. Same key возвращает original preference после новых
+изменений; audit failure откатывает revision/pointer/proof invalidation.
+Exact GET model-contexts?model_id возвращает ETag версии или "0" при отсутствии;
+collection snapshot не имеет preference ETag. PUT If-Match "0" создаёт absent tuple.
+
+Изменение инвалидирует runtime qualifications exact connection/model, сохраняя
+историю. Новый proof фиксирует context version/revision; legacy NULL остаётся
+unqualified, version 0 явно фиксирует отсутствие настройки. Financial admission
+и dispatch держат connection lock, проверяют current/proof/frozen context; input +
+output upper bound не превышает configured budget. После отправки settlement
+использует прежний immutable snapshot, без повторной оценки по current context.
+
+Own PostgreSQL: model-context CAS/history/actor cursor/long IDs/atomic audit —
+1 pass, 0 ignored, 0.68s; financial suite с exact-model invalidation, neighbor model,
+late settlement, fresh version snapshot и small context rejection — 1 pass,
+0 ignored, 14.49s. API RED: route missing 404 вместо scoped 403; final API gate:
+12 pass, 0.08s, exact absence ETag "0", collection без CAS ETag, scope/header/payload.
+UI context editor использует exact model GET/ETag и общий safe operation readback,
+пустое поле для absent context; controlled provider suite 7 pass, включая
+model-specific 412/rebase. Rust OpenAPI export, generated TypeScript и final
+frontend typecheck pass. IAB/live proof,
+own runtime, профильный draft/publication и полный S1–S7 acceptance ещё pending.

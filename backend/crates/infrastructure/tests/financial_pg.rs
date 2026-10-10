@@ -157,7 +157,7 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
     sqlx::query("INSERT INTO operations(id,installation_id,principal_kind,principal_id,idempotency_key,binding_hmac,action,state,expires_at) VALUES($1,$2,'internal','fixture-worker',$1,$3,'account-preflight','succeeded',now()+interval '30 days')").bind(account_op).bind(installation).bind(vec![7_u8;32]).execute(&store.pool).await.unwrap();
     sqlx::query("INSERT INTO probe_snapshots(id,installation_id,operation_id,scope,config_hash,configuration) VALUES($1,$2,$3,'connection_model',$4,'{}')").bind(account_probe).bind(installation).bind(account_op).bind("1".repeat(64)).execute(&store.pool).await.unwrap();
     sqlx::query("INSERT INTO verification_evidence(id,installation_id,probe_snapshot_id,state,child_evidence,receipt_digest,expires_at) VALUES($1,$2,$3,'verified','[]',$4,now()+interval '1 hour')").bind(evidence).bind(installation).bind(account_probe).bind("2".repeat(64)).execute(&store.pool).await.unwrap();
-    sqlx::query("INSERT INTO runtime_qualifications(id,installation_id,connection_id,generation,provider_model_id,adapter_revision,endpoint_policy_hash,proof_id,capabilities,state,billing_currency,billing_currency_origin) VALUES($1,$2,$3,1,'model-a','synthetic-v1',$4,$5,'{\"trusted_charge_receipts\":true}','active','USD','synthetic-statement')").bind(qualification).bind(installation).bind(connection).bind("1".repeat(64)).bind(evidence).execute(&store.pool).await.unwrap();
+    sqlx::query("INSERT INTO runtime_qualifications(id,installation_id,connection_id,generation,provider_model_id,adapter_revision,endpoint_policy_hash,proof_id,capabilities,state,billing_currency,billing_currency_origin,model_context_version) VALUES($1,$2,$3,1,'model-a','synthetic-v1',$4,$5,'{\"trusted_charge_receipts\":true}','active','USD','synthetic-statement',0)").bind(qualification).bind(installation).bind(connection).bind("1".repeat(64)).bind(evidence).execute(&store.pool).await.unwrap();
     let budget = Uuid::new_v4();
     sqlx::query("INSERT INTO budget_policies(id,installation_id,scope_type,scope_id,currency,period,hard_limit,thresholds,status) VALUES($1,$2,'installation',$3,'USD','utc_day',0.0006,'[80,95]','active')").bind(budget).bind(installation).bind(installation.to_string()).execute(&store.pool).await.unwrap();
     // Legitimate unconfigured source before a policy exists; a hard cap still rejects unknown cost.
@@ -1164,4 +1164,119 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
             .await
             .is_err()
     );
+    // Context changes affect only the exact model, block queued proof, and preserve dispatched history.
+    use aihub_domain::model_context::ModelContextInput;
+    let context_one = fixture_intent(&store, connection, price, qualification).await;
+    let context_two = fixture_intent(&store, connection, price, qualification).await;
+    let context_one = store.reserve(&context_one).await.unwrap();
+    let context_two = store.reserve(&context_two).await.unwrap();
+    store
+        .save_model_context(
+            "fixture-worker",
+            Uuid::new_v4(),
+            [21; 32],
+            connection,
+            0,
+            &ModelContextInput {
+                model_id: "model-b".into(),
+                context_window_tokens: 2000,
+            },
+        )
+        .await
+        .unwrap();
+    let old_context_claim = store
+        .claim_dispatch(context_one.attempt_id, Uuid::new_v4(), 30)
+        .await
+        .unwrap();
+    assert_eq!(
+        old_context_claim.deployment_snapshot["model_context"]["version"],
+        0
+    );
+    store
+        .save_model_context(
+            "fixture-worker",
+            Uuid::new_v4(),
+            [22; 32],
+            connection,
+            0,
+            &ModelContextInput {
+                model_id: "model-a".into(),
+                context_window_tokens: 2000,
+            },
+        )
+        .await
+        .unwrap();
+    assert!(matches!(
+        store
+            .claim_dispatch(context_two.attempt_id, Uuid::new_v4(), 30)
+            .await,
+        Err(HubError::PreconditionFailed)
+    ));
+    let stale_context_intent = fixture_intent(&store, connection, price, qualification).await;
+    assert!(matches!(
+        store.reserve(&stale_context_intent).await,
+        Err(HubError::Forbidden)
+    ));
+    let preserved: serde_json::Value =
+        sqlx::query_scalar("SELECT deployment_snapshot FROM attempts WHERE id=$1")
+            .bind(old_context_claim.attempt_id)
+            .fetch_one(&store.pool)
+            .await
+            .unwrap();
+    assert_eq!(preserved, old_context_claim.deployment_snapshot);
+    let late_context = SettlementFact {
+        attempt_id: old_context_claim.attempt_id,
+        authority: SettlementAuthority::Dispatch {
+            owner_id: old_context_claim.owner_id,
+            fence: old_context_claim.fence,
+        },
+        source: "synthetic-v1".into(),
+        source_event_id: "late-after-context-change".into(),
+        acceptance: Acceptance::Accepted,
+        terminal: TerminalState::Completed,
+        usage: Some(Usage::normalized(50, 0, 10, "synthetic-v1".into()).unwrap()),
+        receipt: None,
+    };
+    store.settle(&late_context).await.unwrap();
+    let revision:Uuid=sqlx::query_scalar("SELECT current_revision_id FROM model_context_preferences WHERE connection_id=$1 AND model_id='model-a'").bind(connection).fetch_one(&store.pool).await.unwrap();
+    let fresh_context_qualification = Uuid::new_v4();
+    sqlx::query("INSERT INTO runtime_qualifications(id,installation_id,connection_id,generation,provider_model_id,adapter_revision,endpoint_policy_hash,proof_id,capabilities,state,billing_currency,billing_currency_origin,model_context_version,model_context_revision_id) SELECT $1,installation_id,connection_id,generation,provider_model_id,adapter_revision,endpoint_policy_hash,proof_id,capabilities,'active',billing_currency,billing_currency_origin,1,$2 FROM runtime_qualifications WHERE id=$3").bind(fresh_context_qualification).bind(revision).bind(qualification).execute(&store.pool).await.unwrap();
+    let fresh_context_intent =
+        fixture_intent(&store, connection, price, fresh_context_qualification).await;
+    let fresh_context = store.reserve(&fresh_context_intent).await.unwrap();
+    let fresh_context_claim = store
+        .claim_dispatch(fresh_context.attempt_id, Uuid::new_v4(), 30)
+        .await
+        .unwrap();
+    assert_eq!(
+        fresh_context_claim.deployment_snapshot["model_context"]["version"],
+        1
+    );
+    assert_eq!(
+        fresh_context_claim.deployment_snapshot["model_context"]["context_window_tokens"],
+        2000
+    );
+    let small = store
+        .save_model_context(
+            "fixture-worker",
+            Uuid::new_v4(),
+            [23; 32],
+            connection,
+            1,
+            &ModelContextInput {
+                model_id: "model-a".into(),
+                context_window_tokens: 1,
+            },
+        )
+        .await
+        .unwrap();
+    assert_eq!(small.preference.version, 2);
+    let small_revision:Uuid=sqlx::query_scalar("SELECT current_revision_id FROM model_context_preferences WHERE connection_id=$1 AND model_id='model-a'").bind(connection).fetch_one(&store.pool).await.unwrap();
+    let small_qualification = Uuid::new_v4();
+    sqlx::query("INSERT INTO runtime_qualifications(id,installation_id,connection_id,generation,provider_model_id,adapter_revision,endpoint_policy_hash,proof_id,capabilities,state,billing_currency,billing_currency_origin,model_context_version,model_context_revision_id) SELECT $1,installation_id,connection_id,generation,provider_model_id,adapter_revision,endpoint_policy_hash,proof_id,capabilities,'active',billing_currency,billing_currency_origin,2,$2 FROM runtime_qualifications WHERE id=$3").bind(small_qualification).bind(small_revision).bind(qualification).execute(&store.pool).await.unwrap();
+    let too_large = fixture_intent(&store, connection, price, small_qualification).await;
+    assert!(matches!(
+        store.reserve(&too_large).await,
+        Err(HubError::InvalidSemantics(_))
+    ));
 }

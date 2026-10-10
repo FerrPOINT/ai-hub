@@ -77,6 +77,23 @@ impl aihub_application::MetadataOperations for TestStore {
 }
 #[async_trait]
 impl FoundationStore for TestStore {
+    async fn model_context_page(
+        &self,
+        _: &str,
+        _: Uuid,
+        _: Option<&str>,
+        _: i64,
+        _: Option<Uuid>,
+    ) -> Result<
+        aihub_domain::records::Page<aihub_domain::model_context::ModelContextPreference>,
+        HubError,
+    > {
+        self.reads.fetch_add(1, Ordering::SeqCst);
+        Ok(aihub_domain::records::Page {
+            items: vec![],
+            next_cursor: None,
+        })
+    }
     async fn operation_key(
         &self,
         _: &str,
@@ -225,6 +242,83 @@ async fn control_key_readback_and_no_send_close_are_scoped_before_storage() {
             .unwrap();
         assert_eq!(
             app.clone().oneshot(request).await.unwrap().status(),
+            expected
+        );
+    }
+    assert_eq!(store.reads.load(Ordering::SeqCst), 2);
+}
+#[tokio::test]
+async fn model_context_scope_and_exact_zero_version_precede_storage() {
+    let (app, store) = fixture();
+    let path = format!("/api/v1/connections/{}/model-contexts", Uuid::new_v4());
+    assert_eq!(
+        status(
+            &app,
+            &format!("{path}?model_id=vendor%2Fmodel"),
+            Some("foreign")
+        )
+        .await,
+        StatusCode::FORBIDDEN
+    );
+    for (token, version, body, expected) in [
+        (
+            "read",
+            "\"0\"",
+            r#"{"model_id":"vendor/model","context_window_tokens":4096}"#,
+            StatusCode::FORBIDDEN,
+        ),
+        (
+            "write",
+            "0",
+            r#"{"model_id":"vendor/model","context_window_tokens":4096}"#,
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            "\"0\"",
+            r#"{"model_id":"vendor/model","context_window_tokens":0}"#,
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            "\"0\"",
+            r#"{"model_id":"vendor/model","context_window_tokens":4096,"physical_limit":999}"#,
+            StatusCode::BAD_REQUEST,
+        ),
+    ] {
+        let request = Request::builder()
+            .method("PUT")
+            .uri(&path)
+            .header("authorization", format!("Bearer {token}"))
+            .header("content-type", "application/json")
+            .header("If-Match", version)
+            .header("Idempotency-Key", Uuid::new_v4().to_string())
+            .body(Body::from(body))
+            .unwrap();
+        assert_eq!(
+            app.clone().oneshot(request).await.unwrap().status(),
+            expected
+        );
+    }
+    assert_eq!(store.reads.load(Ordering::SeqCst), 0);
+}
+#[tokio::test]
+async fn exact_context_absence_has_zero_etag_while_collection_has_no_cas_etag() {
+    let (app, store) = fixture();
+    let path = format!("/api/v1/connections/{}/model-contexts", Uuid::new_v4());
+    for (suffix, expected) in [
+        ("?model_id=CaseSensitive%2Fmodel", Some("\"0\"")),
+        ("", None),
+    ] {
+        let request = Request::builder()
+            .uri(format!("{path}{suffix}"))
+            .header("authorization", "Bearer read")
+            .body(Body::empty())
+            .unwrap();
+        let response = app.clone().oneshot(request).await.unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            response.headers().get("etag").map(|v| v.to_str().unwrap()),
             expected
         );
     }

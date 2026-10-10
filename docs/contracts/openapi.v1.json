@@ -5968,7 +5968,7 @@
             "schema": {
               "type": "string",
               "minLength": 1,
-              "maxLength": 120
+              "maxLength": 256
             }
           }
         ],
@@ -10520,7 +10520,7 @@
           "model_id": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 120
+            "maxLength": 256
           },
           "context_window_tokens": {
             "type": "integer",
@@ -10541,7 +10541,7 @@
           "model_id": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 120
+            "maxLength": 256
           },
           "context_window_tokens": {
             "type": "integer",

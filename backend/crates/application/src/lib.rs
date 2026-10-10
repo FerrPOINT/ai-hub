@@ -212,6 +212,27 @@ pub trait FoundationStore: Send + Sync {
         limit: i64,
     ) -> Result<Vec<AuditEvent>, HubError>;
     async fn operation(&self, subject: &str, id: Uuid) -> Result<Operation, HubError>;
+    async fn model_context_page(
+        &self,
+        _subject: &str,
+        _connection: Uuid,
+        _model: Option<&str>,
+        _limit: i64,
+        _cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::model_context::ModelContextPreference>, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn save_model_context(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+        _connection: Uuid,
+        _expected: i64,
+        _input: &aihub_domain::model_context::ModelContextInput,
+    ) -> Result<aihub_domain::model_context::ModelContextMutation, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn operation_key(
         &self,
         _subject: &str,
@@ -290,6 +311,56 @@ pub struct BudgetFilter {
 }
 
 impl Foundation {
+    pub async fn model_contexts(
+        &self,
+        principal: &HumanPrincipal,
+        connection: Uuid,
+        model: Option<&str>,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::model_context::ModelContextPreference>, HubError> {
+        principal.require_config(false)?;
+        if connection.is_nil() {
+            return Err(HubError::Invalid("connection ID"));
+        }
+        if let Some(model) = model {
+            aihub_domain::model_context::validate_model_id(model)?
+        }
+        self.store
+            .model_context_page(
+                &principal.subject,
+                connection,
+                model,
+                bounded_limit(limit)?,
+                cursor,
+            )
+            .await
+    }
+    pub async fn save_model_context(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        connection: Uuid,
+        expected: i64,
+        input: &aihub_domain::model_context::ModelContextInput,
+    ) -> Result<aihub_domain::model_context::ModelContextMutation, HubError> {
+        principal.require_config(true)?;
+        input.validate()?;
+        if key.is_nil() || connection.is_nil() || expected < 0 || expected == i64::MAX {
+            return Err(HubError::Invalid("model context CAS"));
+        }
+        let binding=self.bindings.bind(&serde_json::json!({"installation":self.installation_id,"principal":principal.subject,"action":"model-context.write","connection":connection,"expected":expected,"input":input}))?;
+        self.store
+            .save_model_context(
+                &principal.subject,
+                key,
+                binding,
+                connection,
+                expected,
+                input,
+            )
+            .await
+    }
     pub async fn catalog(
         &self,
         principal: &HumanPrincipal,

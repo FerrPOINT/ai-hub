@@ -140,6 +140,32 @@ impl PgStore {
 
 #[async_trait]
 impl FoundationStore for PgStore {
+    async fn model_context_page(
+        &self,
+        subject: &str,
+        connection: Uuid,
+        model: Option<&str>,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<
+        aihub_domain::records::Page<aihub_domain::model_context::ModelContextPreference>,
+        HubError,
+    > {
+        self.model_context_page_internal(subject, connection, model, limit, cursor)
+            .await
+    }
+    async fn save_model_context(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        connection: Uuid,
+        expected: i64,
+        input: &aihub_domain::model_context::ModelContextInput,
+    ) -> Result<aihub_domain::model_context::ModelContextMutation, HubError> {
+        self.save_model_context_internal(subject, key, binding, connection, expected, input)
+            .await
+    }
     async fn catalog_page(
         &self,
         subject: &str,

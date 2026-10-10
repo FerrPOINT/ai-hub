@@ -5,6 +5,7 @@ pub mod catalog;
 pub mod connections;
 pub mod error;
 pub mod financial;
+pub mod model_context;
 pub mod prices;
 pub mod pricing_sources;
 pub mod records;

@@ -278,3 +278,8 @@ GET `/api/v1/connection-presets` читает разрешённые опера�
 через actor-bound snapshot/cursor. UI передаёт выбранную ссылку вместо произвольного
 URL. Connection.catalog_refresh_supported обозначает реализованный metadata reader
 для текущего endpoint snapshot; не является authorization/currency/inference proof.
+
+Model context GET/PUT реализованы: exact model_id до 256 bytes, context budget
+1..4294967295; null/missing preference не physical default. Exact GET ETag "0"
+фиксирует отсутствие; collection cursor не precondition. PUT uses own key и
+strong If-Match, original result readback и atomic model-specific proof invalidation.

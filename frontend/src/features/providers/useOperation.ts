@@ -1,15 +1,16 @@
 import { useRef, useState } from 'react';
 import { ApiError } from '@sdlc/ui/lib';
 import { authGeneration, queryClient, type Identity, type OperationLookup, type ConnectionInput } from '../../shared/api/client';
-import { closeUnstarted, lookupOperation, providerKeys, validateSettings } from './service';
-export type ProviderAction = 'connection.create' | 'connection.update' | 'credential.write' | 'credential.revoke' | 'catalog.refresh';
+import { closeUnstarted, lookupOperation, providerKeys, validateSettings, validateContext } from './service';
+export type ProviderAction = 'connection.create' | 'connection.update' | 'credential.write' | 'credential.revoke' | 'catalog.refresh' | 'model-context.write';
 type SafeIntent = {
     key: string;
     action: ProviderAction;
     resource_id: string | null;
     settings?: ConnectionInput;
+    model_context?: import('../../shared/api/client').ModelContextInput;
 };
-const actions: ProviderAction[] = ['connection.create', 'connection.update', 'credential.write', 'credential.revoke', 'catalog.refresh'];
+const actions: ProviderAction[] = ['connection.create', 'connection.update', 'credential.write', 'credential.revoke', 'catalog.refresh', 'model-context.write'];
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const validId = (value: unknown): value is string => typeof value === 'string' && uuid.test(value) && value !== '00000000-0000-0000-0000-000000000000';
 function readIntent(key: string): SafeIntent | null {
@@ -19,23 +20,30 @@ function readIntent(key: string): SafeIntent | null {
     if (raw.length > 4096)
         throw new Error('Операция во вкладке повреждена.');
     const value = JSON.parse(raw) as SafeIntent;
-    if (!validId(value.key) || !actions.includes(value.action) || !(value.resource_id === null || validId(value.resource_id)) || Object.keys(value).some(k => !['key', 'action', 'resource_id', 'settings'].includes(k)))
+    if (!validId(value.key) || !actions.includes(value.action) || !(value.resource_id === null || validId(value.resource_id)) || Object.keys(value).some(k => !['key', 'action', 'resource_id', 'settings', 'model_context'].includes(k)))
         throw new Error('Операция во вкладке повреждена.');
     if (value.settings) {
         if (!['connection.create', 'connection.update'].includes(value.action) || Object.keys(value.settings).some(k => !['display_name', 'endpoint_policy_ref', 'billing_mode'].includes(k)))
             throw new Error('Операция во вкладке повреждена.');
         validateSettings(value.settings);
     }
+    if (value.model_context) {
+        if (value.action !== 'model-context.write' || Object.keys(value.model_context).some(k => !['model_id', 'context_window_tokens'].includes(k)))
+            throw new Error('Операция во вкладке повреждена.');
+        validateContext(value.model_context);
+    }
     return value;
 }
 export function useProviderOperation(identity: Identity, resource: string, onSuccess: (value: OperationLookup) => void) {
     const storageKey = `aihub.provider-intent:${identity.installation_id}:${identity.subject}:${resource}`;
-    const [initial] = useState(() => { try {
-        return { intent: readIntent(storageKey), error: '' };
-    }
-    catch {
-        return { intent: null, error: 'Не удалось прочитать операцию вкладки. Новые изменения заблокированы.' };
-    } });
+    const [initial] = useState(() => {
+        try {
+            return { intent: readIntent(storageKey), error: '' };
+        }
+        catch {
+            return { intent: null, error: 'Не удалось прочитать операцию вкладки. Новые изменения заблокированы.' };
+        }
+    });
     const [intent, setIntent] = useState(initial.intent);
     const [pending, setPending] = useState(false);
     const [error, setError] = useState(initial.error);
@@ -70,10 +78,10 @@ export function useProviderOperation(identity: Identity, resource: string, onSuc
             setNotice(closed ? 'Позднее выполнение исходного запроса запрещено. Можно создать новую операцию.' : '');
         }
     }
-    async function execute(action: ProviderAction, resource_id: string | null, send: (key: string) => Promise<unknown>, settings?: ConnectionInput) {
+    async function execute(action: ProviderAction, resource_id: string | null, send: (key: string) => Promise<unknown>, settings?: ConnectionInput, model_context?: import('../../shared/api/client').ModelContextInput) {
         if (locked || busy.current)
             return;
-        const current: SafeIntent = { key: crypto.randomUUID(), action, resource_id, ...(settings ? { settings: { display_name: settings.display_name, endpoint_policy_ref: settings.endpoint_policy_ref, billing_mode: settings.billing_mode } } : {}) };
+        const current: SafeIntent = { key: crypto.randomUUID(), action, resource_id, ...(settings ? { settings: { display_name: settings.display_name, endpoint_policy_ref: settings.endpoint_policy_ref, billing_mode: settings.billing_mode } } : {}), ...(model_context ? { model_context: { model_id: model_context.model_id, context_window_tokens: model_context.context_window_tokens } } : {}) };
         try {
             sessionStorage.setItem(storageKey, JSON.stringify(current));
             setIntent(current);

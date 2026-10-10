@@ -494,7 +494,7 @@
 | Поле                  | Тип         | Nullable | Правило                                             |
 | --------------------- | ----------- | -------- | --------------------------------------------------- |
 | connection_id         | uuid        | нет      | own connection FK                                   |
-| model_id              | text        | нет      | exact upstream ID                                   |
+| model_id              | text        | нет      | exact upstream ID, 1..256; no case/name normalization |
 | context_window_tokens | bigint      | нет      | configured budget 1..4294967295; not physical bound |
 | version               | bigint      | нет      | CAS                                                 |
 | updated_at            | timestamptz | нет      | UTC                                                 |

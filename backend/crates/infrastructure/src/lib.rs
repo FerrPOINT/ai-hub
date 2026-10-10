@@ -10,6 +10,7 @@ pub mod financial;
 pub mod maintenance;
 mod metadata_http;
 pub mod metadata_refresh;
+mod model_context;
 pub mod namespace_reader;
 pub mod openrouter_metadata;
 mod operation_control;

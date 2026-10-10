@@ -16,7 +16,7 @@ Production admission выключен до successful explicit migrate/readiness
 new state → switch; downgrade только если старый binary умеет читать актуальную schema.
 Rollback binary не откатывает facts и не освобождает unknown reserves.
 Миграция с irreversible data transformation требует own backup/restore rehearsal.
-Actual migrations `0001`–`0017` применились на own disposable PostgreSQL17;
+Actual migrations `0001`–`0018` применились на own disposable PostgreSQL17;
 foundation и financial evidence отражены в IMPLEMENTATION_STATUS. Все новые
 миграции квалифицировались только на disposable fixture, не на installed PDLC DB.
 Upgrade/nonempty restore остаются S7 gates; их PASS не выводится из fresh install.
@@ -70,3 +70,10 @@ nonempty upgrade/restore остаётся S7 gate.
 `0017` добавляет immutable no-send fences control keys с точным composite FK на
 installation/human actor/key/operation. Исходная operation не удаляется; expiry
 readback не разрешает позднюю mutation. Existing identity/history не переписывается.
+
+`0018` вводит immutable model-context revisions, CAS pointer и exact own FK.
+Runtime qualification получает immutable nullable context binding; legacy NULL
+не превращается в нулевую версию автоматически. Version 0 нового proof фиксирует
+проверенное отсутствие preference. New admission freezes context, claim проверяет
+его актуальность; legacy snapshot без context не получает новый dispatch.
+Settlement/history не переписываются; nonempty migration/restore остаются S7 gates.

@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen,waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router';
@@ -10,8 +10,61 @@ import '../../app/i18n';
 const identity: Identity = { subject: 'provider-test-human', installation_id: 'c47b4c36-5132-42bc-af03-5e581b90a3ce', capabilities: ['config.read', 'config.write'], project_grants: ['installation'] };
 const connection: Connection = { id: '12259f65-c6ef-42a2-b031-5228cd0376c9', provider_kind: 'openai_compatible', display_name: 'Свой аккаунт', generation: 1, status: 'authorization_unknown', has_credentials: false, catalog_refresh_supported: true, quota: null, version: 1, settings: { display_name: 'Свой аккаунт', endpoint_policy_ref: 'openrouter-api-v1', billing_mode: 'metered' } };
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } });
-function mount(id=connection.id) { useAuth.getState().setAuth({ token: 'fixture-provider-bearer', userId: identity.subject, email: 'fixture@example.test', displayName: 'Fixture' }); return render(<QueryClientProvider client={queryClient}><RouterProvider router={createMemoryRouter([{ path: '/providers/:id', element: <ConnectionDetails identity={identity}/> }], { initialEntries: [`/providers/${id}?provider_tab=connection`] })}/></QueryClientProvider>); }
+function mount(id = connection.id) { useAuth.getState().setAuth({ token: 'fixture-provider-bearer', userId: identity.subject, email: 'fixture@example.test', displayName: 'Fixture' }); return render(<QueryClientProvider client={queryClient}><RouterProvider router={createMemoryRouter([{ path: '/providers/:id', element: <ConnectionDetails identity={identity}/> }], { initialEntries: [`/providers/${id}?provider_tab=connection`] })}/></QueryClientProvider>); }
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); useAuth.getState().logout(); queryClient.clear(); sessionStorage.clear(); });
+it('configured model context starts absent and CAS zero creates only the exact model', async () => {
+    const model = 'vendor/CaseSensitive-model';
+    let key = '';
+    let saved: unknown = null;
+    const versions: string[] = [];
+    vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
+        if (String(url).includes('/model-contexts')) {
+            if (init?.method === 'PUT') {
+                const headers = new Headers(init.headers);
+                key = headers.get('Idempotency-Key')!;
+                versions.push(headers.get('If-Match')!);
+                const input = JSON.parse(String(init.body));
+                saved = { connection_id: connection.id, ...input, version: 1, updated_at: '2026-10-10T00:00:00Z' };
+                return json(saved);
+            }
+            return new Response(JSON.stringify({ items: saved ? [saved] : [], next_cursor: null }), { headers: { 'Content-Type': 'application/json', 'ETag': saved ? '"1"' : '"0"' } });
+        }
+        if (String(url).includes('/operations/by-key/'))
+            return json({ idempotency_key: key, action: 'model-context.write', operation: { id: crypto.randomUUID(), resource_id: connection.id, status: 'succeeded', safe_error: null, version: 2 } });
+        if (String(url).includes('/models'))
+            return json({ connection_id: connection.id, generation: 1, models: [{ provider_model_id: model, input_limit: 128000, output_limit: null, capabilities: [], evidence_status: 'unverified', observed_at: '2026-10-10T00:00:00Z' }], data_status: 'complete', as_of: '2026-10-10T00:00:00Z', next_cursor: null });
+        if (String(url).includes('/connection-presets'))
+            return json({ items: [], next_cursor: null });
+        if (String(url) === '/version')
+            return json({ external_calls: false });
+        return json(connection);
+    }));
+    const user = userEvent.setup();
+    mount();
+    await user.click(await screen.findByRole('tab', { name: 'Каталог' }));
+    await user.click(await screen.findByRole('button', { name: 'Настроить контекст' }));
+    const input = await screen.findByLabelText('Контекст, токены', { exact: false }) as HTMLInputElement;
+    expect(input.value).toBe('');
+    await user.type(input, '4096');
+    await user.click(screen.getByRole('button', { name: 'Сохранить контекст' }));
+    await screen.findByText(/Контекст модели сохранён/);
+    expect(versions).toEqual(['"0"']);
+    expect(saved).toMatchObject({ model_id: model, context_window_tokens: 4096 });
+    expect(sessionStorage.length).toBe(0);
+}, 10000);
+it('context 412 preserves tokens and rebases only the selected model version',async()=>{
+    const model='vendor/CaseSensitive-model';let current={connection_id:connection.id,model_id:model,context_window_tokens:4096,version:1,updated_at:'2026-10-10T00:00:00Z'};const writes:{key:string;version:string;tokens:number}[]=[];let key=''
+    vi.stubGlobal('fetch',vi.fn(async(url:string,init?:RequestInit)=>{
+        if(String(url).includes('/model-contexts')){if(init?.method==='PUT'){const headers=new Headers(init.headers);key=headers.get('Idempotency-Key')!;const input=JSON.parse(String(init.body));writes.push({key,version:headers.get('If-Match')!,tokens:input.context_window_tokens});if(writes.length===1){current={...current,version:2,context_window_tokens:5120};return json({error:{code:'precondition_failed',message:'fixture changed context'}},412)}current={...current,version:3,context_window_tokens:input.context_window_tokens};return json(current)}return new Response(JSON.stringify({items:[current],next_cursor:null}),{headers:{'Content-Type':'application/json','ETag':`"${current.version}"`}})}
+        if(String(url).includes('/operations/by-key/'))return json({idempotency_key:key,action:'model-context.write',operation:{id:crypto.randomUUID(),resource_id:connection.id,status:'succeeded',safe_error:null,version:2}})
+        if(String(url).includes('/models'))return json({connection_id:connection.id,generation:1,models:[{provider_model_id:model,input_limit:null,output_limit:null,capabilities:[],evidence_status:'unverified',observed_at:'2026-10-10T00:00:00Z'}],data_status:'complete',as_of:'2026-10-10T00:00:00Z',next_cursor:null})
+        if(String(url).includes('/connection-presets'))return json({items:[],next_cursor:null});if(String(url)==='/version')return json({external_calls:false});return json(connection)
+    }))
+    const user=userEvent.setup();mount();await user.click(await screen.findByRole('tab',{name:'Каталог'}));await user.click(await screen.findByRole('button',{name:'Настроить контекст'}));const input=await screen.findByLabelText('Контекст, токены',{exact:false}) as HTMLInputElement
+    await waitFor(()=>expect(input.value).toBe('4096'));await user.clear(input);await user.type(input,'8192');await user.click(screen.getByRole('button',{name:'Сохранить контекст'}));await screen.findByText(/Подключение изменено/);expect(input.value).toBe('8192')
+    await user.click(screen.getByRole('button',{name:'Загрузить версию контекста'}));await screen.findByText(/Актуальная версия контекста 2/);expect(input.value).toBe('8192')
+    await user.click(screen.getByRole('button',{name:'Сохранить контекст'}));await screen.findByText(/Контекст модели сохранён/);expect(writes.map(w=>w.version)).toEqual(['"1"','"2"']);expect(writes[0].key).not.toBe(writes[1].key);expect(writes[1].tokens).toBe(8192)
+},10000)
 it('lost credential reply reloads only a safe key intent and resolves original operation without repeating PUT', async () => {
     let writes = 0;
     let lookup = 0;

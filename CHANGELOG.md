@@ -41,6 +41,8 @@
   browser reload не требует хранения key body, existing operation не отменяется.
 - Base provider list/detail: presets, connection CAS/rebase, write-only key,
   revoke confirmation и cached catalog/search. Full live/IAB acceptance pending.
+- Exact model context GET/PUT, immutable revisions/CAS/history, model-specific
+  proof invalidation и frozen financial context guard; без physical default.
 
 ### Повторная проверка 2026-10-10
 

@@ -172,6 +172,16 @@
     "ui_uuid_regression": "uppercase_connection_uuid_readback_red_then_green_without_resend",
     "remaining": "live SSO/account/currency/model; model contexts and full connection/profile lifecycle; process crash/restore; IAB themes/viewports/states and full TC"
   },
+  "model_context_oracles": {
+    "status": "partial_implementation",
+    "tests": ["TC-003", "TC-004", "TC-027", "TC-028", "TC-036"],
+    "model_context_pg": {"source": "backend/crates/infrastructure/tests/model_context_pg.rs", "passed": 1, "ignored": 0, "seconds": 0.68},
+    "financial_pg": {"source": "backend/crates/infrastructure/tests/financial_pg.rs", "passed": 1, "ignored": 0, "seconds": 14.49},
+    "api": {"source": "backend/crates/api/tests/access.rs", "passed": 12, "seconds": 0.08},
+    "ui": "7_provider_tests_pass_including_exact_context_and_412_rebase",
+    "generated_contract": "rust_openapi_typescript_and_final_typecheck_pass",
+    "remaining": "full profile draft/proof/publication; actual provider/context qualification; process crash/restore; IAB themes/viewports/states and full TC"
+  },
   "required_acceptance": {
     "S1": "in_progress",
     "S2a": "in_progress",

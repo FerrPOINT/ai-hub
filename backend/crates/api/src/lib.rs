@@ -1,4 +1,5 @@
 use aihub_application::{BudgetFilter, Foundation};
+use aihub_domain::model_context::{ModelContextInput, ModelContextPreference};
 use aihub_domain::{
     NamespaceRef,
     access::{HumanPrincipal, namespace_filter},
@@ -296,6 +297,9 @@ fn budget_options(raw: &str) -> Result<(BudgetFilter, i64, Option<Uuid>), HubErr
 }
 
 fn budget_version(headers: &HeaderMap) -> Result<i64, HubError> {
+    quoted_version(headers, 1)
+}
+fn quoted_version(headers: &HeaderMap, minimum: i64) -> Result<i64, HubError> {
     let mut values = headers.get_all("if-match").iter();
     let raw = values
         .next()
@@ -313,10 +317,95 @@ fn budget_version(headers: &HeaderMap) -> Result<i64, HubError> {
     let version = raw
         .parse::<i64>()
         .map_err(|_| HubError::Invalid("If-Match version"))?;
-    if version < 1 {
+    if version < minimum {
         return Err(HubError::Invalid("If-Match version"));
     }
     Ok(version)
+}
+#[derive(Serialize, ToSchema)]
+pub struct ModelContextPage {
+    items: Vec<ModelContextPreference>,
+    next_cursor: Option<String>,
+}
+#[utoipa::path(get,path="/api/v1/connections/{connection_id}/model-contexts",operation_id="listModelContextPreferences",security(("CentralAuth"=[])),params(("connection_id"=Uuid,Path),("model_id"=Option<String>,Query,min_length=1,max_length=256),("limit"=Option<i64>,Query,minimum=1,maximum=100),("cursor"=Option<Uuid>,Query)),responses((status=200,body=ModelContextPage),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=503,body=Error)))]
+pub async fn model_contexts(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(id): Path<String>,
+    RawQuery(raw): RawQuery,
+) -> Result<(HeaderMap, Json<ModelContextPage>), ApiError> {
+    principal.require_config(false)?;
+    let id = Uuid::parse_str(&id).map_err(|_| HubError::Invalid("connection ID"))?;
+    let (model, limit, cursor) = model_context_options(raw.as_deref().unwrap_or(""))?;
+    let page = state
+        .foundation
+        .model_contexts(&principal, id, model.as_deref(), limit, cursor)
+        .await?;
+    let mut headers = HeaderMap::new();
+    if model.is_some() {
+        headers.insert(
+            "etag",
+            axum::http::HeaderValue::from_str(&format!(
+                "\"{}\"",
+                page.items.first().map_or(0, |p| p.version)
+            ))
+            .map_err(|_| HubError::Unavailable)?,
+        );
+    }
+    Ok((
+        headers,
+        Json(ModelContextPage {
+            items: page.items,
+            next_cursor: page.next_cursor,
+        }),
+    ))
+}
+fn model_context_options(raw: &str) -> Result<(Option<String>, i64, Option<Uuid>), HubError> {
+    let mut model = None;
+    let mut encoded = url::form_urlencoded::Serializer::new(String::new());
+    for (key, value) in url::form_urlencoded::parse(raw.as_bytes()) {
+        if key == "model_id" {
+            if model.is_some() {
+                return Err(HubError::Invalid("duplicate model ID"));
+            }
+            aihub_domain::model_context::validate_model_id(&value)?;
+            model = Some(value.into_owned())
+        } else {
+            encoded.append_pair(&key, &value);
+        }
+    }
+    let (limit, cursor) = list_options(&encoded.finish(), false)?;
+    if model.is_some() && cursor.is_some() {
+        return Err(HubError::Invalid("exact context cursor"));
+    }
+    Ok((model, limit, cursor))
+}
+#[utoipa::path(put,path="/api/v1/connections/{connection_id}/model-contexts",operation_id="saveModelContextPreference",security(("CentralAuth"=[])),params(("connection_id"=Uuid,Path),("Idempotency-Key"=Uuid,Header),("If-Match"=String,Header)),request_body=ModelContextInput,responses((status=200,body=ModelContextPreference),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=409,body=Error),(status=412,body=Error),(status=503,body=Error)))]
+pub async fn save_model_context(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(id): Path<String>,
+    headers: HeaderMap,
+    body: Result<Json<ModelContextInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<([(String, String); 2], Json<ModelContextPreference>), ApiError> {
+    principal.require_config(true)?;
+    let key = mutation_key(&headers)?;
+    let expected = quoted_version(&headers, 0)?;
+    let id = Uuid::parse_str(&id).map_err(|_| HubError::Invalid("connection ID"))?;
+    let input = body
+        .map_err(|_| HubError::Invalid("model context payload"))?
+        .0;
+    let result = state
+        .foundation
+        .save_model_context(&principal, key, id, expected, &input)
+        .await?;
+    Ok((
+        [
+            ("etag".into(), format!("\"{}\"", result.preference.version)),
+            ("x-operation-id".into(), result.operation_id.to_string()),
+        ],
+        Json(result.preference),
+    ))
 }
 
 #[utoipa::path(get,path="/api/v1/budgets",operation_id="listBudgets",security(("CentralAuth"=[])),params(("limit"=Option<i64>,Query,minimum=1,maximum=100),("cursor"=Option<Uuid>,Query),("registry_instance_id"=Option<Uuid>,Query),("namespace_id"=Option<Uuid>,Query),("binding"=Option<String>,Query)),responses((status=200,body=BudgetPage),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=503,body=Error)))]
@@ -793,7 +882,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,write_credential,revoke_credential,read_catalog,refresh_catalog,operation_key,close_unstarted_operation,endpoint_policies),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata,MetadataRefreshInput,OperationLookup,EndpointPolicyInput,EndpointPolicyPage)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,write_credential,revoke_credential,read_catalog,refresh_catalog,operation_key,close_unstarted_operation,endpoint_policies,model_contexts,save_model_context),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata,MetadataRefreshInput,OperationLookup,EndpointPolicyInput,EndpointPolicyPage,ModelContextInput,ModelContextPreference,ModelContextPage)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -871,6 +960,10 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
             axum::routing::post(close_unstarted_operation),
         )
         .route("/api/v1/connection-presets", get(endpoint_policies))
+        .route(
+            "/api/v1/connections/{connection_id}/model-contexts",
+            get(model_contexts).put(save_model_context),
+        )
         .route("/openapi.json", get(openapi))
         .fallback(not_found)
         .layer(DefaultBodyLimit::max(body_limit))
