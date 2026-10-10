@@ -268,6 +268,129 @@ async fn credential_write_only_generation_revoke_replay_and_atomic_audit() {
             .await
             .is_err()
     );
+    let lookup = foundation.operation_key(&principal, key).await.unwrap();
+    assert_eq!(lookup.action, "credential.write");
+    assert_eq!(lookup.operation.id, one.id);
+    assert_eq!(lookup.operation.status, "succeeded");
+    let other = HumanPrincipal {
+        subject: "other-actor".into(),
+        authentication: HumanAuthentication::BrowserSession,
+    };
+    assert!(matches!(
+        foundation.operation_key(&other, key).await,
+        Err(HubError::NotFound)
+    ));
+    assert_eq!(
+        foundation
+            .close_unstarted_operation(&principal, key)
+            .await
+            .unwrap()
+            .operation
+            .id,
+        one.id,
+        "close returns existing write without undoing it"
+    );
+    let closed_key = Uuid::new_v4();
+    let closed = foundation
+        .close_unstarted_operation(&principal, closed_key)
+        .await
+        .unwrap();
+    assert_eq!(closed.action, "operation.close-unstarted");
+    assert_eq!(closed.operation.status, "cancelled");
+    assert_eq!(
+        foundation
+            .close_unstarted_operation(&principal, closed_key)
+            .await
+            .unwrap()
+            .operation
+            .id,
+        closed.operation.id
+    );
+    let next = CredentialInput {
+        secret: Zeroizing::new("late-synthetic-key-canary".into()),
+        credential_type: CredentialType::ApiKey,
+        expected_generation: 3,
+    };
+    assert!(matches!(
+        foundation
+            .write_credential(&principal, closed_key, conn.id, &next)
+            .await,
+        Err(HubError::IdempotencyConflict)
+    ));
+    assert_eq!(
+        FoundationStore::read_connection(&*store, conn.id)
+            .await
+            .unwrap()
+            .generation,
+        3
+    );
+    assert!(
+        sqlx::query("DELETE FROM control_key_fences WHERE operation_id=$1")
+            .bind(closed.operation.id)
+            .execute(&store.pool)
+            .await
+            .is_err()
+    );
+    assert!(
+        sqlx::query("DELETE FROM operations WHERE id=$1")
+            .bind(closed.operation.id)
+            .execute(&store.pool)
+            .await
+            .is_err()
+    );
+    let race_key = Uuid::new_v4();
+    let (write, close) = tokio::join!(
+        foundation.write_credential(&principal, race_key, conn.id, &next),
+        foundation.close_unstarted_operation(&principal, race_key)
+    );
+    let close = close.unwrap();
+    match write {
+        Ok(write) => {
+            assert_eq!(write.id, close.operation.id);
+            assert_eq!(close.operation.status, "succeeded");
+        }
+        Err(HubError::IdempotencyConflict) => {
+            assert_eq!(close.operation.status, "cancelled");
+        }
+        other => panic!("unexpected race result: {other:?}"),
+    }
+    let current = FoundationStore::read_connection(&*store, conn.id)
+        .await
+        .unwrap();
+    let neighboring = CredentialInput {
+        secret: Zeroizing::new("neighbor-synthetic-key".into()),
+        credential_type: CredentialType::ApiKey,
+        expected_generation: current.generation,
+    };
+    foundation
+        .write_credential(&other, closed_key, conn.id, &neighboring)
+        .await
+        .unwrap();
+    let failed_close = Uuid::new_v4();
+    sqlx::raw_sql("CREATE FUNCTION reject_control_close_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='operation.close-unstarted' THEN RAISE EXCEPTION 'fixture audit unavailable'; END IF; RETURN NEW; END; $$; CREATE TRIGGER reject_control_close_audit BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION reject_control_close_audit();").execute(&store.pool).await.unwrap();
+    assert!(
+        foundation
+            .close_unstarted_operation(&principal, failed_close)
+            .await
+            .is_err()
+    );
+    assert!(matches!(
+        foundation.operation_key(&principal, failed_close).await,
+        Err(HubError::NotFound)
+    ));
+    sqlx::raw_sql("DROP TRIGGER reject_control_close_audit ON audit_events; DROP FUNCTION reject_control_close_audit();").execute(&store.pool).await.unwrap();
+    let presets = foundation
+        .endpoint_policies(&principal, 1, None)
+        .await
+        .unwrap();
+    assert_eq!(presets.items[0].policy_ref, "credential-fixture");
+    assert!(
+        !FoundationStore::read_connection(&*store, conn.id)
+            .await
+            .unwrap()
+            .catalog_refresh_supported,
+        "generic compatible endpoint is not OpenRouter metadata support"
+    );
     assert_eq!(
         sqlx::query_scalar::<_, i64>("SELECT count(*) FROM ledger_entries")
             .fetch_one(&store.pool)

@@ -55,6 +55,13 @@ pub struct Operation {
     pub safe_error: Option<String>,
     pub version: i64,
 }
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct OperationLookup {
+    pub idempotency_key: Uuid,
+    pub action: String,
+    pub operation: Operation,
+}
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 #[serde(deny_unknown_fields)]

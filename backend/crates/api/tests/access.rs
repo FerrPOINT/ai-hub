@@ -77,6 +77,23 @@ impl aihub_application::MetadataOperations for TestStore {
 }
 #[async_trait]
 impl FoundationStore for TestStore {
+    async fn operation_key(
+        &self,
+        _: &str,
+        _: Uuid,
+    ) -> Result<aihub_domain::records::OperationLookup, HubError> {
+        self.reads.fetch_add(1, Ordering::SeqCst);
+        Err(HubError::NotFound)
+    }
+    async fn close_unstarted_operation(
+        &self,
+        _: &str,
+        _: Uuid,
+        _: [u8; 32],
+    ) -> Result<aihub_domain::records::OperationLookup, HubError> {
+        self.reads.fetch_add(1, Ordering::SeqCst);
+        Err(HubError::NotFound)
+    }
     async fn ready(&self) -> Result<(), HubError> {
         Ok(())
     }
@@ -183,6 +200,35 @@ async fn metadata_refresh_requires_write_scope_and_external_opt_in_before_intent
         );
     }
     assert_eq!(store.reads.load(Ordering::SeqCst), 1);
+}
+#[tokio::test]
+async fn control_key_readback_and_no_send_close_are_scoped_before_storage() {
+    let (app, store) = fixture();
+    let path = format!("/api/v1/operations/by-key/{}", Uuid::new_v4());
+    assert_eq!(
+        status(&app, &path, Some("foreign")).await,
+        StatusCode::FORBIDDEN
+    );
+    assert_eq!(
+        status(&app, &path, Some("read")).await,
+        StatusCode::NOT_FOUND
+    );
+    for (token, expected) in [
+        ("read", StatusCode::FORBIDDEN),
+        ("write", StatusCode::NOT_FOUND),
+    ] {
+        let request = Request::builder()
+            .method("POST")
+            .uri(format!("{path}/close-unstarted"))
+            .header("authorization", format!("Bearer {token}"))
+            .body(Body::empty())
+            .unwrap();
+        assert_eq!(
+            app.clone().oneshot(request).await.unwrap().status(),
+            expected
+        );
+    }
+    assert_eq!(store.reads.load(Ordering::SeqCst), 2);
 }
 async fn status(app: &axum::Router, path: &str, token: Option<&str>) -> StatusCode {
     let mut request = Request::builder().uri(path);

@@ -30,6 +30,8 @@ Pricing-source control/CAS/resolver и mandatory financial source guard пров
 Начат S2b connection control/operator allowlist и write-only credential lifecycle;
 exact decoder, cached catalog и durable metadata reader добавлены;
 live account/currency/managed auth/qualification ещё pending.
+Начаты Base provider list/detail, write-only key/revoke и catalog UI; operation
+lookup/no-send close поддерживают recovery после reload без хранения secret.
 Control prices/budgets API
 и basic budget UI реализованы; price forms и live provider path ещё впереди.
 [Partial evidence](implementation-evidence.json)

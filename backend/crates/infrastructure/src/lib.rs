@@ -12,6 +12,7 @@ mod metadata_http;
 pub mod metadata_refresh;
 pub mod namespace_reader;
 pub mod openrouter_metadata;
+mod operation_control;
 pub mod postgres;
 mod pricing_sources;
 pub mod replay;

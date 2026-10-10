@@ -5,12 +5,13 @@ use aihub_domain::{
     budgets::{Budget, BudgetInput, BudgetPeriod, BudgetScope},
     catalog::{CatalogPage, MetadataRefreshInput, ModelMetadata},
     connections::{
-        BillingMode, Connection, ConnectionInput, CredentialInput, CredentialType, ProviderKind,
+        BillingMode, Connection, ConnectionInput, CredentialInput, CredentialType,
+        EndpointPolicyInput, ProviderKind,
     },
     error::HubError,
     prices::{PriceInput, PriceRevision, PriceUnit},
     pricing_sources::{PricingDataStatus, PricingMode, PricingSourceInput, PricingSourceRevision},
-    records::{AuditEvent, Health, Identity, NamespaceBinding, Operation},
+    records::{AuditEvent, Health, Identity, NamespaceBinding, Operation, OperationLookup},
 };
 use axum::{
     Json, Router,
@@ -648,6 +649,51 @@ pub async fn operation(
 ) -> Result<Json<Operation>, ApiError> {
     Ok(Json(state.foundation.operation(&principal, id).await?))
 }
+#[utoipa::path(get,path="/api/v1/operations/by-key/{idempotency_key}",operation_id="readOperationByKey",security(("CentralAuth"=[])),params(("idempotency_key"=Uuid,Path)),responses((status=200,body=OperationLookup),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=503,body=Error)))]
+pub async fn operation_key(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(key): Path<String>,
+) -> Result<Json<OperationLookup>, ApiError> {
+    let key = Uuid::parse_str(&key).map_err(|_| HubError::Invalid("operation key"))?;
+    Ok(Json(state.foundation.operation_key(&principal, key).await?))
+}
+#[utoipa::path(post,path="/api/v1/operations/by-key/{idempotency_key}/close-unstarted",operation_id="closeUnstartedOperation",security(("CentralAuth"=[])),params(("idempotency_key"=Uuid,Path)),responses((status=200,body=OperationLookup),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=503,body=Error)))]
+pub async fn close_unstarted_operation(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(key): Path<String>,
+) -> Result<Json<OperationLookup>, ApiError> {
+    principal.require_config(true)?;
+    let key = Uuid::parse_str(&key).map_err(|_| HubError::Invalid("operation key"))?;
+    Ok(Json(
+        state
+            .foundation
+            .close_unstarted_operation(&principal, key)
+            .await?,
+    ))
+}
+#[derive(Serialize, ToSchema)]
+pub struct EndpointPolicyPage {
+    items: Vec<EndpointPolicyInput>,
+    next_cursor: Option<String>,
+}
+#[utoipa::path(get,path="/api/v1/connection-presets",operation_id="listConnectionPresets",security(("CentralAuth"=[])),params(("limit"=Option<i64>,Query,minimum=1,maximum=100),("cursor"=Option<Uuid>,Query)),responses((status=200,body=EndpointPolicyPage),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=503,body=Error)))]
+pub async fn endpoint_policies(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    RawQuery(raw): RawQuery,
+) -> Result<Json<EndpointPolicyPage>, ApiError> {
+    let (limit, cursor) = list_options(raw.as_deref().unwrap_or(""), false)?;
+    let page = state
+        .foundation
+        .endpoint_policies(&principal, limit, cursor)
+        .await?;
+    Ok(Json(EndpointPolicyPage {
+        items: page.items,
+        next_cursor: page.next_cursor,
+    }))
+}
 
 #[derive(Serialize, ToSchema)]
 pub struct Version {
@@ -747,7 +793,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,write_credential,revoke_credential,read_catalog,refresh_catalog),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata,MetadataRefreshInput)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,write_credential,revoke_credential,read_catalog,refresh_catalog,operation_key,close_unstarted_operation,endpoint_policies),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata,MetadataRefreshInput,OperationLookup,EndpointPolicyInput,EndpointPolicyPage)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -816,6 +862,15 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
             axum::routing::patch(update_budget),
         )
         .route("/api/v1/operations/{operation_id}", get(operation))
+        .route(
+            "/api/v1/operations/by-key/{idempotency_key}",
+            get(operation_key),
+        )
+        .route(
+            "/api/v1/operations/by-key/{idempotency_key}/close-unstarted",
+            axum::routing::post(close_unstarted_operation),
+        )
+        .route("/api/v1/connection-presets", get(endpoint_policies))
         .route("/openapi.json", get(openapi))
         .fallback(not_found)
         .layer(DefaultBodyLimit::max(body_limit))

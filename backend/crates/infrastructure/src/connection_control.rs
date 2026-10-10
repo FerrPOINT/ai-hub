@@ -10,7 +10,7 @@ use aihub_domain::{
 use sha2::{Digest, Sha256};
 use sqlx::{Postgres, Row, Transaction};
 use uuid::Uuid;
-const VIEW: &str = "SELECT c.*,p.kind,EXISTS(SELECT 1 FROM credential_versions v WHERE v.connection_id=c.id AND v.generation=c.generation AND v.state IN ('prepared','active')) AS has_credentials FROM connections c JOIN providers p ON p.installation_id=c.installation_id AND p.id=c.provider_id";
+const VIEW: &str = "SELECT c.*,p.kind,g.endpoint_snapshot,EXISTS(SELECT 1 FROM credential_versions v WHERE v.connection_id=c.id AND v.generation=c.generation AND v.state IN ('prepared','active')) AS has_credentials FROM connections c JOIN providers p ON p.installation_id=c.installation_id AND p.id=c.provider_id LEFT JOIN connection_generations g ON g.connection_id=c.id AND g.generation=c.generation";
 fn connection(row: &sqlx::postgres::PgRow) -> Result<Connection, HubError> {
     let billing_mode = match row.get::<String, _>("billing_mode").as_str() {
         "metered" => BillingMode::Metered,
@@ -19,13 +19,18 @@ fn connection(row: &sqlx::postgres::PgRow) -> Result<Connection, HubError> {
         "unknown" => BillingMode::Unknown,
         _ => return Err(HubError::Unavailable),
     };
+    let provider_kind = ProviderKind::parse(&row.get::<String, _>("kind"))?;
+    let snapshot = row.get::<Option<serde_json::Value>, _>("endpoint_snapshot");
     Ok(Connection {
         id: row.get("id"),
-        provider_kind: ProviderKind::parse(&row.get::<String, _>("kind"))?,
+        provider_kind,
         display_name: row.get("display_name"),
         generation: row.get("generation"),
         status: row.get("status"),
         has_credentials: row.get("has_credentials"),
+        catalog_refresh_supported: snapshot.as_ref().is_some_and(|p| {
+            aihub_domain::connections::supports_openrouter_metadata(provider_kind, p)
+        }),
         quota: None,
         version: row.get("version"),
         settings: ConnectionInput {

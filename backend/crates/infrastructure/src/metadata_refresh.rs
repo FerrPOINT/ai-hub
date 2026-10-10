@@ -85,10 +85,10 @@ impl MetadataRefresh {
         let endpoint: serde_json::Value = row
             .get::<Option<serde_json::Value>, _>("endpoint_snapshot")
             .ok_or(HubError::PreconditionFailed)?;
-        if endpoint.get("base_url").and_then(|v| v.as_str())
-            != Some("https://openrouter.ai/api/v1/")
-            || endpoint.get("allow_loopback").and_then(|v| v.as_bool()) != Some(false)
-        {
+        if !aihub_domain::connections::supports_openrouter_metadata(
+            aihub_domain::connections::ProviderKind::parse(&row.get::<String, _>("kind"))?,
+            &endpoint,
+        ) {
             return Err(HubError::InvalidSemantics(
                 "OpenRouter metadata requires its exact owned preset",
             ));

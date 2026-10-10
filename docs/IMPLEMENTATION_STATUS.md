@@ -33,7 +33,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
 | S2a | В реализации: financial SQL/source guard, control API, basic budget UI, protected results и wired maintenance worker | Price/source forms и milestone runtime/provider evidence |
-| S2b | В реализации: connection/credentials, exact OpenRouter decoder, cached catalog и durable metadata refresh | Live account/currency qualification, context, disable/archive, draft/proof/publication и UI |
+| S2b | В реализации: connection/credentials/catalog, durable metadata refresh, own operation recovery и начат UI подключений | Live account/currency qualification, model context, lifecycle, draft/proof/publication и полный UI |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
 | S5 | Не реализован | Полный operational UI и authorized snapshot/export |
@@ -377,3 +377,47 @@ Fresh cached-catalog regression после shared transaction helper: 1 pass, 0 
 1.08s. Rust OpenAPI export, regenerated TypeScript и frontend typecheck pass.
 Live Dev account/currency/model qualification ещё pending.
 Provider HTTP/model calls в этой сессии: 0.
+
+## Provider control UI и write-only recovery — текущий срез
+
+Исходный недостаток: после lost credential reply браузер знал Idempotency-Key,
+но не серверный operation ID. Повтор после reload потребовал бы хранения secret.
+Added own operation lookup и close-unstarted fence решают это на серверной границе,
+сохраняя существующие операции и audit. API regression RED: missing route 404
+вместо scoped 403. Final API gate после reader projection: 10 access tests pass,
+0.08s. Rust OpenAPI export, regenerated TypeScript и frontend typecheck pass.
+
+Routes /providers и /providers/:id подключены к Base ListPage/DetailPage/Tabs/
+FormField/UnsavedChangesGuard и реальным API. Create использует own operator preset,
+PATCH strong CAS; 412 сохраняет значения и требует explicit version rebase. Ключ
+только password input, direct transport без React Query mutation cache; очищается
+после отправки. sessionStorage содержит только UUID/action/resource и явно выбранные
+nonsecret settings. Unknown/404/403 после потерянного ответа не создают fresh mutation.
+GET исходной операции либо explicit no-send fence разрешают дальнейшее действие.
+Revoke требует подтверждения; catalog GET cached, refresh отдельный external opt-in.
+Reader availability приходит с backend; URL/protocol selection не переносится в UI.
+
+Providers search/status и detail provider_tab/catalog_q сохраняются в URL.
+Connection search выполняется над полным actor-bound snapshot с ceiling 10k;
+server search нужен при превышении этой границы. Catalog search/pagination серверные.
+Secrets/Bearer не сериализуются в intent; same-key readback проверяет action/resource.
+Source authorization, inference proof и native currency остаются отдельными данными.
+
+Controlled UI: 5 provider tests + 3 budget regression tests pass. Checked lost reply,
+reload/403/readback без нового PUT, absent lookup/fence, create→authorization и 412
+с fresh CAS после rebase, cached catalog/URL query и external_calls=false.
+Uppercase UUID route воспроизвёл readback mismatch (RED); нормализация connection
+UUID исправляет его, сохраняя model IDs. Final UI run: 8 pass, 5.20s test time;
+typecheck pass после последнего изменения. Это DOM/transport checks, не IAB evidence. Permanent own
+runtime, all-provider/SSO/Namespace acceptance, model context, managed login,
+disable/archive/proof/publication, price forms и full S1–S7 всё ещё pending.
+
+Final credential PostgreSQL17 fixture после `0017`: 1 pass, 0 ignored, 2.17s.
+Проверены original successful lookup после revoke, actor isolation, concurrent
+write/close, immutable fence/operation FK, late-write denial, same UUID другого
+actor, audit rollback и snapshot presets. Compatible non-OpenRouter endpoint не
+объявляется поддержанным metadata reader. Тест не выполняет provider I/O.
+
+Metadata PostgreSQL17 regression после shared availability predicate: 1 pass,
+0 ignored, 0.80s; exact OpenRouter preset объявляет reader support, сохраняя
+authorization_unknown и отсутствие runtime qualifications/ledger.

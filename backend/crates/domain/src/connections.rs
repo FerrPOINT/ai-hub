@@ -79,10 +79,17 @@ pub struct Connection {
     pub generation: i64,
     pub status: String,
     pub has_credentials: bool,
+    /// Adapter metadata support only; not authorization, currency or inference proof.
+    pub catalog_refresh_supported: bool,
     #[schema(required = true)]
     pub quota: Option<serde_json::Value>,
     pub version: i64,
     pub settings: ConnectionInput,
+}
+pub fn supports_openrouter_metadata(kind: ProviderKind, policy: &serde_json::Value) -> bool {
+    kind == ProviderKind::OpenaiCompatible
+        && policy.get("base_url").and_then(|v| v.as_str()) == Some("https://openrouter.ai/api/v1/")
+        && policy.get("allow_loopback").and_then(|v| v.as_bool()) == Some(false)
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConnectionMutation {
@@ -128,7 +135,7 @@ pub struct ProtectedCredential {
     pub key_id: String,
 }
 /// Operator-owned allowlist; never read from public connection body or caller metadata.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct EndpointPolicyInput {
     pub policy_ref: String,

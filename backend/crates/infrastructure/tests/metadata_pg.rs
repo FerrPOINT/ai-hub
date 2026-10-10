@@ -101,6 +101,12 @@ async fn durable_metadata_single_claim_generation_fence_atomic_audit_and_recover
         .await
         .unwrap();
     let service = MetadataRefresh::new(store.clone(), vault.clone()).unwrap();
+    assert!(
+        FoundationStore::read_connection(&*store, connection.id)
+            .await
+            .unwrap()
+            .catalog_refresh_supported
+    );
     let key = Uuid::new_v4();
     let (one, two) = tokio::join!(
         service.begin(&principal.subject, key, connection.id, 2),

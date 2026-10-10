@@ -1,0 +1,141 @@
+import { useRef, useState } from 'react';
+import { ApiError } from '@sdlc/ui/lib';
+import { authGeneration, queryClient, type Identity, type OperationLookup, type ConnectionInput } from '../../shared/api/client';
+import { closeUnstarted, lookupOperation, providerKeys, validateSettings } from './service';
+export type ProviderAction = 'connection.create' | 'connection.update' | 'credential.write' | 'credential.revoke' | 'catalog.refresh';
+type SafeIntent = {
+    key: string;
+    action: ProviderAction;
+    resource_id: string | null;
+    settings?: ConnectionInput;
+};
+const actions: ProviderAction[] = ['connection.create', 'connection.update', 'credential.write', 'credential.revoke', 'catalog.refresh'];
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const validId = (value: unknown): value is string => typeof value === 'string' && uuid.test(value) && value !== '00000000-0000-0000-0000-000000000000';
+function readIntent(key: string): SafeIntent | null {
+    const raw = sessionStorage.getItem(key);
+    if (!raw)
+        return null;
+    if (raw.length > 4096)
+        throw new Error('Операция во вкладке повреждена.');
+    const value = JSON.parse(raw) as SafeIntent;
+    if (!validId(value.key) || !actions.includes(value.action) || !(value.resource_id === null || validId(value.resource_id)) || Object.keys(value).some(k => !['key', 'action', 'resource_id', 'settings'].includes(k)))
+        throw new Error('Операция во вкладке повреждена.');
+    if (value.settings) {
+        if (!['connection.create', 'connection.update'].includes(value.action) || Object.keys(value.settings).some(k => !['display_name', 'endpoint_policy_ref', 'billing_mode'].includes(k)))
+            throw new Error('Операция во вкладке повреждена.');
+        validateSettings(value.settings);
+    }
+    return value;
+}
+export function useProviderOperation(identity: Identity, resource: string, onSuccess: (value: OperationLookup) => void) {
+    const storageKey = `aihub.provider-intent:${identity.installation_id}:${identity.subject}:${resource}`;
+    const [initial] = useState(() => { try {
+        return { intent: readIntent(storageKey), error: '' };
+    }
+    catch {
+        return { intent: null, error: 'Не удалось прочитать операцию вкладки. Новые изменения заблокированы.' };
+    } });
+    const [intent, setIntent] = useState(initial.intent);
+    const [pending, setPending] = useState(false);
+    const [error, setError] = useState(initial.error);
+    const [notice, setNotice] = useState('');
+    const [notFound, setNotFound] = useState(false);
+    const [stale, setStale] = useState(false);
+    const busy = useRef(false);
+    const locked = pending || !!intent || !!initial.error;
+    function finish(result: OperationLookup, current: SafeIntent) {
+        const closed = result.action === 'operation.close-unstarted' && result.operation.status === 'cancelled' && result.operation.resource_id === null;
+        if (result.idempotency_key !== current.key || !validId(result.operation.id) || !closed && (result.action !== current.action || current.resource_id !== null && result.operation.resource_id !== current.resource_id))
+            throw new Error('Результат относится к другой операции. Исходный запрос сохранён.');
+        if (!['succeeded', 'failed', 'cancelled', 'pending', 'unknown'].includes(result.operation.status))
+            throw new Error('Неизвестное состояние операции.');
+        if (result.operation.status === 'succeeded' && !validId(result.operation.resource_id))
+            throw new Error('Не подтверждён объект исходной операции.');
+        if (['pending', 'unknown'].includes(result.operation.status)) {
+            setError('Результат операции пока неизвестен. Проверьте исходную операцию; новые изменения заблокированы.');
+            return;
+        }
+        sessionStorage.removeItem(storageKey);
+        setIntent(null);
+        setNotFound(false);
+        setStale(false);
+        if (result.operation.status === 'succeeded') {
+            setError('');
+            onSuccess(result);
+            void queryClient.invalidateQueries({ queryKey: providerKeys.all });
+        }
+        else {
+            setError(result.operation.safe_error ?? 'Операция не выполнена.');
+            setNotice(closed ? 'Позднее выполнение исходного запроса запрещено. Можно создать новую операцию.' : '');
+        }
+    }
+    async function execute(action: ProviderAction, resource_id: string | null, send: (key: string) => Promise<unknown>, settings?: ConnectionInput) {
+        if (locked || busy.current)
+            return;
+        const current: SafeIntent = { key: crypto.randomUUID(), action, resource_id, ...(settings ? { settings: { display_name: settings.display_name, endpoint_policy_ref: settings.endpoint_policy_ref, billing_mode: settings.billing_mode } } : {}) };
+        try {
+            sessionStorage.setItem(storageKey, JSON.stringify(current));
+            setIntent(current);
+        }
+        catch {
+            setError('Не удалось сохранить идентификатор операции во вкладке. Запрос не отправлен.');
+            return;
+        }
+        busy.current = true;
+        setPending(true);
+        setError('');
+        setNotice('');
+        setStale(false);
+        const generation = authGeneration();
+        let replied = false;
+        try {
+            await send(current.key);
+            replied = true;
+            const result = await lookupOperation(current.key);
+            if (generation === authGeneration())
+                finish(result, current);
+        }
+        catch (cause) {
+            if (generation === authGeneration()) {
+                const rejected = !replied && cause instanceof ApiError && cause.status >= 400 && cause.status < 500 && ![408, 429].includes(cause.status);
+                if (rejected) {
+                    sessionStorage.removeItem(storageKey);
+                    setIntent(null);
+                    setStale(cause.status === 412);
+                    setError(cause.status === 412 ? 'Подключение изменено. Ваши значения сохранены; загрузите актуальную версию.' : cause.message);
+                }
+                else
+                    setError('Результат операции пока неизвестен. Проверьте исходную операцию; новые изменения заблокированы.');
+            }
+        }
+        finally {
+            busy.current = false;
+            setPending(false);
+        }
+    }
+    async function recover(close = false) {
+        if (!intent || busy.current)
+            return;
+        busy.current = true;
+        setPending(true);
+        setError('');
+        const generation = authGeneration();
+        try {
+            const result = await (close ? closeUnstarted(intent.key) : lookupOperation(intent.key));
+            if (generation === authGeneration())
+                finish(result, intent);
+        }
+        catch (cause) {
+            if (generation === authGeneration()) {
+                setNotFound(cause instanceof ApiError && cause.status === 404);
+                setError(cause instanceof ApiError && cause.status === 404 ? 'Исходная операция пока не найдена. Это не подтверждает отказ; проверьте ещё раз или закройте непринятый запрос.' : cause instanceof Error ? cause.message : 'Не удалось проверить исходную операцию.');
+            }
+        }
+        finally {
+            busy.current = false;
+            setPending(false);
+        }
+    }
+    return { intent, initial, pending, locked, error, notice, notFound, stale, setStale, setError, setNotice, execute, recover };
+}

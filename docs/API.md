@@ -259,3 +259,22 @@ POST `/api/v1/connections/{connection_id}/models/refresh` принимает т�
 читается через GET операции. Disabled external calls отклоняются до intent/HTTP.
 Same-key повтор при enabled calls читает исходную operation. GET models остаётся
 cached read. Metadata не заменяет verification/probe и не разрешает inference.
+
+## Восстановление write-only control операции
+
+GET `/api/v1/operations/by-key/{idempotency_key}` возвращает OperationLookup:
+точный ключ, action и safe Operation; поиск ограничен installation + human actor.
+Разрешены config read или write, как для GET операции по ID. Binding HMAC,
+credential body и внутренний safe_result не выдаются. 404 не доказывает no-send.
+
+POST `/api/v1/operations/by-key/{idempotency_key}/close-unstarted` требует write.
+При существующей operation возвращает её без отмены, изменения state или нового
+I/O. При отсутствии атомарно создаёт cancelled operation + immutable key fence
++ audit. Unique-key insert ждёт исходную транзакцию; поздняя control mutation с
+закрытым ключом получает 409, включая после replay expiry. Ошибка audit откатывает
+fence. Другой actor с тем же UUID не затрагивается. Это не inference cancel/reconcile.
+
+GET `/api/v1/connection-presets` читает разрешённые оператором endpoint policies
+через actor-bound snapshot/cursor. UI передаёт выбранную ссылку вместо произвольного
+URL. Connection.catalog_refresh_supported обозначает реализованный metadata reader
+для текущего endpoint snapshot; не является authorization/currency/inference proof.

@@ -37,6 +37,10 @@
 - Durable OpenRouter metadata refresh: generation-bound operation до HTTP,
   bounded HTTPS reads, atomic sanitized cache/audit/readback и unknown recovery.
   Metadata success не активирует inference и не подтверждает currency.
+- Own operation lookup по Idempotency-Key и atomic close-unstarted fence;
+  browser reload не требует хранения key body, existing operation не отменяется.
+- Base provider list/detail: presets, connection CAS/rebase, write-only key,
+  revoke confirmation и cached catalog/search. Full live/IAB acceptance pending.
 
 ### Повторная проверка 2026-10-10
 

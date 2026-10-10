@@ -444,4 +444,29 @@ impl FoundationStore for PgStore {
             version: row.get("version"),
         })
     }
+    async fn operation_key(
+        &self,
+        subject: &str,
+        key: Uuid,
+    ) -> Result<aihub_domain::records::OperationLookup, HubError> {
+        self.operation_key_internal(subject, key).await
+    }
+    async fn close_unstarted_operation(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+    ) -> Result<aihub_domain::records::OperationLookup, HubError> {
+        self.close_unstarted_internal(subject, key, binding).await
+    }
+    async fn endpoint_policy_page(
+        &self,
+        subject: &str,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<aihub_domain::records::Page<aihub_domain::connections::EndpointPolicyInput>, HubError>
+    {
+        self.endpoint_policy_page_internal(subject, limit, cursor)
+            .await
+    }
 }

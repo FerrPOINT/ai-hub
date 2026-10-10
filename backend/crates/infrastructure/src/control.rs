@@ -54,6 +54,10 @@ impl PgStore {
         if key.is_nil() || subject.is_empty() {
             return Err(HubError::Invalid("control operation"));
         }
+        let closed:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM control_key_fences WHERE installation_id=$1 AND principal_kind='human' AND principal_id=$2 AND idempotency_key=$3)").bind(self.installation_id).bind(subject).bind(key).fetch_one(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;
+        if closed {
+            return Err(HubError::IdempotencyConflict);
+        }
         let operation = Uuid::new_v4();
         let row=sqlx::query("INSERT INTO operations(id,installation_id,principal_kind,principal_id,idempotency_key,binding_hmac,action,state,expires_at) VALUES($1,$2,'human',$3,$4,$5,$6,'pending',now()+interval '30 days') ON CONFLICT(installation_id,principal_kind,principal_id,idempotency_key) DO UPDATE SET id=operations.id RETURNING *,expires_at>now() AS replay_valid")
             .bind(operation).bind(self.installation_id).bind(subject).bind(key).bind(binding.as_slice()).bind(action).fetch_one(&mut **tx).await.map_err(|err|db_failure(err,line!()))?;

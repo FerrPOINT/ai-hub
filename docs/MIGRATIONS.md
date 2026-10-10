@@ -16,7 +16,7 @@ Production admission выключен до successful explicit migrate/readiness
 new state → switch; downgrade только если старый binary умеет читать актуальную schema.
 Rollback binary не откатывает facts и не освобождает unknown reserves.
 Миграция с irreversible data transformation требует own backup/restore rehearsal.
-Actual migrations `0001`–`0016` применились на own disposable PostgreSQL17;
+Actual migrations `0001`–`0017` применились на own disposable PostgreSQL17;
 foundation и financial evidence отражены в IMPLEMENTATION_STATUS. Все новые
 миграции квалифицировались только на disposable fixture, не на installed PDLC DB.
 Upgrade/nonempty restore остаются S7 gates; их PASS не выводится из fresh install.
@@ -66,3 +66,7 @@ account observation. Unknown recovery изменяет только lifecycle st
 `0016` проверяет exact owner/generation account→catalog перед insert и валидирует
 существующие связи без переписывания immutable facts. Installed PDLC DB не затронута;
 nonempty upgrade/restore остаётся S7 gate.
+
+`0017` добавляет immutable no-send fences control keys с точным composite FK на
+installation/human actor/key/operation. Исходная operation не удаляется; expiry
+readback не разрешает позднюю mutation. Existing identity/history не переписывается.

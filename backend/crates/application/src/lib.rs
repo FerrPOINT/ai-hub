@@ -212,6 +212,29 @@ pub trait FoundationStore: Send + Sync {
         limit: i64,
     ) -> Result<Vec<AuditEvent>, HubError>;
     async fn operation(&self, subject: &str, id: Uuid) -> Result<Operation, HubError>;
+    async fn operation_key(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+    ) -> Result<aihub_domain::records::OperationLookup, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn close_unstarted_operation(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+    ) -> Result<aihub_domain::records::OperationLookup, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn endpoint_policy_page(
+        &self,
+        _subject: &str,
+        _limit: i64,
+        _cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::connections::EndpointPolicyInput>, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn namespace_page(
         &self,
         subject: &str,
@@ -548,6 +571,46 @@ impl Foundation {
             return Err(HubError::Forbidden);
         }
         self.store.operation(&principal.subject, id).await
+    }
+    pub async fn operation_key(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+    ) -> Result<aihub_domain::records::OperationLookup, HubError> {
+        if !principal.permits_config(false) && !principal.permits_config(true) {
+            return Err(HubError::Forbidden);
+        }
+        if key.is_nil() {
+            return Err(HubError::Invalid("operation key"));
+        }
+        self.store.operation_key(&principal.subject, key).await
+    }
+    pub async fn close_unstarted_operation(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+    ) -> Result<aihub_domain::records::OperationLookup, HubError> {
+        principal.require_config(true)?;
+        if key.is_nil() {
+            return Err(HubError::Invalid("operation key"));
+        }
+        let binding=self.bindings.bind(&serde_json::json!({"installation":self.installation_id,"principal":principal.subject,"action":"operation.close-unstarted","key":key}))?;
+        self.store
+            .close_unstarted_operation(&principal.subject, key, binding)
+            .await
+    }
+    pub async fn endpoint_policies(
+        &self,
+        principal: &HumanPrincipal,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::connections::EndpointPolicyInput>, HubError> {
+        if !principal.permits_config(false) && !principal.permits_config(true) {
+            return Err(HubError::Forbidden);
+        }
+        self.store
+            .endpoint_policy_page(&principal.subject, bounded_limit(limit)?, cursor)
+            .await
     }
 }
 

@@ -160,6 +160,18 @@
     "generated_contract": "rust_openapi_typescript_regeneration_and_typecheck_pass",
     "remaining": "live authenticated account/currency witness; quote materialization; inference capability proof; context/UI; process crash/restore and full TC acceptance"
   },
+  "provider_control_oracles": {
+    "status": "partial_implementation",
+    "tests": ["TC-001", "TC-002", "TC-003", "TC-018", "TC-027", "TC-028"],
+    "red": "missing_operation_key_route_http_404_instead_of_scoped_403",
+    "credential_pg": {"source": "backend/crates/infrastructure/tests/credential_pg.rs", "passed": 1, "ignored": 0, "seconds": 2.17},
+    "metadata_pg": {"source": "backend/crates/infrastructure/tests/metadata_pg.rs", "passed": 1, "ignored": 0, "seconds": 0.80},
+    "ui_controlled_transport": {"source": "frontend/src/features/providers/Providers.test.tsx", "passed": 5, "budget_regression_passed": 3},
+    "api": {"source": "backend/crates/api/tests/access.rs", "passed": 10, "seconds": 0.08},
+    "generated_contract": "rust_openapi_typescript_regeneration_and_final_typecheck_pass",
+    "ui_uuid_regression": "uppercase_connection_uuid_readback_red_then_green_without_resend",
+    "remaining": "live SSO/account/currency/model; model contexts and full connection/profile lifecycle; process crash/restore; IAB themes/viewports/states and full TC"
+  },
   "required_acceptance": {
     "S1": "in_progress",
     "S2a": "in_progress",
