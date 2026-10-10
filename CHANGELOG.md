@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+### Повторная проверка 2026-10-10
+
+- Опубликован source-bound отчёт ревью contracts/dataflow/ecosystem и прототипа:
+  204 geometry checks, 146 flow assertions, свежие desktop/mobile snapshots.
+- Исправлены старые счётчики и статус semantic review в обзорных README.
+- Готовность относится к документации и дизайну; runtime integration не выполнена.
+
 ### Добавлено
 
 - Предварительный контракт AI Hub: провайдеры, версии виртуальных моделей,

@@ -97,8 +97,8 @@ transcripts в аналитике. Существующие Octo/PDLC installati
 
 [DEVELOP_READY](docs/DEVELOP_READY.md) — полный handoff до разработки.
 [Интерактивный дизайн](docs/design/README.md) / [галерея](docs/design/gallery.html).
-15 screens,3 themes, explicit states/forms/fields; IAB evidence — только prototype.
-Typed DD34 tables/294 fields и execution packets позволяют начать S1.
+17 маршрутов, 3 темы, явные состояния, формы и поля; IAB evidence — только prototype.
+Typed DD: 47 таблиц/420 полей; implementation packets позволяют начать S1.
 
 ## Дизайн и выделение из Admin
 
@@ -109,3 +109,7 @@ Typed DD34 tables/294 fields и execution packets позволяют начат�
 [PROJECT_TARIFFS](docs/PROJECT_TARIFFS.md): 1M input/output, default 20% markup, свои проектные цены, OpenRouter auto и manual Ollama Online/ChatGPT. В [прототипе](docs/design/prototype.html) добавлен /tariffs. Реальный billing/provider/runtime not_run.
 
 [READINESS_AUDIT](docs/READINESS_AUDIT.md): OpenAPI 0.5.0-design, S2a prerequisites, unknown/receipt accounting, cancellation and canonical query/export/protocol. Полный documentation/design gate завершён; start frontier S1, actual app/runtime not_run.
+
+[Повторное ревью 2026-10-10](docs/reviews/2026-10-10/README.md): contracts/dataflow,
+границы экосистемы и свежие 204 geometry/146 flow assertions. Новых блокирующих
+замечаний к документации и дизайну нет; runtime integration требует своей приёмки.

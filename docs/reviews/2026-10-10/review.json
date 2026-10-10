@@ -1,0 +1,157 @@
+{
+  "reviewDate": "2026-10-10",
+  "scope": "Read-only documentation, dataflow, ecosystem integration and prototype review",
+  "verdict": "No new blocking documentation/design findings; ready to start S1; runtime integration not accepted",
+  "findings": [],
+  "source": {
+    "hub": "28098a573ca99b5f7d8551e3a30f5aef12ea2e82",
+    "baseDocs": "299b98913608ee7b9dfbd35caaffe4e310b3e0a2",
+    "adminDocs": "81c0a139c69645620536c1e6ac6c8f3a0168fb69",
+    "htmlSha256": "6304f472e631fb361c18f261905045b7cd03b884fda90be41c4466c913b58b61",
+    "servedScriptSha256": "197fd00d4643ab9708e7eb7a8fd917b1ef74c2a0b3c06fbf733d32524b59803a",
+    "baseSdk": "875cac2edf1a18c3a8a59e2f67256d02a8fc04e4",
+    "namespaceTarget": "81decf7d9edd2c4218d8625a96e2e25c0617e9f1"
+  },
+  "currentRemoteMain": {
+    "base": "a119c5d0d970ae931dfb2267514f1128213b7c11",
+    "admin": "902245d59ecf45467536e4d789733dfc4414c5cc",
+    "fleet": "b750e7b69cb359fbe7c7fd13647882c7ae8472bb",
+    "forge": "d1282107f042a348fd3ddb7244bf0de00f605e2f",
+    "tracker": "4c106e3272eddd01c1ace928d8c8a73b7a8e9127"
+  },
+  "contracts": {
+    "openapi": "0.5.0-design",
+    "operations": 82,
+    "tables": 47,
+    "columns": 420,
+    "adminMappingRows": 20
+  },
+  "verifiedBoundaries": [
+    {
+      "boundary": "Ownership and isolation",
+      "result": "PASS",
+      "sources": [
+        "ARCHITECTURE.md",
+        "BASE_INTEGRATION.md",
+        "contracts/ADMIN_HANDOFF_V1.md",
+        "Base docs/platform/SDLC.md"
+      ],
+      "rule": "Hub owns AI connections/profiles/routing/accounting/evaluations; Auth/Admin/Fleet/Tracker/Forge retain identity/registry/execution/Task/Git; no cross-DB or shared vault."
+    },
+    {
+      "boundary": "Namespace and service identity",
+      "result": "PASS_DESIGN",
+      "sources": [
+        "contracts/NAMESPACE_V1.md",
+        "contracts/SERVICE_ADAPTER_V1.md",
+        "Base crates/sdlc-shared/src/resource_context.rs",
+        "Fleet docs/NAMESPACE.md",
+        "Tracker docs/NAMESPACE_PROJECT_READER.md"
+      ],
+      "rule": "Exact nonnil registry+Namespace UUID, separate verified projection; service client/claim/body identity equal; public SDK does not require Task/run; signed transport is future target."
+    },
+    {
+      "boundary": "Inference/recovery/versioning",
+      "result": "PASS_DESIGN",
+      "sources": [
+        "contracts/INFERENCE_V1.md",
+        "ROUTING.md",
+        "STATE_MACHINES.md",
+        "API_VERSIONING.md"
+      ],
+      "rule": "Freeze profile and price; intent/reserve before I/O; no replay of uncertain external action; no upstream switch after content; TTL readback and CAS remain explicit."
+    },
+    {
+      "boundary": "Accounting/tariffs",
+      "result": "PASS_DESIGN_AND_PROTOTYPE",
+      "sources": [
+        "ACCOUNTING.md",
+        "PROJECT_TARIFFS.md",
+        "RECONCILIATION.md",
+        "contracts/data-dictionary.v1.json"
+      ],
+      "rule": "Exact decimal per-million rates, provider cash distinct from project charge/margin, default markup 2000bps, explicit manual vs auto, one subscription cash charge, retained unknown reserves, late receipt supersedes without fabricated config/history."
+    },
+    {
+      "boundary": "Statistics/export",
+      "result": "PASS_DESIGN_AND_PROTOTYPE",
+      "sources": [
+        "ANALYTICS.md",
+        "contracts/openapi.v1.json",
+        "scripts/readiness_flows.mjs"
+      ],
+      "rule": "Shared StatisticsFilters, authorized snapshot/range/currency, full JSON/CSV echo and exact virtual_model buckets; samples not invented charge history."
+    },
+    {
+      "boundary": "Forms/shell/UX",
+      "result": "PASS_PROTOTYPE",
+      "sources": [
+        "UI_SCREEN_SPEC.md",
+        "FRONTEND_ARCHITECTURE.md",
+        "design/design-contract.json",
+        "Base docs/platform/UI_SHELL_STANDARD.md"
+      ],
+      "rule": "17 routes, Base shell dimensions/theme account menu, tab-local Namespace and history, dirty/pending/412/readback, app profile allowlists, pricing lifecycle and cancellation."
+    },
+    {
+      "boundary": "Implementation order",
+      "result": "PASS_DESIGN",
+      "sources": [
+        "IMPLEMENTATION_PLAN.md",
+        "IMPLEMENTATION_PACKETS.md",
+        "MIGRATION_PLAN.md",
+        "scripts/check_readiness.py"
+      ],
+      "rule": "S1 qualification of Base/Auth/Namespace and real foundation, S2a finance before S2b proof, then S3..S7; actual migrations/constraints not claimed."
+    },
+    {
+      "boundary": "Base onboarding/Admin extraction",
+      "result": "PASS_DOCUMENTATION_BRANCHES",
+      "sources": [
+        "Base docs/products/MANIFEST.json",
+        "Base scripts/sync_product_docs.py",
+        "Admin docs/contracts/AI_HUB_EXTRACTION_V1.md"
+      ],
+      "rule": "Exact Hub mirror checks pass, corruption/duplicate/selected-owner tests pass; source AI section retained pending accepted cutover."
+    }
+  ],
+  "checks": {
+    "documentation": "PASS",
+    "alignment": "PASS",
+    "semantics": "PASS",
+    "readiness": "PASS",
+    "designSourceEvidence": "PASS",
+    "independentOpenApiSchemas": "PASS",
+    "hubRegressionTests": 39,
+    "signedOfflineVectors": 13,
+    "baseSyncOnboardingHubTests": 15,
+    "baseManifestIntegrity": "PASS",
+    "baseHubMirrorExact": "PASS",
+    "freshIabGeometry": 204,
+    "freshIabFlowAssertions": 146,
+    "iabErrors": 0,
+    "paidProviderCalls": 0
+  },
+  "browserEvidence": "browser.json",
+  "screenshots": [
+    "tariffs-desktop.png",
+    "tariffs-mobile.png"
+  ],
+  "externalVerification": {
+    "source": "https://openrouter.ai/docs/cookbook/administration/usage-accounting",
+    "checked": "2026-10-10",
+    "result": "usage/cost, final SSE, no include_usage needed; account cost and upstream cost distinct"
+  },
+  "remainingGates": [
+    "Base/Admin documentation branches not integrated into main",
+    "S1 must qualify exact SDK/Namespace owner readers and Auth service scopes using existing separate pins",
+    "No actual Hub backend, SQL migrations, generated clients, SSO, provider adapters, signed consumers or installed runtime yet",
+    "S7 cutover needs nonempty backup, mappings, consumer/provider qualification, financial reconciliation and rollback; current Admin /ai remains active"
+  ],
+  "limits": [
+    "Read-only review; no product edits, commits, merge, deploy or cutover",
+    "Prototype and offline schemas/crypto are design evidence, not actual security/billing/provider acceptance",
+    "Fresh geometry and 146 flows repeated; existing source-bound 179-state evidence validated structurally, not independently repeated in full this turn",
+    "New screenshots directly inspected; no full formal accessibility audit"
+  ]
+}

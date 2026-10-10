@@ -39,4 +39,8 @@ Namespace в шапке имеет tab-local URL. Контекст модели 
 
 ## Тарифы и актуальная приёмка
 
-/tariffs: проекты и себестоимость подключений. [QA](QA.md) и [evidence](evidence.json) привязаны к финальному исходнику. Semantic audit остаётся открытым; rendered PASS не означает DEVELOP_READY или actual application acceptance.
+/tariffs: проекты и себестоимость подключений. [QA](QA.md) и [evidence](evidence.json)
+привязаны к финальному исходнику. Semantic readiness закрыт в
+[READINESS_AUDIT](../READINESS_AUDIT.md); [повторное ревью 2026-10-10](../reviews/2026-10-10/README.md)
+подтвердило согласованность документов и дизайна. DEVELOP_READY относится к этому
+пакету; actual application acceptance остаётся not_run.
