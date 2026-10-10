@@ -21,7 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_env_filter(tracing_subscriber::EnvFilter::new("aihub=info"))
         .init();
     let config = Config::load()?;
-    let vault = Vault::new(config.vault_key.to_vec())?;
+    let vault = Arc::new(Vault::new(config.vault_key.to_vec())?);
     let store = Arc::new(
         PgStore::connect(
             &config.database_url,
@@ -54,6 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             installation_id: config.installation_id,
             auth: Arc::new(CentralAuth::default()),
             store,
+            bindings: vault,
         },
         external_calls: config.external_calls,
         auth_issuer: config.auth_issuer.to_string().trim_end_matches('/').into(),

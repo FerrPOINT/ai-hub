@@ -91,6 +91,25 @@ financial admission и остальные S4/S7 gates ещё не закрыты
   синтетические; это не live provider qualification и не полный TC-028.
 - Live SSO, owner readers, served UI и CI ещё pending.
 
+## Control prices — текущий срез
+
+Добавлены `GET/POST /api/v1/prices`: immutable quote, обязательный UUID
+Idempotency-Key, HMAC canonical payload собственным vault key, safe operation
+readback и atomic audit. Write-only PAT может создать quote без config read.
+Rates/currency/effective window/source типизированы; nullable cached/effective_to
+явные, отсутствие request_fee сохраняется unknown. Overlapping quote windows
+разрешены; effective pricing-source timeline реализуется отдельно, поэтому
+создание quote не публикует inference config.
+
+Own PostgreSQL17 control fixture: concurrent same-key create возвращает одну
+quote/operation/audit, changed binding конфликтует, чужой actor не читает operation,
+cursor привязан к actor/limit и не включает новые quotes; final audit failure
+откатывает quote и operation. Это scoped SQL evidence, не browser/live API acceptance.
+HTTP access: 3 tests pass, включая wrong PAT scope/nil key/decimal number/negative fee.
+Required nullable fields и unknown fee: domain unit pass. Rust-generated OpenAPI
+и generated TypeScript consumer/typecheck pass для этого actual subset.
+Budget API/forms и подключение этих quotes к S2b proof ещё впереди.
+
 `0003_financial_prerequisites` вводит connection/generation/catalog/price/probe,
 requests/attempts/usage/replay, immutable ledger и budget/reservation таблицы.
 `0004` добавляет exact bounded grant/account/currency authority, `0005` —

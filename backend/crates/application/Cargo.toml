@@ -9,3 +9,4 @@ license-file.workspace = true
 aihub-domain.workspace = true
 async-trait.workspace = true
 uuid.workspace = true
+serde_json.workspace = true

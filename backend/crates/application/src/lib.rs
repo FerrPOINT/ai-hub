@@ -8,6 +8,10 @@ use async_trait::async_trait;
 use std::sync::Arc;
 use uuid::Uuid;
 
+pub trait OperationBinding: Send + Sync {
+    fn bind(&self, value: &serde_json::Value) -> Result<[u8; 32], HubError>;
+}
+
 #[async_trait]
 pub trait FinancialAdmission: Send + Sync {
     async fn reserve(
@@ -38,6 +42,23 @@ pub trait CentralAuthentication: Send + Sync {
 
 #[async_trait]
 pub trait FoundationStore: Send + Sync {
+    async fn price_page(
+        &self,
+        _subject: &str,
+        _limit: i64,
+        _cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::prices::PriceRevision>, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn create_price(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+        _price: &aihub_domain::prices::PriceInput,
+    ) -> Result<aihub_domain::prices::PriceMutation, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn ready(&self) -> Result<(), HubError>;
     async fn project_grants(&self, subject: &str, action: &str) -> Result<Vec<String>, HubError>;
     async fn namespaces(
@@ -102,9 +123,37 @@ pub struct Foundation {
     pub installation_id: Uuid,
     pub auth: Arc<dyn CentralAuthentication>,
     pub store: Arc<dyn FoundationStore>,
+    pub bindings: Arc<dyn OperationBinding>,
 }
 
 impl Foundation {
+    pub async fn prices(
+        &self,
+        principal: &HumanPrincipal,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::prices::PriceRevision>, HubError> {
+        principal.require_config(false)?;
+        self.store
+            .price_page(&principal.subject, bounded_limit(limit)?, cursor)
+            .await
+    }
+    pub async fn create_price(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        price: &aihub_domain::prices::PriceInput,
+    ) -> Result<aihub_domain::prices::PriceMutation, HubError> {
+        principal.require_config(true)?;
+        if key.is_nil() {
+            return Err(HubError::Invalid("idempotency key"));
+        }
+        price.validate()?;
+        let binding=self.bindings.bind(&serde_json::json!({"installation_id":self.installation_id,"principal":principal.subject,"action":"price.create","price":price}))?;
+        self.store
+            .create_price(&principal.subject, key, binding, price)
+            .await
+    }
     pub async fn identity(&self, principal: &HumanPrincipal) -> Result<Identity, HubError> {
         // A write-only PAT may inspect its own capabilities without gaining config read access.
         if !principal.permits_config(false) && !principal.permits_config(true) {

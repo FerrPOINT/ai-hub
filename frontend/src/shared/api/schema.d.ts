@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listPrices"];
+        put?: never;
+        post: operations["createPriceRevision"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/config": {
         parameters: {
             query?: never;
@@ -168,6 +184,7 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Amount: string;
         AuditEvent: {
             action: string;
             actor: string;
@@ -193,6 +210,7 @@ export interface components {
             schema_version: number;
             service_key: string;
         };
+        Currency: string;
         Error: {
             error: components["schemas"]["ErrorDetail"];
         };
@@ -254,6 +272,36 @@ export interface components {
             /** Format: int64 */
             version: number;
         };
+        PriceInput: {
+            /** Format: uuid */
+            connection_id: string;
+            currency: components["schemas"]["Currency"];
+            /** Format: date-time */
+            effective_from: string;
+            /** Format: date-time */
+            effective_to: string | null;
+            input_cached: null | components["schemas"]["Rate"];
+            input_uncached: components["schemas"]["Rate"];
+            model_id: string;
+            output_billable: components["schemas"]["Rate"];
+            request_fee?: null | components["schemas"]["Amount"];
+            source: string;
+            tier: string;
+            unit: components["schemas"]["PriceUnit"];
+        };
+        PricePage: {
+            items: components["schemas"]["PriceRevision"][];
+            next_cursor?: string | null;
+        };
+        PriceRevision: {
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            price: components["schemas"]["PriceInput"];
+        };
+        /** @enum {string} */
+        PriceUnit: "per_million_tokens";
         PublicConfig: {
             auth_issuer: string;
             branding_url?: string | null;
@@ -262,6 +310,7 @@ export interface components {
             oidc_client_id: string;
             service_catalog_url?: string | null;
         };
+        Rate: string;
         Version: {
             base_revision: string;
             external_calls: boolean;
@@ -423,6 +472,134 @@ export interface operations {
                 };
             };
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listPrices: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PricePage"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    createPriceRevision: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID operation key */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceRevision"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

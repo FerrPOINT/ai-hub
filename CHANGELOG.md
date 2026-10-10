@@ -11,6 +11,8 @@
   SQL fixture проверяет конкуренцию двух экземпляров, unknown reserve, audit rollback,
   idempotent receipt, replacement estimate и настоящий overrun без обрезания.
 - Source S1/S2a в работе; release, live SSO/provider/UI/consumer acceptance pending.
+- Control prices GET/POST: decimal quote, keyed operation replay, actor-bound cursor
+  и atomic audit; quote не публикует профиль и не запускает provider.
 
 ### Повторная проверка 2026-10-10
 

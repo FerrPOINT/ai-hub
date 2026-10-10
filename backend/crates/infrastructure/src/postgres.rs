@@ -17,7 +17,7 @@ pub struct PgStore {
 }
 
 impl PgStore {
-    async fn snapshot_page<T: serde::Serialize + serde::de::DeserializeOwned>(
+    pub(crate) async fn snapshot_page<T: serde::Serialize + serde::de::DeserializeOwned>(
         &self,
         subject: &str,
         query_identity: &str,
@@ -140,6 +140,24 @@ impl PgStore {
 
 #[async_trait]
 impl FoundationStore for PgStore {
+    async fn price_page(
+        &self,
+        subject: &str,
+        limit: i64,
+        cursor: Option<Uuid>,
+    ) -> Result<Page<aihub_domain::prices::PriceRevision>, HubError> {
+        self.price_page_internal(subject, limit, cursor).await
+    }
+    async fn create_price(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        price: &aihub_domain::prices::PriceInput,
+    ) -> Result<aihub_domain::prices::PriceMutation, HubError> {
+        self.create_price_internal(subject, key, binding, price)
+            .await
+    }
     async fn namespace_page(
         &self,
         subject: &str,

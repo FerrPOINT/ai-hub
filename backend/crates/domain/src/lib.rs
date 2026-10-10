@@ -2,6 +2,7 @@ pub mod access;
 pub mod admission;
 pub mod error;
 pub mod financial;
+pub mod prices;
 pub mod records;
 pub mod settlement;
 

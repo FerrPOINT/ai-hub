@@ -41,6 +41,9 @@ export type PublicConfig = components['schemas']['PublicConfig']
 export type Version = components['schemas']['Version']
 export type AuditPage = components['schemas']['AuditPage']
 export type NamespacePage = components['schemas']['NamespacePage']
+export type PriceInput = components['schemas']['PriceInput']
+export type PriceRevision = components['schemas']['PriceRevision']
+export type PricePage = components['schemas']['PricePage']
 
 export async function listNamespaceBindings(signal?: AbortSignal): Promise<NamespaceBinding[]> {
   const items: NamespaceBinding[] = []

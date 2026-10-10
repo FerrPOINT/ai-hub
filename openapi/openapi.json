@@ -252,6 +252,194 @@
         ]
       }
     },
+    "/api/v1/prices": {
+      "get": {
+        "tags": [],
+        "operationId": "listPrices",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [],
+        "operationId": "createPriceRevision",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "UUID operation key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceRevision"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CentralAuth": []
+          }
+        ]
+      }
+    },
     "/api/v1/public/config": {
       "get": {
         "tags": [],
@@ -383,6 +571,9 @@
   },
   "components": {
     "schemas": {
+      "Amount": {
+        "type": "string"
+      },
       "AuditEvent": {
         "type": "object",
         "required": [
@@ -484,6 +675,9 @@
             "type": "string"
           }
         }
+      },
+      "Currency": {
+        "type": "string"
       },
       "Error": {
         "type": "object",
@@ -709,6 +903,129 @@
         },
         "additionalProperties": false
       },
+      "PriceInput": {
+        "type": "object",
+        "required": [
+          "connection_id",
+          "model_id",
+          "tier",
+          "currency",
+          "unit",
+          "input_uncached",
+          "input_cached",
+          "output_billable",
+          "effective_from",
+          "effective_to",
+          "source"
+        ],
+        "properties": {
+          "connection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effective_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "input_cached": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Rate"
+              }
+            ]
+          },
+          "input_uncached": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "output_billable": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "request_fee": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Amount",
+                "description": "Missing fee stays unknown, never a default zero."
+              }
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "tier": {
+            "type": "string"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/PriceUnit"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PricePage": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PriceRevision"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "PriceRevision": {
+        "type": "object",
+        "required": [
+          "id",
+          "price",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "price": {
+            "$ref": "#/components/schemas/PriceInput"
+          }
+        }
+      },
+      "PriceUnit": {
+        "type": "string",
+        "enum": [
+          "per_million_tokens"
+        ]
+      },
       "PublicConfig": {
         "type": "object",
         "required": [
@@ -740,6 +1057,9 @@
             ]
           }
         }
+      },
+      "Rate": {
+        "type": "string"
       },
       "Version": {
         "type": "object",

@@ -15,6 +15,17 @@ pub struct Sealed {
     pub ciphertext: Vec<u8>,
 }
 
+impl aihub_application::OperationBinding for Vault {
+    fn bind(&self, value: &serde_json::Value) -> Result<[u8; 32], HubError> {
+        use hmac::{Hmac, Mac};
+        let mut mac =
+            <Hmac<Sha256> as Mac>::new_from_slice(&self.key).map_err(|_| HubError::Unavailable)?;
+        mac.update(b"AIHUB-OPERATION-BINDING-V1\0");
+        mac.update(&serde_json::to_vec(value).map_err(|_| HubError::Invalid("operation payload"))?);
+        Ok(mac.finalize().into_bytes().into())
+    }
+}
+
 impl Vault {
     pub fn new(key: Vec<u8>) -> Result<Self, HubError> {
         if key.len() != 32 {
@@ -81,6 +92,19 @@ impl Vault {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn operation_binding_is_keyed_and_canonical() {
+        use aihub_application::OperationBinding;
+        let vault = Vault::new(vec![7; 32]).unwrap();
+        let other = Vault::new(vec![8; 32]).unwrap();
+        let one = serde_json::json!({"actor":"fixture-a","action":"price.create","amount":"2"});
+        let reordered =
+            serde_json::json!({"amount":"2","action":"price.create","actor":"fixture-a"});
+        assert_eq!(vault.bind(&one).unwrap(), vault.bind(&reordered).unwrap());
+        assert_ne!(vault.bind(&one).unwrap(), other.bind(&one).unwrap());
+        let changed = serde_json::json!({"actor":"fixture-b","action":"price.create","amount":"2"});
+        assert_ne!(vault.bind(&one).unwrap(), vault.bind(&changed).unwrap());
+    }
     #[test]
     fn secrets_are_bound_to_installation_generation_and_purpose() {
         let vault = Vault::new(vec![7; 32]).unwrap();

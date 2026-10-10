@@ -3,12 +3,13 @@ use aihub_domain::{
     NamespaceRef,
     access::{HumanPrincipal, namespace_filter},
     error::HubError,
+    prices::{PriceInput, PriceRevision, PriceUnit},
     records::{AuditEvent, Health, Identity, NamespaceBinding, Operation},
 };
 use axum::{
     Json, Router,
     extract::{DefaultBodyLimit, FromRequestParts, Path, RawQuery, State},
-    http::{StatusCode, request::Parts},
+    http::{HeaderMap, StatusCode, request::Parts},
     response::{IntoResponse, Response},
     routing::get,
 };
@@ -106,6 +107,66 @@ pub struct NamespacePage {
 pub struct AuditPage {
     pub items: Vec<AuditEvent>,
     pub next_cursor: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+pub struct PricePage {
+    pub items: Vec<PriceRevision>,
+    pub next_cursor: Option<String>,
+}
+
+fn mutation_key(headers: &HeaderMap) -> Result<Uuid, HubError> {
+    let mut values = headers.get_all("idempotency-key").iter();
+    let raw = values
+        .next()
+        .ok_or(HubError::Invalid("Idempotency-Key required"))?;
+    if values.next().is_some() {
+        return Err(HubError::Invalid("duplicate Idempotency-Key"));
+    }
+    let key = Uuid::parse_str(
+        raw.to_str()
+            .map_err(|_| HubError::Invalid("Idempotency-Key"))?,
+    )
+    .map_err(|_| HubError::Invalid("Idempotency-Key"))?;
+    if key.is_nil() {
+        return Err(HubError::Invalid("nil Idempotency-Key"));
+    }
+    Ok(key)
+}
+
+#[utoipa::path(get,path="/api/v1/prices",operation_id="listPrices",security(("CentralAuth"=[])),params(("limit"=Option<i64>,Query,minimum=1,maximum=100),("cursor"=Option<Uuid>,Query)),responses((status=200,body=PricePage),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=503,body=Error)))]
+pub async fn prices(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    RawQuery(query): RawQuery,
+) -> Result<Json<PricePage>, ApiError> {
+    let (limit, cursor) = list_options(query.as_deref().unwrap_or(""), false)?;
+    let page = state.foundation.prices(&principal, limit, cursor).await?;
+    Ok(Json(PricePage {
+        items: page.items,
+        next_cursor: page.next_cursor,
+    }))
+}
+
+#[utoipa::path(post,path="/api/v1/prices",operation_id="createPriceRevision",security(("CentralAuth"=[])),params(("Idempotency-Key"=Uuid,Header,description="UUID operation key")),request_body=PriceInput,responses((status=201,body=PriceRevision),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=409,body=Error),(status=503,body=Error)))]
+pub async fn create_price(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    headers: HeaderMap,
+    body: Result<Json<PriceInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<(StatusCode, [(String, String); 1], Json<PriceRevision>), ApiError> {
+    principal.require_config(true)?;
+    let key = mutation_key(&headers)?;
+    let price = body.map_err(|_| HubError::Invalid("price payload"))?.0;
+    let result = state
+        .foundation
+        .create_price(&principal, key, &price)
+        .await?;
+    Ok((
+        StatusCode::CREATED,
+        [("x-operation-id".into(), result.operation_id.to_string())],
+        Json(result.value),
+    ))
 }
 
 fn list_options(raw: &str, namespace_allowed: bool) -> Result<(i64, Option<Uuid>), HubError> {
@@ -312,7 +373,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -349,6 +410,7 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
         .route("/api/v1/auth/me", get(identity))
         .route("/api/v1/namespaces", get(namespaces))
         .route("/api/v1/audit", get(audit))
+        .route("/api/v1/prices", get(prices).post(create_price))
         .route("/api/v1/operations/{operation_id}", get(operation))
         .route("/openapi.json", get(openapi))
         .fallback(not_found)

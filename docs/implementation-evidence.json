@@ -62,6 +62,16 @@
       "source": "backend/crates/infrastructure/tests/financial_pg.rs",
       "evidence": "actual_postgresql17_admission_claim_recovery_settlement_pass_20261010",
       "remaining": "control API/forms; pricing-source bindings; cancel/unclaimed restart; real provider I/O; public fallback/SSE/replay; process crash and full S3 oracle"
+    },
+    {
+      "tests": [
+        "TC-010",
+        "TC-018",
+        "TC-027"
+      ],
+      "source": "backend/crates/infrastructure/tests/control_pg.rs",
+      "evidence": "actual_postgresql17_price_control_concurrency_snapshot_pass_and_3_api_access_tests",
+      "remaining": "budget and pricing source forms; qualified connection/model; live SSO/browser and inference use of prices"
     }
   ],
   "required_acceptance": {

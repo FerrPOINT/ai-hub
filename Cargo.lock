@@ -77,6 +77,7 @@ version = "0.1.0"
 dependencies = [
  "aihub-domain",
  "async-trait",
+ "serde_json",
  "uuid",
 ]
 
@@ -106,6 +107,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "hex",
+ "hmac",
  "reqwest",
  "sdlc-auth-core",
  "sdlc-shared",

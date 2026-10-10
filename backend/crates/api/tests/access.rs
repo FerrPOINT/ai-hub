@@ -19,6 +19,12 @@ use tower::ServiceExt;
 use uuid::Uuid;
 
 struct TestAuth;
+struct TestBinding;
+impl aihub_application::OperationBinding for TestBinding {
+    fn bind(&self, _: &serde_json::Value) -> Result<[u8; 32], HubError> {
+        Ok([7; 32])
+    }
+}
 #[async_trait]
 impl CentralAuthentication for TestAuth {
     async fn authenticate(&self, token: &str) -> Result<HumanPrincipal, HubError> {
@@ -83,6 +89,7 @@ fn fixture() -> (axum::Router, Arc<TestStore>) {
                 installation_id: Uuid::new_v4(),
                 auth: Arc::new(TestAuth),
                 store: store.clone(),
+                bindings: Arc::new(TestBinding),
             },
             external_calls: false,
             auth_issuer: "http://localhost:8101".into(),
@@ -159,4 +166,76 @@ async fn invalid_namespace_does_not_expand_audit_to_all() {
         status(&app, "/api/v1/audit", Some("read")).await,
         StatusCode::OK
     );
+}
+
+#[tokio::test]
+async fn price_mutation_rejects_wrong_scope_invalid_headers_and_decimal_numbers() {
+    let (app, _) = fixture();
+    let price = serde_json::json!({"connection_id":Uuid::new_v4(),"model_id":"model-a","tier":"metered","currency":"USD","unit":"per_million_tokens","input_uncached":"2","input_cached":null,"output_billable":"8","effective_from":"2026-10-10T00:00:00Z","effective_to":null,"source":"synthetic-fixture"});
+    for (token, key, body, expected) in [
+        (
+            "read",
+            Uuid::new_v4().to_string(),
+            price.clone(),
+            StatusCode::FORBIDDEN,
+        ),
+        (
+            "foreign",
+            Uuid::new_v4().to_string(),
+            price.clone(),
+            StatusCode::FORBIDDEN,
+        ),
+        (
+            "write",
+            Uuid::nil().to_string(),
+            price.clone(),
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            "bad".into(),
+            price.clone(),
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            Uuid::new_v4().to_string(),
+            {
+                let mut p = price.clone();
+                p["input_uncached"] = serde_json::json!(2.0);
+                p
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            Uuid::new_v4().to_string(),
+            {
+                let mut p = price.clone();
+                p["request_fee"] = serde_json::json!("-1");
+                p
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+    ] {
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/v1/prices")
+                    .header("authorization", format!("Bearer {token}"))
+                    .header("content-type", "application/json")
+                    .header("idempotency-key", key)
+                    .body(Body::from(serde_json::to_vec(&body).unwrap()))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), expected);
+        assert_eq!(
+            response.headers().get("content-type").unwrap(),
+            "application/json"
+        );
+    }
 }
