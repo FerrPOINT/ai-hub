@@ -7,6 +7,22 @@ use aihub_domain::{
 use async_trait::async_trait;
 #[async_trait]
 pub trait MetadataOperations: Send + Sync {
+    async fn verify_account(
+        &self,
+        _principal: &HumanPrincipal,
+        _key: Uuid,
+        _connection: Uuid,
+        _expected_generation: i64,
+    ) -> Result<Operation, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn account_authority(
+        &self,
+        _principal: &HumanPrincipal,
+        _connection: Uuid,
+    ) -> Result<aihub_domain::catalog::AccountAuthorityView, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn refresh(
         &self,
         principal: &HumanPrincipal,

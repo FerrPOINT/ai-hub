@@ -119,7 +119,8 @@ async fn fixture_context(
         model_id: "model-a".into(),
         tier: "metered".into(),
         price_revision_id: price,
-        qualification_id: qualification,
+        qualification_id: Some(qualification),
+        account_authority_id: None,
         upper_usage: usage,
     }
 }

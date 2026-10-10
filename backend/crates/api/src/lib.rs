@@ -24,7 +24,9 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use utoipa::{OpenApi, ToSchema};
 use uuid::Uuid;
+mod account_authority;
 mod profiles;
+use aihub_domain::catalog::AccountAuthorityView;
 use aihub_domain::profiles::{
     CallerOverride, Capability, DeploymentInput, GenerationParameters, Profile, ProfileInput,
     ProfileMode,
@@ -910,7 +912,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(profiles::list_profiles,profiles::read_profile,profiles::create_profile,profiles::update_profile,live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,disable_connection,write_credential,revoke_credential,read_catalog,refresh_catalog,operation_key,close_unstarted_operation,endpoint_policies,model_contexts,save_model_context),components(schemas(Profile,ProfileInput,ProfileMode,DeploymentInput,GenerationParameters,Capability,CallerOverride,ProfilePage,Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata,MetadataRefreshInput,OperationLookup,EndpointPolicyInput,EndpointPolicyPage,ModelContextInput,ModelContextPreference,ModelContextPage)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(account_authority::read,account_authority::qualify,profiles::list_profiles,profiles::read_profile,profiles::create_profile,profiles::update_profile,live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,disable_connection,write_credential,revoke_credential,read_catalog,refresh_catalog,operation_key,close_unstarted_operation,endpoint_policies,model_contexts,save_model_context),components(schemas(AccountAuthorityView,Profile,ProfileInput,ProfileMode,DeploymentInput,GenerationParameters,Capability,CallerOverride,ProfilePage,Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType,CatalogPage,ModelMetadata,MetadataRefreshInput,OperationLookup,EndpointPolicyInput,EndpointPolicyPage,ModelContextInput,ModelContextPreference,ModelContextPage)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -957,6 +959,10 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
             get(profiles::read_profile).patch(profiles::update_profile),
         )
         .route("/api/v1/connections", get(connections))
+        .route(
+            "/api/v1/connections/{connection_id}/account-authority",
+            get(account_authority::read).post(account_authority::qualify),
+        )
         .route(
             "/api/v1/connections/{connection_id}/models",
             get(read_catalog),

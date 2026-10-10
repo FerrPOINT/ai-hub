@@ -12,6 +12,42 @@ const connection: Connection = { id: '12259f65-c6ef-42a2-b031-5228cd0376c9', pro
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } });
 function mount(id = connection.id) { useAuth.getState().setAuth({ token: 'fixture-provider-bearer', userId: identity.subject, email: 'fixture@example.test', displayName: 'Fixture' }); return render(<QueryClientProvider client={queryClient}><RouterProvider router={createMemoryRouter([{ path: '/providers/:id', element: <ConnectionDetails identity={identity}/> }], { initialEntries: [`/providers/${id}?provider_tab=connection`] })}/></QueryClientProvider>); }
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); useAuth.getState().logout(); queryClient.clear(); sessionStorage.clear(); });
+it('account statement recovery never repeats POST or promotes model authorization', async () => {
+    let writes = 0;
+    let key = '';
+    let qualified = false;
+    const current = { ...connection, has_credentials: true };
+    vi.stubGlobal('fetch', vi.fn(async (url, init?: RequestInit) => {
+        if (String(url).includes('/account-authority')) {
+            if (init?.method === 'POST') {
+                writes++;
+                key = new Headers(init.headers).get('idempotency-key')!;
+                qualified = true;
+                expect(JSON.parse(String(init.body))).toEqual({ expected_generation: 1 });
+                throw new TypeError('lost reply');
+            }
+            return json({ connection_id: connection.id, generation: 1, status: qualified ? 'active' : 'unqualified', currency: qualified ? 'USD' : null, statement_usage: qualified ? '1.000000000000000001' : null, observed_at: null, expires_at: null });
+        }
+        if (String(url).includes('/operations/by-key/'))
+            return json({ idempotency_key: key, action: 'account.qualify', operation: { id: crypto.randomUUID(), resource_id: connection.id, status: 'succeeded', safe_error: null, version: 2 } });
+        if (String(url).includes('/connection-presets'))
+            return json({ items: [], next_cursor: null });
+        if (String(url) === '/version')
+            return json({ external_calls: true });
+        return json(current);
+    }));
+    const user = userEvent.setup();
+    mount();
+    await user.click(await screen.findByRole('button', { name: 'Проверить аккаунт' }));
+    await screen.findByText(/Результат операции пока неизвестен/);
+    expect(writes).toBe(1);
+    expect((screen.getByRole('button', { name: 'Проверить аккаунт' }) as HTMLButtonElement).disabled).toBe(true);
+    await user.click(screen.getByRole('button', { name: 'Проверить исходную операцию' }));
+    await screen.findByText(/Валюта аккаунта подтверждена/);
+    await screen.findByText('1.000000000000000001 USD');
+    expect(writes).toBe(1);
+    expect(screen.getByText('Авторизация требует проверки')).toBeTruthy();
+});
 it('disable requires confirmation and lost reply resolves the original operation without another DELETE', async () => {
     let writes = 0;
     let key = '';

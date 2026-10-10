@@ -16,7 +16,7 @@ fn decimal(value: impl ToString) -> Result<BigDecimal, HubError> {
 fn row_amount(row: &sqlx::postgres::PgRow, column: &str) -> Result<Option<Amount>, HubError> {
     let value: Option<BigDecimal> = row.try_get(column).map_err(|_| HubError::Unavailable)?;
     value
-        .map(|v| Amount::parse(&v.to_plain_string()))
+        .map(|v| Amount::parse(&v.normalized().to_plain_string()))
         .transpose()
 }
 

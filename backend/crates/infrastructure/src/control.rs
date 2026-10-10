@@ -27,13 +27,13 @@ fn quote(row: &sqlx::postgres::PgRow) -> Result<PriceRevision, HubError> {
             tier: row.get("tier"),
             currency: Currency::parse(&row.get::<String, _>("currency"))?,
             unit: PriceUnit::PerMillionTokens,
-            input_uncached: Rate::parse(&input.to_plain_string())?,
+            input_uncached: Rate::parse(&input.normalized().to_plain_string())?,
             input_cached: cached
-                .map(|v| Rate::parse(&v.to_plain_string()))
+                .map(|v| Rate::parse(&v.normalized().to_plain_string()))
                 .transpose()?,
-            output_billable: Rate::parse(&output.to_plain_string())?,
+            output_billable: Rate::parse(&output.normalized().to_plain_string())?,
             request_fee: fee
-                .map(|v| Amount::parse(&v.to_plain_string()))
+                .map(|v| Amount::parse(&v.normalized().to_plain_string()))
                 .transpose()?,
             effective_from: row.get("effective_from"),
             effective_to: row.get("effective_to"),

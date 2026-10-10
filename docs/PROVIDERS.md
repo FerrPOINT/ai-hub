@@ -58,3 +58,33 @@ input; OpenAI Responses streaming — typed SSE. Mapping сверяется с e
 OpenRouter explicit preset поддерживает qualified automatic catalog pricing и terminal usage.cost / generation readback. Ollama Online/ChatGPT по подписке получают manual per-million rates как allocation; это не API list price или confirmed cash. [PROJECT_TARIFFS](PROJECT_TARIFFS.md) хранит official source/date и unknown rules.
 
 Billing currency квалифицируется отдельно от per-token price по exact account statement/receipt witness. Unconfigured rates не означают unknown currency разрешена; currency_unqualified отвергается до inference. Caller metadata и provider display name не источник валюты.
+
+
+## Account witness до первого model probe
+
+Первый model probe не может требовать готовую runtime qualification той же модели.
+Для этого Hub вводит отдельную immutable verification account authority: exact
+connection/generation/adapter/endpoint, authenticated native statement digest,
+валюта, billing tier, время наблюдения/expiry и audited operation. Эта authority
+разрешает только own bounded verification; inference/evaluation всё ещё требуют
+model qualification. Metadata catalog и старые unqualified account observations
+не преобразуются в proof.
+
+OpenRouter collector получает свежий authenticated GET /api/v1/key по собственному
+фиксированному HTTPS origin. Native usage в этом account statement имеет USD unit
+по [контракту provider](https://raw.githubusercontent.com/OpenRouterTeam/terraform-provider-openrouter/main/docs/data-sources/api_key.md);
+[официальный limits contract](https://openrouter.ai/docs/api_reference/limits)
+также содержит spend_usd/remaining_usd. Валюта привязана к этому response digest
+и unit contract, а не к display name или caller metadata. Отсутствующий/некорректный
+statement usage, management/provisioning key или expired authorization не
+квалифицируются. Свидетельство не создаёт cash expense и не подтверждает модели.
+
+Перед I/O model probe использует общий financial reserve/claim/settlement: own
+purpose grant, immutable probe target, exact price/source, контекст, caps и budgets.
+Prepared credential разрешён только с живой account authority и own ciphertext.
+Claim ещё раз проверяет generation/endpoint/credential/authority/context/source.
+Unknown сохраняет reserve; повторный dispatch запрещён. Изменение или expiry
+authority блокирует новые calls, но settlement уже отправленного остаётся frozen.
+
+Эта граница находится в реализации; live qualification и actual model evidence
+остаются отдельными gates IMPLEMENTATION_STATUS.

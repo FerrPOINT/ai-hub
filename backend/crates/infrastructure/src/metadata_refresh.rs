@@ -23,6 +23,7 @@ pub struct MetadataClaim {
     endpoint_hash: String,
     fence: Uuid,
     secret: Zeroizing<Vec<u8>>,
+    action: &'static str,
 }
 pub enum MetadataStart {
     Claim(MetadataClaim),
@@ -34,6 +35,79 @@ pub struct MetadataRefresh {
     http: crate::metadata_http::MetadataHttp,
 }
 impl MetadataRefresh {
+    pub async fn complete_account(
+        &self,
+        claim: &MetadataClaim,
+        catalog: &CatalogObservation,
+        statement: &crate::account_statement::OpenRouterStatement,
+    ) -> Result<Operation, HubError> {
+        if claim.action != "account.qualify" {
+            return Err(HubError::PreconditionFailed);
+        }
+        let mut tx = self
+            .store
+            .pool
+            .begin()
+            .await
+            .map_err(|e| db_failure(e, line!()))?;
+        self.lock_claim(&mut tx, claim, true).await?;
+        self.store
+            .store_account_statement_locked(
+                &mut tx,
+                claim.operation.id,
+                claim.connection_id,
+                claim.generation,
+                &claim.endpoint_hash,
+                catalog,
+                statement,
+            )
+            .await?;
+        self.lock_claim(&mut tx, claim, true).await?;
+        let result = self
+            .store
+            .finish_metadata(
+                &mut tx,
+                claim.operation.id,
+                claim.connection_id,
+                "succeeded",
+            )
+            .await?;
+        tx.commit().await.map_err(|e| db_failure(e, line!()))?;
+        Ok(result)
+    }
+    async fn qualify_account_internal(
+        &self,
+        subject: &str,
+        key: Uuid,
+        connection: Uuid,
+        expected_generation: i64,
+    ) -> Result<Operation, HubError> {
+        let claim = match self
+            .begin_account(subject, key, connection, expected_generation)
+            .await?
+        {
+            MetadataStart::Readback(result) => return Ok(result),
+            MetadataStart::Claim(claim) => claim,
+        };
+        match self.http.read_account_statement(&claim.secret).await {
+            Ok((catalog, statement)) => {
+                match self.complete_account(&claim, &catalog, &statement).await {
+                    Ok(result) => Ok(result),
+                    Err(HubError::PreconditionFailed | HubError::Invalid(_)) => {
+                        self.fail(&claim, false).await
+                    }
+                    Err(error) => Err(error),
+                }
+            }
+            Err(failure) => {
+                self.fail(
+                    &claim,
+                    matches!(failure, crate::metadata_http::ReadFailure::Unknown),
+                )
+                .await
+            }
+        }
+    }
     pub fn new(store: Arc<PgStore>, vault: Arc<Vault>) -> Result<Self, HubError> {
         if store.vault_fingerprint != vault.fingerprint() {
             return Err(HubError::InstallationMismatch);
@@ -51,11 +125,44 @@ impl MetadataRefresh {
         connection: Uuid,
         expected_generation: i64,
     ) -> Result<MetadataStart, HubError> {
+        self.begin_action(
+            subject,
+            key,
+            connection,
+            expected_generation,
+            "catalog.refresh",
+        )
+        .await
+    }
+    pub async fn begin_account(
+        &self,
+        subject: &str,
+        key: Uuid,
+        connection: Uuid,
+        expected_generation: i64,
+    ) -> Result<MetadataStart, HubError> {
+        self.begin_action(
+            subject,
+            key,
+            connection,
+            expected_generation,
+            "account.qualify",
+        )
+        .await
+    }
+    async fn begin_action(
+        &self,
+        subject: &str,
+        key: Uuid,
+        connection: Uuid,
+        expected_generation: i64,
+        action: &'static str,
+    ) -> Result<MetadataStart, HubError> {
         if key.is_nil() || connection.is_nil() || expected_generation < 1 {
             return Err(HubError::Invalid("metadata operation"));
         }
         self.store.ready().await?;
-        let binding=self.vault.bind(&serde_json::json!({"installation":self.store.installation_id,"principal":subject,"action":"catalog.refresh","connection":connection,"generation":expected_generation}))?;
+        let binding=self.vault.bind(&serde_json::json!({"installation":self.store.installation_id,"principal":subject,"action":action,"connection":connection,"generation":expected_generation}))?;
         let mut tx = self
             .store
             .pool
@@ -64,7 +171,7 @@ impl MetadataRefresh {
             .map_err(|e| db_failure(e, line!()))?;
         let (operation, replay) = self
             .store
-            .begin_control_operation(&mut tx, subject, key, binding, "catalog.refresh")
+            .begin_control_operation(&mut tx, subject, key, binding, action)
             .await?;
         if let Some(replay) = replay {
             return Ok(MetadataStart::Readback(
@@ -121,8 +228,8 @@ impl MetadataRefresh {
             version: 1,
         };
         sqlx::query("UPDATE operations SET resource_id=$3,safe_result=$4 WHERE installation_id=$1 AND id=$2").bind(self.store.installation_id).bind(operation).bind(connection).bind(serde_json::to_value(&result).map_err(|_|HubError::Unavailable)?).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
-        sqlx::query("INSERT INTO audit_events(id,installation_id,actor,action,object_id,operation_id,reason) VALUES($1,$2,$3,'catalog.refresh.start',$4,$5,'Сохранено намерение чтения метаданных')")
-            .bind(Uuid::new_v4()).bind(self.store.installation_id).bind(subject).bind(connection.to_string()).bind(operation).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
+        sqlx::query("INSERT INTO audit_events(id,installation_id,actor,action,object_id,operation_id,reason) VALUES($1,$2,$3,$4,$5,$6,'Сохранено намерение чтения provider statement')")
+            .bind(Uuid::new_v4()).bind(self.store.installation_id).bind(subject).bind(format!("{action}.start")).bind(connection.to_string()).bind(operation).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
         tx.commit().await.map_err(|e| db_failure(e, line!()))?;
         Ok(MetadataStart::Claim(MetadataClaim {
             operation: result,
@@ -131,6 +238,7 @@ impl MetadataRefresh {
             endpoint_hash,
             fence,
             secret,
+            action,
         }))
     }
     pub async fn fail(
@@ -175,7 +283,8 @@ impl MetadataRefresh {
         catalog: &CatalogObservation,
         account: &AccountObservation,
     ) -> Result<Operation, HubError> {
-        if account.digest.len() != 64
+        if claim.action != "catalog.refresh"
+            || account.digest.len() != 64
             || !account.digest.bytes().all(|b| b.is_ascii_hexdigit())
             || account.is_management_key != Some(false)
             || account.expires_at.is_some_and(|t| t <= chrono::Utc::now())
@@ -229,7 +338,7 @@ impl PgStore {
         state: &str,
     ) -> Result<Operation, HubError> {
         sqlx::query("UPDATE metadata_refreshes SET state=$3 WHERE installation_id=$1 AND operation_id=$2 AND state='running'").bind(self.installation_id).bind(operation).bind(state).execute(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;
-        let row=sqlx::query("UPDATE operations SET state=$3,version=version+1,updated_at=now() WHERE installation_id=$1 AND id=$2 AND state='pending' RETURNING version,principal_id")
+        let row=sqlx::query("UPDATE operations SET state=$3,version=version+1,updated_at=now() WHERE installation_id=$1 AND id=$2 AND state='pending' RETURNING version,principal_id,action")
             .bind(self.installation_id).bind(operation).bind(state).fetch_optional(&mut **tx).await.map_err(|e|db_failure(e,line!()))?.ok_or(HubError::PreconditionFailed)?;
         let result = Operation {
             id: operation,
@@ -249,8 +358,8 @@ impl PgStore {
             .execute(&mut **tx)
             .await
             .map_err(|e| db_failure(e, line!()))?;
-        sqlx::query("INSERT INTO audit_events(id,installation_id,actor,action,object_id,operation_id,reason) VALUES($1,$2,$3,'catalog.refresh.finish',$4,$5,$6)")
-            .bind(Uuid::new_v4()).bind(self.installation_id).bind(row.get::<String,_>("principal_id")).bind(connection.to_string()).bind(operation).bind(state).execute(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;
+        sqlx::query("INSERT INTO audit_events(id,installation_id,actor,action,object_id,operation_id,reason) VALUES($1,$2,$3,$4,$5,$6,$7)")
+            .bind(Uuid::new_v4()).bind(self.installation_id).bind(row.get::<String,_>("principal_id")).bind(format!("{}.finish",row.get::<String,_>("action"))).bind(connection.to_string()).bind(operation).bind(state).execute(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;
         Ok(result)
     }
     pub async fn recover_expired_metadata(&self) -> Result<u64, HubError> {
@@ -276,6 +385,28 @@ impl PgStore {
 }
 #[async_trait::async_trait]
 impl aihub_application::MetadataOperations for MetadataRefresh {
+    async fn verify_account(
+        &self,
+        principal: &aihub_domain::access::HumanPrincipal,
+        key: Uuid,
+        connection: Uuid,
+        expected_generation: i64,
+    ) -> Result<Operation, HubError> {
+        principal.require_config(true)?;
+        self.qualify_account_internal(&principal.subject, key, connection, expected_generation)
+            .await
+    }
+    async fn account_authority(
+        &self,
+        principal: &aihub_domain::access::HumanPrincipal,
+        connection: Uuid,
+    ) -> Result<aihub_domain::catalog::AccountAuthorityView, HubError> {
+        principal.require_config(false)?;
+        if connection.is_nil() {
+            return Err(HubError::Invalid("connection ID"));
+        }
+        self.store.read_account_authority(connection).await
+    }
     async fn refresh(
         &self,
         principal: &aihub_domain::access::HumanPrincipal,

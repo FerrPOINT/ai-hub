@@ -64,6 +64,16 @@ struct TestStore {
 }
 #[async_trait]
 impl aihub_application::MetadataOperations for TestStore {
+    async fn verify_account(
+        &self,
+        _: &HumanPrincipal,
+        _: Uuid,
+        _: Uuid,
+        _: i64,
+    ) -> Result<Operation, HubError> {
+        self.reads.fetch_add(1, Ordering::SeqCst);
+        Err(HubError::Unavailable)
+    }
     async fn refresh(
         &self,
         _: &HumanPrincipal,
@@ -162,6 +172,59 @@ impl FoundationStore for TestStore {
 }
 fn fixture() -> (axum::Router, Arc<TestStore>) {
     fixture_with_external(false)
+}
+#[tokio::test]
+async fn account_authority_requires_write_key_and_explicit_external_opt_in() {
+    for external in [false, true] {
+        let (app, store) = fixture_with_external(external);
+        for (token, body, expected) in [
+            (
+                "read",
+                r#"{"expected_generation":2}"#,
+                StatusCode::FORBIDDEN,
+            ),
+            (
+                "write",
+                r#"{"expected_generation":0}"#,
+                if external {
+                    StatusCode::BAD_REQUEST
+                } else {
+                    StatusCode::SERVICE_UNAVAILABLE
+                },
+            ),
+            (
+                "write",
+                r#"{"expected_generation":2,"currency":"USD"}"#,
+                if external {
+                    StatusCode::BAD_REQUEST
+                } else {
+                    StatusCode::SERVICE_UNAVAILABLE
+                },
+            ),
+            (
+                "write",
+                r#"{"expected_generation":2}"#,
+                StatusCode::SERVICE_UNAVAILABLE,
+            ),
+        ] {
+            let request = Request::builder()
+                .method("POST")
+                .uri(format!(
+                    "/api/v1/connections/{}/account-authority",
+                    Uuid::new_v4()
+                ))
+                .header("authorization", format!("Bearer {token}"))
+                .header("content-type", "application/json")
+                .header("idempotency-key", Uuid::new_v4().to_string())
+                .body(Body::from(body))
+                .unwrap();
+            assert_eq!(
+                app.clone().oneshot(request).await.unwrap().status(),
+                expected
+            );
+        }
+        assert_eq!(store.reads.load(Ordering::SeqCst), usize::from(external));
+    }
 }
 #[tokio::test]
 async fn profile_scopes_strict_cas_and_payload_precede_storage() {

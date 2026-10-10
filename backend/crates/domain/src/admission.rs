@@ -49,7 +49,8 @@ pub struct AdmissionIntent {
     pub model_id: String,
     pub tier: String,
     pub price_revision_id: Option<Uuid>,
-    pub qualification_id: Uuid,
+    pub qualification_id: Option<Uuid>,
+    pub account_authority_id: Option<Uuid>,
     pub upper_usage: Usage,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]

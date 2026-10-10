@@ -1,3 +1,5 @@
+mod account_authority;
+pub mod account_statement;
 pub mod auth;
 mod budget_control;
 mod cancellation;
@@ -19,4 +21,5 @@ mod pricing_sources;
 mod profiles;
 pub mod replay;
 mod settlement;
+mod target_authority;
 pub mod vault;

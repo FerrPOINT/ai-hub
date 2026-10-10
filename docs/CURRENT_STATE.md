@@ -56,3 +56,10 @@ Control prices/budgets API
 immutable draft history, ordered targets, CAS/idempotency и Base формы
 /models и /models/:id. Публикация и live proof остаются незакрытыми; actual
 результаты среза перечислены в IMPLEMENTATION_STATUS/implementation-evidence.
+
+
+Первый verification теперь использует отдельную native account authority без
+fabricated model proof, через общий reserve/claim/settlement. Account/quoted-price
+collector и Base UI имеют operation recovery. Реальные SQL проверки schema 22,
+codec 1e-18, current catalog membership и финансовые regressions пройдены;
+это partial implementation, не live qualification или runtime acceptance.

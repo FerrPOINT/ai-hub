@@ -95,7 +95,7 @@ impl PgStore {
         if let Some(replay) = replay {
             return serde_json::from_value(replay).map_err(|_| HubError::Unavailable);
         }
-        let conn=sqlx::query("SELECT g.billing_tier FROM connections c JOIN connection_generations g ON g.connection_id=c.id AND g.generation=c.generation WHERE c.installation_id=$1 AND c.id=$2 AND c.status='enabled' FOR SHARE OF c,g")
+        let conn=sqlx::query("SELECT g.billing_tier FROM connections c JOIN connection_generations g ON g.connection_id=c.id AND g.generation=c.generation WHERE c.installation_id=$1 AND c.id=$2 AND (c.status='enabled' OR (c.status='authorization_unknown' AND EXISTS(SELECT 1 FROM verification_account_authorities a WHERE a.installation_id=c.installation_id AND a.connection_id=c.id AND a.generation=c.generation AND a.state='active' AND a.adapter_revision=g.adapter_revision AND a.endpoint_policy_hash=g.endpoint_policy_hash AND a.billing_tier=g.billing_tier AND a.observed_at<=clock_timestamp() AND a.expires_at>clock_timestamp()))) FOR SHARE OF c,g")
             .bind(self.installation_id).bind(input.connection_id).fetch_optional(&mut *tx).await.map_err(|e|db_failure(e,line!()))?.ok_or(HubError::PreconditionFailed)?;
         let tier: String = conn
             .get::<Option<String>, _>("billing_tier")
@@ -210,7 +210,7 @@ impl PgStore {
         currency: &Currency,
         as_of: DateTime<Utc>,
     ) -> Result<PricingResolution, HubError> {
-        let tier:Option<String>=sqlx::query_scalar("SELECT g.billing_tier FROM connections c JOIN connection_generations g ON g.connection_id=c.id AND g.generation=c.generation WHERE c.installation_id=$1 AND c.id=$2 AND c.status='enabled' FOR SHARE OF c,g")
+        let tier:Option<String>=sqlx::query_scalar("SELECT g.billing_tier FROM connections c JOIN connection_generations g ON g.connection_id=c.id AND g.generation=c.generation WHERE c.installation_id=$1 AND c.id=$2 AND (c.status='enabled' OR (c.status='authorization_unknown' AND EXISTS(SELECT 1 FROM verification_account_authorities a WHERE a.installation_id=c.installation_id AND a.connection_id=c.id AND a.generation=c.generation AND a.state='active' AND a.adapter_revision=g.adapter_revision AND a.endpoint_policy_hash=g.endpoint_policy_hash AND a.billing_tier=g.billing_tier AND a.observed_at<=clock_timestamp() AND a.expires_at>clock_timestamp()))) FOR SHARE OF c,g")
             .bind(self.installation_id).bind(connection).fetch_optional(&mut **tx).await.map_err(|e|db_failure(e,line!()))?.flatten();
         sqlx::query("SELECT pg_advisory_xact_lock_shared(hashtextextended(jsonb_build_array($1::text,$2::text,$3::text)::text,310817))")
             .bind(connection.to_string()).bind(model).bind(currency.to_string()).execute(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;

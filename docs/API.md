@@ -289,3 +289,15 @@ DELETE `/api/v1/connections/{connection_id}` реализует disable (202 Ope
 config write, UUID key, strong current If-Match. Не удаляет connection/credentials/
 history, не отзывает authorization и не отменяет уже отправленный provider call.
 Disabled state блокирует новый financial admission и dispatch claim.
+
+
+## Account authority — implementation helper
+
+GET /api/v1/connections/{connection_id}/account-authority читает own cached
+account witness (config.read), без provider I/O. POST на тот же путь требует
+config.write, UUID Idempotency-Key, expected_generation и explicit external calls
+opt-in; возвращает safe Operation 202. Endpoint не принимает currency, source,
+receipt или billing capabilities от caller. Native fixed-origin collector сохраняет
+statement/quotes/audit атомарно. Actor/key readback и close-unstarted — общие
+control contracts. Эта helper operation не заменяет startVerification и не
+квалифицирует model capabilities. Actual contract генерируется из Rust handlers.

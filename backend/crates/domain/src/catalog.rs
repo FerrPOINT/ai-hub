@@ -43,6 +43,21 @@ pub struct MetadataRefreshInput {
     #[schema(minimum = 1)]
     pub expected_generation: i64,
 }
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct AccountAuthorityView {
+    pub connection_id: uuid::Uuid,
+    pub generation: i64,
+    pub status: String,
+    #[schema(required = true)]
+    pub currency: Option<crate::financial::Currency>,
+    #[schema(required = true)]
+    pub statement_usage: Option<Amount>,
+    #[schema(required = true)]
+    pub observed_at: Option<DateTime<Utc>>,
+    #[schema(required = true)]
+    pub expires_at: Option<DateTime<Utc>>,
+}
 /// No Debug/Serialize: provider key metadata may contain credential fragments and account identities.
 pub struct AccountObservation {
     pub limit: Option<Amount>,

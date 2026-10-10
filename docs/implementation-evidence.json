@@ -232,6 +232,72 @@
     "generated_contract": "rust_openapi_typescript_and_final_typecheck_pass",
     "remaining": "bootstrap verification and account currency witness; exact profile proof/publication/revisions/rollback/disable/enable/archive; live SSO/account/runtime/IAB; full TC"
   },
+  "account_bootstrap_oracles": {
+    "date": "2026-10-11",
+    "status": "partial_implementation",
+    "tests": [
+      "TC-003",
+      "TC-006",
+      "TC-010",
+      "TC-018",
+      "TC-027",
+      "TC-028",
+      "TC-036",
+      "TC-038"
+    ],
+    "account_pg": {
+      "passed": 1,
+      "ignored": 0,
+      "seconds": 1.49,
+      "schema_version": 22
+    },
+    "bootstrap_pg": {
+      "passed": 1,
+      "ignored": 0,
+      "seconds": 1.06
+    },
+    "financial_pg": {
+      "passed": 1,
+      "ignored": 0,
+      "seconds": 18.93
+    },
+    "metadata_pg": {
+      "passed": 1,
+      "ignored": 0,
+      "seconds": 0.89
+    },
+    "budget_pg": {
+      "passed": 1,
+      "ignored": 0,
+      "seconds": 0.75
+    },
+    "pricing_pg": {
+      "passed": 1,
+      "ignored": 0,
+      "seconds": 1.17
+    },
+    "statement_unit": {
+      "passed": 1,
+      "seconds": 0.03
+    },
+    "api": {
+      "passed": 15,
+      "seconds": 0.14,
+      "mode": "in_process_test_auth_store"
+    },
+    "controlled_dom": {
+      "passed": 14,
+      "seconds": 10.61
+    },
+    "doc_regression": {
+      "passed": 39,
+      "seconds": 23.182
+    },
+    "generated_contract": "rust_openapi_typescript_and_final_typecheck_pass",
+    "provider_account_calls": 0,
+    "provider_model_calls": 0,
+    "remaining": "actual provider/model qualification and transport; profile proof/publication/lifecycle; SSO/runtime/IAB; full S1-S7 acceptance"
+  },
   "required_acceptance": {
     "S1": "in_progress",
     "S2a": "in_progress",

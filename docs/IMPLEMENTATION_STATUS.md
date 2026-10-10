@@ -515,3 +515,59 @@ Controlled DOM — 13 pass (5 model + 8 provider regression), 9.66s. Rust export
 TypeScript generation/final typecheck, exported profile contract assertions и
 docs/alignment/design gates pass; документационные regression tests — 39 pass.
 Эти результаты не закрывают live SSO/provider/IAB и весь TC.
+
+
+## Bootstrap verification и account witness — 2026-10-11
+
+Устранён причинный цикл: первое verification не требует уже готовую model runtime
+qualification. Immutable account authority — отдельный binding connection/generation/
+adapter/endpoint/native statement/currency/tier/expiry. Она допускается только для
+verification purpose; SQL attempt FK включает own installation/connection/generation,
+XOR constraint требует ровно одну authority, purpose trigger запрещает её для
+inference/evaluation. Обычная model qualification остаётся отдельной границей.
+
+Native fixed-origin OpenRouter collector выполняет audited/fenced GET key + models
+через существующий lifecycle client, без model POST. Currency witness использует
+свежий authenticated credit-usage statement и документированный USD unit;
+metadata observations сохраняют unqualified. Statement/quotes/operation/audit
+коммитятся атомарно. Prepared credential не становится model authorization.
+Quotes имеют exact per-million units и catalog origin; capabilities остаются
+unverified. Account statement не создаёт provider cash expense.
+
+Общий financial engine выполняет reserve/claim/settlement/unknown/replay и для
+первого probe. Перед claim снова проверяются authority, credential, generation,
+endpoint, configured context и pricing source. Uncertain acceptance сохраняет
+резерв и запрещает новый dispatch. Source status/tier resolution разрешает
+подготовить цену по живому account witness до model proof.
+
+Новый helper GET/POST account-authority и Base UI показывают текущую валюту,
+statement usage и срок проверки. POST имеет explicit external opt-in, config.write,
+UUID key и generation; lost reply восстанавливается через общий operation readback.
+UI не объявляет модель подтверждённой после account success.
+
+Настоящий PostgreSQL выявил SQLx NUMERIC padding: base-10000 decoder может
+вернуть дополнительные дробные нули за scale 18. Infrastructure теперь normalized
+перед strict Amount/Rate parsing; входные API ограничения и значения не меняются.
+Account statement с последней цифрой 1 и tiny budget 1e-18 — отдельные SQL oracles.
+Actual results этого среза перечисляются в implementation-evidence.json.
+Live account/model/SSO/runtime/IAB и full profile proof/lifecycle ещё pending.
+
+
+Automatic quote selection дополнительно следует current catalog membership:
+удалённая из нового snapshot модель не использует старую auto quote. Historical
+price/ledger остаются неизменными; explicit manual source имеет свою семантику.
+Forward migration 0022 добавляет этот guard без переписывания прошлых migrations.
+
+
+Проверка fresh schema выявила ещё одну build boundary: добавленный файл migration
+не гарантированно пересобирал sqlx::migrate! в infrastructure cache. Build script
+теперь отслеживает ../../migrations; fixture требует max schema version 22.
+Это исправляет dependency tracking, не запускает schema writes при app startup.
+
+
+Final scoped SQL: account 1 pass (1.49s, schema 22), bootstrap 1 pass (1.06s),
+financial 1 pass (18.93s), metadata 1 pass (0.89s), budget 1 pass (0.75s), pricing
+1 pass (1.17s); во всех 0 ignored. Statement unit 1 pass (0.03s); API access 15
+pass (0.14s); controlled UI 14 pass (10.61s); doc regressions 39 pass (23.182s).
+Generated OpenAPI export pass; final frontend generation/typecheck фиксируется
+в implementation-evidence. External account/model calls остаются 0.

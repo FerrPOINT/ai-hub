@@ -87,3 +87,18 @@ Pricing source revisions и project tariff revisions отдельны от provi
 project_tariff_policies и project_tariff_activations задают стабильный CAS timeline отдельно от immutable revisions. evaluation_manual_scores содержит own score witness/actor/version. service_delegations хранит verified context, fence и revoke tombstones без prompt/provider secrets. Все отношения own DB; wire в OpenAPI 0.5.0-design.
 
 S2a вводит canonical request/attempt/usage/price/ledger/budget/replay до S2b proof. S3 добавляет tariff cancellations с own same-policy FK и immutable operation receipt; ProjectCharge unconfigured source — explicit state/null FK. Dictionary.phase задаёт раннюю schema introduction, не полную FR acceptance.
+
+
+## Implementation: account authority для bootstrap probe
+
+verification_account_authorities хранит immutable native account statement
+binding: own installation/connection/generation/operation, adapter/endpoint,
+currency/tier, digest/origin/usage, observed_at/expiry и billing reader capabilities.
+State может быть invalidated; запись не является cash ledger entry или model proof.
+
+Attempt фиксирует ровно одну reference: runtime qualification либо account
+authority. Composite FK account authority включает installation/connection/generation;
+SQL trigger допускает её только для request_kind=verification. Authority identity
+не меняется после admission. Первый probe проходит тот же reservation/claim/settlement
+контур, без fabricated runtime qualification. Quote origins остаются собственными
+FK к catalog/price; catalogue capabilities не становятся model evidence.

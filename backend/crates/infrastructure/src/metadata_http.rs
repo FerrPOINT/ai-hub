@@ -80,6 +80,37 @@ fn builder() -> reqwest::ClientBuilder {
         .pool_idle_timeout(Duration::from_secs(30))
 }
 impl MetadataHttp {
+    pub(crate) async fn read_account_statement(
+        &self,
+        secret: &[u8],
+    ) -> Result<
+        (
+            CatalogObservation,
+            crate::account_statement::OpenRouterStatement,
+        ),
+        ReadFailure,
+    > {
+        let bytes = get(
+            &self.client,
+            "https://openrouter.ai/api/v1/key",
+            secret,
+            65536,
+        )
+        .await?;
+        let statement =
+            crate::account_statement::decode_openrouter_statement(&bytes, chrono::Utc::now())
+                .map_err(|_| ReadFailure::Known)?;
+        let models = get(
+            &self.client,
+            "https://openrouter.ai/api/v1/models",
+            secret,
+            MAX_METADATA_BYTES,
+        )
+        .await?;
+        let catalog =
+            decode_catalog(&models, statement.observed_at).map_err(|_| ReadFailure::Known)?;
+        Ok((catalog, statement))
+    }
     pub(crate) fn new() -> Result<Self, HubError> {
         Ok(Self {
             client: builder().build().map_err(|_| HubError::Unavailable)?,

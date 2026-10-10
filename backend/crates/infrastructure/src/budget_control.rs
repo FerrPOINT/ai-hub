@@ -18,7 +18,7 @@ const AUTHORIZED: &str = " AND EXISTS(SELECT 1 FROM grants g WHERE g.installatio
 
 fn amount(row: &sqlx::postgres::PgRow, column: &str) -> Result<Amount, HubError> {
     let value: BigDecimal = row.get(column);
-    Amount::parse(&value.to_plain_string())
+    Amount::parse(&value.normalized().to_plain_string())
 }
 fn budget(row: &sqlx::postgres::PgRow) -> Result<Budget, HubError> {
     let namespace =

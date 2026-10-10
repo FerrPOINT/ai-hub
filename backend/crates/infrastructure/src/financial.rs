@@ -1,5 +1,5 @@
 //! One durable admission transaction. Provider transport is deliberately outside it.
-use crate::postgres::PgStore;
+use crate::{postgres::PgStore, target_authority::TargetAuthorityId};
 use aihub_application::FinancialAdmission;
 use aihub_domain::{
     admission::{AdmissionIntent, AdmissionReceipt, DispatchClaim, Purpose, PurposeBounds},
@@ -27,12 +27,12 @@ fn decimal(amount: Amount) -> Result<BigDecimal, HubError> {
 }
 fn amount(row: &sqlx::postgres::PgRow, name: &str) -> Result<Amount, HubError> {
     let value: BigDecimal = row.try_get(name).map_err(|err| db_failure(err, line!()))?;
-    Amount::parse(&value.to_plain_string())
+    Amount::parse(&value.normalized().to_plain_string())
 }
 fn optional_amount(row: &sqlx::postgres::PgRow, name: &str) -> Result<Option<Amount>, HubError> {
     let value: Option<BigDecimal> = row.try_get(name).map_err(|err| db_failure(err, line!()))?;
     value
-        .map(|v| Amount::parse(&v.to_plain_string()))
+        .map(|v| Amount::parse(&v.normalized().to_plain_string()))
         .transpose()
 }
 fn rates(row: &sqlx::postgres::PgRow) -> Result<BTreeMap<Category, Rate>, HubError> {
@@ -48,7 +48,10 @@ fn rates(row: &sqlx::postgres::PgRow) -> Result<BTreeMap<Category, Rate>, HubErr
             .try_get(column)
             .map_err(|err| db_failure(err, line!()))?;
         if let Some(value) = value {
-            rates.insert(category, Rate::parse(&value.to_plain_string())?);
+            rates.insert(
+                category,
+                Rate::parse(&value.normalized().to_plain_string())?,
+            );
         }
     }
     Ok(rates)
@@ -127,19 +130,51 @@ impl FinancialAdmission for PgStore {
             .await
             .map_err(|e| db_failure(e, line!()))?
             .ok_or(HubError::PreconditionFailed)?;
-        let qualification=sqlx::query("SELECT q.id,q.model_context_version,q.model_context_revision_id FROM runtime_qualifications q JOIN connections c ON c.installation_id=q.installation_id AND c.id=q.connection_id JOIN connection_generations g ON g.connection_id=q.connection_id AND g.generation=q.generation JOIN verification_evidence e ON e.installation_id=q.installation_id AND e.id=q.proof_id WHERE q.installation_id=$1 AND q.id=$2 AND q.connection_id=$3 AND q.generation=$4 AND q.provider_model_id=$5 AND q.state='active' AND c.status='enabled' AND c.generation=q.generation AND g.authorization_state='active' AND g.adapter_revision=q.adapter_revision AND g.endpoint_policy_hash=q.endpoint_policy_hash AND q.adapter_revision=$6 AND q.endpoint_policy_hash=$7 AND q.billing_currency=$8 AND e.state='verified' AND e.expires_at>now() FOR SHARE OF q,c,g,e")
-            .bind(self.installation_id).bind(attempt.get::<Uuid,_>("qualification_id")).bind(attempt.get::<Uuid,_>("connection_id")).bind(attempt.get::<i64,_>("generation")).bind(target.get("model_id").and_then(|v|v.as_str()).ok_or(HubError::Unavailable)?).bind(snapshot.get("adapter_revision").and_then(|v|v.as_str()).ok_or(HubError::Unavailable)?).bind(snapshot.get("endpoint_policy_hash").and_then(|v|v.as_str()).ok_or(HubError::Unavailable)?).bind(attempt.get::<String,_>("currency")).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::PreconditionFailed)?;
-        let current_context = self
-            .qualified_model_context_locked(
+        let kind: String = sqlx::query_scalar(
+            "SELECT request_kind FROM requests WHERE installation_id=$1 AND id=$2",
+        )
+        .bind(self.installation_id)
+        .bind(context.get::<Uuid, _>("id"))
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(|e| db_failure(e, line!()))?;
+        let purpose = match kind.as_str() {
+            "verification" => Purpose::Verification,
+            "inference" => Purpose::Inference,
+            "evaluation" => Purpose::Evaluation,
+            _ => return Err(HubError::Unavailable),
+        };
+        let authority = self
+            .target_authority_locked(
                 &mut tx,
                 attempt.get("connection_id"),
+                attempt.get("generation"),
                 target
                     .get("model_id")
                     .and_then(|v| v.as_str())
                     .ok_or(HubError::Unavailable)?,
-                &qualification,
+                TargetAuthorityId::from_ids(
+                    attempt.get("qualification_id"),
+                    attempt.get("account_authority_id"),
+                )?,
+                purpose,
             )
-            .await?;
+            .await
+            .map_err(|e| match e {
+                HubError::Forbidden | HubError::NotFound => HubError::PreconditionFailed,
+                other => other,
+            })?;
+        if snapshot.get("adapter_revision").and_then(|v| v.as_str())
+            != Some(authority.adapter_revision.as_str())
+            || snapshot
+                .get("endpoint_policy_hash")
+                .and_then(|v| v.as_str())
+                != Some(authority.endpoint_hash.as_str())
+            || attempt.get::<String, _>("currency") != authority.currency.to_string()
+        {
+            return Err(HubError::PreconditionFailed);
+        }
+        let current_context = authority.model_context;
         let frozen_context: aihub_domain::model_context::ModelContextSnapshot =
             serde_json::from_value(
                 snapshot
@@ -264,7 +299,8 @@ impl FinancialAdmission for PgStore {
             || intent.grant_id.is_nil()
             || intent.idempotency_key.is_nil()
             || intent.connection_id.is_nil()
-            || intent.qualification_id.is_nil()
+            || TargetAuthorityId::from_ids(intent.qualification_id, intent.account_authority_id)
+                .is_err()
             || intent.generation < 1
             || intent.model_id.is_empty()
             || intent.model_id.len() > 256
@@ -380,16 +416,17 @@ impl FinancialAdmission for PgStore {
             .await
             .map_err(|e| db_failure(e, line!()))?
             .ok_or(HubError::Forbidden)?;
-        let qualification=sqlx::query("SELECT q.billing_currency,q.adapter_revision,q.endpoint_policy_hash,q.capabilities,q.model_context_version,q.model_context_revision_id FROM runtime_qualifications q JOIN connections c ON c.installation_id=q.installation_id AND c.id=q.connection_id JOIN connection_generations g ON g.connection_id=q.connection_id AND g.generation=q.generation JOIN verification_evidence e ON e.installation_id=q.installation_id AND e.id=q.proof_id WHERE q.installation_id=$1 AND q.id=$2 AND q.connection_id=$3 AND q.generation=$4 AND q.provider_model_id=$5 AND q.state='active' AND q.billing_currency IS NOT NULL AND q.billing_currency_origin IS NOT NULL AND c.status='enabled' AND c.generation=q.generation AND g.authorization_state='active' AND g.adapter_revision=q.adapter_revision AND g.endpoint_policy_hash=q.endpoint_policy_hash AND e.state='verified' AND e.expires_at>now() FOR SHARE OF q,g,e")
-            .bind(self.installation_id).bind(intent.qualification_id).bind(intent.connection_id).bind(intent.generation).bind(&intent.model_id).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::Forbidden)?;
-        let model_context = self
-            .qualified_model_context_locked(
+        let authority = self
+            .target_authority_locked(
                 &mut tx,
                 intent.connection_id,
+                intent.generation,
                 &intent.model_id,
-                &qualification,
+                TargetAuthorityId::from_ids(intent.qualification_id, intent.account_authority_id)?,
+                intent.purpose,
             )
             .await?;
+        let model_context = authority.model_context;
         if model_context.context_window_tokens.is_some_and(|cap| {
             input
                 .checked_add(output)
@@ -399,14 +436,17 @@ impl FinancialAdmission for PgStore {
                 "configured context budget exceeded",
             ));
         }
-        let currency = Currency::parse(&qualification.get::<String, _>("billing_currency"))?;
+        let currency = authority.currency;
         if currency != bounds.currency {
             return Err(HubError::Forbidden);
         }
         let probe=sqlx::query("SELECT configuration,draft_model_id,operation_id FROM probe_snapshots WHERE installation_id=$1 AND id=$2")
             .bind(self.installation_id).bind(intent.probe_snapshot_id).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::NotFound)?;
         let configuration: serde_json::Value = probe.get("configuration");
-        let target = serde_json::json!({"connection_id":intent.connection_id,"generation":intent.generation,"model_id":intent.model_id,"tier":intent.tier,"price_revision_id":intent.price_revision_id,"qualification_id":intent.qualification_id,"upper_usage":intent.upper_usage,"protocol":intent.protocol,"streaming":intent.streaming,"intent_ttl_seconds":intent.intent_ttl_seconds,"pricing_source_revision_id":intent.pricing_source_revision_id,"pricing_policy_version":intent.pricing_policy_version});
+        let mut target = serde_json::json!({"connection_id":intent.connection_id,"generation":intent.generation,"model_id":intent.model_id,"tier":intent.tier,"price_revision_id":intent.price_revision_id,"qualification_id":intent.qualification_id,"upper_usage":intent.upper_usage,"protocol":intent.protocol,"streaming":intent.streaming,"intent_ttl_seconds":intent.intent_ttl_seconds,"pricing_source_revision_id":intent.pricing_source_revision_id,"pricing_policy_version":intent.pricing_policy_version});
+        if let Some(id) = intent.account_authority_id {
+            target["account_authority_id"] = serde_json::json!(id);
+        }
         if !configuration
             .get("targets")
             .and_then(|v| v.as_array())
@@ -522,9 +562,9 @@ impl FinancialAdmission for PgStore {
         }
         sqlx::query("INSERT INTO requests(id,installation_id,client_id,grant_id,principal_id,project_binding,request_kind,probe_snapshot_id,idempotency_key,payload_hmac,state,namespace_binding_id,operation_id,wire_protocol,streaming,intent_ttl_seconds,intent_deadline,pricing_source_revision_id,pricing_policy_version) VALUES($1,$2,$3,$4,$5,$6,'verification',$7,$8,$9,'admitted',$10,$11,$12,$13,$14,LEAST(now()+make_interval(secs=>$14::double precision),$15),$16,$17)")
             .bind(request_id).bind(self.installation_id).bind(intent.client_id).bind(intent.grant_id).bind(&intent.principal_id).bind(&project).bind(intent.probe_snapshot_id).bind(intent.idempotency_key).bind(intent.payload_hmac.as_slice()).bind(namespace).bind(probe.get::<Uuid,_>("operation_id")).bind(intent.protocol.as_str()).bind(intent.streaming).bind(intent.intent_ttl_seconds).bind(grant.get::<chrono::DateTime<chrono::Utc>,_>("expires_at")).bind(cost_source.source_revision_id).bind(cost_source.policy_version).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
-        let deployment = serde_json::json!({"target":target,"price":price,"cost_source":cost_source,"model_context":model_context,"qualified_capabilities":qualification.get::<serde_json::Value,_>("capabilities"),"cost_source_state":if cost_source.source_revision_id.is_some(){"configured"}else{"unconfigured"},"adapter_revision":qualification.get::<String,_>("adapter_revision"),"endpoint_policy_hash":qualification.get::<String,_>("endpoint_policy_hash")});
-        sqlx::query("INSERT INTO attempts(id,installation_id,request_id,ordinal,connection_id,generation,deployment_snapshot,state,accepted,qualification_id,upper_provider_cost,currency) VALUES($1,$2,$3,1,$4,$5,$6,'intended','not_accepted',$7,$8,$9)")
-            .bind(attempt_id).bind(self.installation_id).bind(request_id).bind(intent.connection_id).bind(intent.generation).bind(deployment).bind(intent.qualification_id).bind(upper.map(decimal).transpose()?).bind(currency.to_string()).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
+        let deployment = serde_json::json!({"target":target,"price":price,"cost_source":cost_source,"model_context":model_context,"qualified_capabilities":authority.capabilities,"cost_source_state":if cost_source.source_revision_id.is_some(){"configured"}else{"unconfigured"},"adapter_revision":authority.adapter_revision,"endpoint_policy_hash":authority.endpoint_hash,"qualification_scope":authority.scope});
+        sqlx::query("INSERT INTO attempts(id,installation_id,request_id,ordinal,connection_id,generation,deployment_snapshot,state,accepted,qualification_id,upper_provider_cost,currency,account_authority_id) VALUES($1,$2,$3,1,$4,$5,$6,'intended','not_accepted',$7,$8,$9,$10)")
+            .bind(attempt_id).bind(self.installation_id).bind(request_id).bind(intent.connection_id).bind(intent.generation).bind(deployment).bind(intent.qualification_id).bind(upper.map(decimal).transpose()?).bind(currency.to_string()).bind(intent.account_authority_id).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
         if let Some(upper) = upper {
             for period in period_ids {
                 sqlx::query("UPDATE budget_periods SET reserved=reserved+$3,version=version+1 WHERE installation_id=$1 AND id=$2").bind(self.installation_id).bind(period).bind(decimal(upper)?).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
