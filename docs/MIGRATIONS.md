@@ -16,7 +16,7 @@ Production admission выключен до successful explicit migrate/readiness
 new state → switch; downgrade только если старый binary умеет читать актуальную schema.
 Rollback binary не откатывает facts и не освобождает unknown reserves.
 Миграция с irreversible data transformation требует own backup/restore rehearsal.
-Actual migrations `0001`–`0012` применились на own disposable PostgreSQL17;
+Actual migrations `0001`–`0013` применились на own disposable PostgreSQL17;
 foundation и financial evidence отражены в IMPLEMENTATION_STATUS. Все новые
 миграции квалифицировались только на disposable fixture, не на installed PDLC DB.
 Upgrade/nonempty restore остаются S7 gates; их PASS не выводится из fresh install.
@@ -49,3 +49,8 @@ Legacy missing version не backfill-ится выдуманным current state
 Legacy endpoint bytes не угадываются; миграция не подключает credentials или
 HTTP transport. Label-only updates не меняют generation; material settings дают
 новую непроверенную generation. Existing history остаётся immutable.
+
+`0013` запрещает изменение cipher/nonce/key/generation и удаление credential
+history. State prepared/active/revoked меняется отдельно; new cipher bound 16 KiB
+plus GCM tag enforce для новых writes. Legacy oversized bytes не переписываются;
+constraint validation и nonempty restore остаются S7 gate.

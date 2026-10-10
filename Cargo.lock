@@ -77,8 +77,10 @@ version = "0.1.0"
 dependencies = [
  "aihub-domain",
  "async-trait",
+ "hex",
  "serde",
  "serde_json",
+ "sha2",
  "uuid",
 ]
 

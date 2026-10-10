@@ -20,6 +20,17 @@ use uuid::Uuid;
 
 struct TestAuth;
 struct TestBinding;
+impl aihub_application::CredentialProtection for TestBinding {
+    fn protect(
+        &self,
+        _: Uuid,
+        _: Uuid,
+        _: i64,
+        _: &[u8],
+    ) -> Result<aihub_domain::connections::ProtectedCredential, HubError> {
+        Err(HubError::Unavailable)
+    }
+}
 impl aihub_application::OperationBinding for TestBinding {
     fn bind(&self, _: &serde_json::Value) -> Result<[u8; 32], HubError> {
         Ok([7; 32])
@@ -90,6 +101,7 @@ fn fixture() -> (axum::Router, Arc<TestStore>) {
                 auth: Arc::new(TestAuth),
                 store: store.clone(),
                 bindings: Arc::new(TestBinding),
+                secrets: Arc::new(TestBinding),
             },
             external_calls: false,
             auth_issuer: "http://localhost:8101".into(),
@@ -483,5 +495,81 @@ async fn connection_control_cannot_accept_a_raw_url_secret_or_wrong_pat_scope() 
         )
         .await,
         StatusCode::BAD_REQUEST
+    );
+}
+
+#[tokio::test]
+async fn credential_http_denies_read_scope_and_never_echoes_secret_on_errors() {
+    let (app, _) = fixture();
+    let path = format!("/api/v1/connections/{}/credentials", Uuid::new_v4());
+    let input = serde_json::json!({"secret":"synthetic-http-credential-canary","credential_type":"api_key","expected_generation":1});
+    for (token, body, expected) in [
+        ("read", input.clone(), StatusCode::FORBIDDEN),
+        ("foreign", input.clone(), StatusCode::FORBIDDEN),
+        (
+            "write",
+            {
+                let mut p = input.clone();
+                p["expected_generation"] = serde_json::json!(0);
+                p
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            {
+                let mut p = input.clone();
+                p["credential_type"] = serde_json::json!("managed_token");
+                p
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+        (
+            "write",
+            {
+                let mut p = input.clone();
+                p["secret"] = serde_json::json!("synthetic-http-credential-canary\n");
+                p
+            },
+            StatusCode::BAD_REQUEST,
+        ),
+        ("write", input.clone(), StatusCode::SERVICE_UNAVAILABLE),
+    ] {
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("PUT")
+                    .uri(&path)
+                    .header("authorization", format!("Bearer {token}"))
+                    .header("idempotency-key", Uuid::new_v4().to_string())
+                    .header("content-type", "application/json")
+                    .body(Body::from(serde_json::to_vec(&body).unwrap()))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), expected);
+        let bytes = axum::body::to_bytes(response.into_body(), 65536)
+            .await
+            .unwrap();
+        assert!(!String::from_utf8_lossy(&bytes).contains("synthetic-http-credential-canary"));
+    }
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("DELETE")
+                .uri(&path)
+                .header("authorization", "Bearer write")
+                .header("idempotency-key", Uuid::new_v4().to_string())
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        response.status(),
+        StatusCode::BAD_REQUEST,
+        "revocation requires fresh strong If-Match"
     );
 }

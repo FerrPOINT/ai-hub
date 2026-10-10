@@ -3,7 +3,9 @@ use aihub_domain::{
     NamespaceRef,
     access::{HumanPrincipal, namespace_filter},
     budgets::{Budget, BudgetInput, BudgetPeriod, BudgetScope},
-    connections::{BillingMode, Connection, ConnectionInput, ProviderKind},
+    connections::{
+        BillingMode, Connection, ConnectionInput, CredentialInput, CredentialType, ProviderKind,
+    },
     error::HubError,
     prices::{PriceInput, PriceRevision, PriceUnit},
     pricing_sources::{PricingDataStatus, PricingMode, PricingSourceInput, PricingSourceRevision},
@@ -434,6 +436,49 @@ pub async fn create_price(
     ))
 }
 
+#[utoipa::path(put,path="/api/v1/connections/{connection_id}/credentials",operation_id="writeCredential",security(("CentralAuth"=[])),params(("connection_id"=Uuid,Path),("Idempotency-Key"=Uuid,Header)),request_body=CredentialInput,responses((status=202,body=Operation),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=409,body=Error),(status=412,body=Error),(status=422,body=Error),(status=503,body=Error)))]
+pub async fn write_credential(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(id): Path<String>,
+    headers: HeaderMap,
+    body: Result<Json<CredentialInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<(StatusCode, Json<Operation>), ApiError> {
+    principal.require_config(true)?;
+    let key = mutation_key(&headers)?;
+    let id = Uuid::parse_str(&id).map_err(|_| HubError::Invalid("connection ID"))?;
+    let input = body.map_err(|_| HubError::Invalid("credential payload"))?.0;
+    Ok((
+        StatusCode::ACCEPTED,
+        Json(
+            state
+                .foundation
+                .write_credential(&principal, key, id, &input)
+                .await?,
+        ),
+    ))
+}
+#[utoipa::path(delete,path="/api/v1/connections/{connection_id}/credentials",operation_id="revokeConnectionAuthorization",security(("CentralAuth"=[])),params(("connection_id"=Uuid,Path),("Idempotency-Key"=Uuid,Header),("If-Match"=String,Header)),responses((status=202,body=Operation),(status=400,body=Error),(status=401,body=Error),(status=403,body=Error),(status=404,body=Error),(status=409,body=Error),(status=412,body=Error),(status=503,body=Error)))]
+pub async fn revoke_credential(
+    State(state): State<AppState>,
+    Authenticated(principal): Authenticated,
+    Path(id): Path<String>,
+    headers: HeaderMap,
+) -> Result<(StatusCode, Json<Operation>), ApiError> {
+    principal.require_config(true)?;
+    let key = mutation_key(&headers)?;
+    let version = budget_version(&headers)?;
+    let id = Uuid::parse_str(&id).map_err(|_| HubError::Invalid("connection ID"))?;
+    Ok((
+        StatusCode::ACCEPTED,
+        Json(
+            state
+                .foundation
+                .revoke_credential(&principal, key, id, version)
+                .await?,
+        ),
+    ))
+}
 fn list_options(raw: &str, namespace_allowed: bool) -> Result<(i64, Option<Uuid>), HubError> {
     let mut limit = None;
     let mut cursor = None;
@@ -638,7 +683,7 @@ pub async fn branding_contract() -> Json<BrandingContract> {
 }
 
 #[derive(OpenApi)]
-#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode)),modifiers(&SecurityAddon))]
+#[openapi(info(title="AI Hub — implemented API",version="0.1.0-dev"),paths(live,ready,identity,namespaces,audit,operation,version,public_config,integration_status,branding_contract,prices,create_price,budgets,create_budget,update_budget,pricing_sources,create_pricing_source,connections,read_connection,create_connection,update_connection,write_credential,revoke_credential),components(schemas(Health,Identity,NamespaceRef,NamespaceBinding,AuditEvent,Operation,Error,ErrorDetail,NamespacePage,AuditPage,Version,PublicConfig,IntegrationStatus,BrandingContract,PriceInput,PriceRevision,PriceUnit,PricePage,Budget,BudgetInput,BudgetScope,BudgetPeriod,BudgetPage,PricingSourceInput,PricingSourceRevision,PricingMode,PricingDataStatus,PricingSourcePage,Connection,ConnectionInput,ConnectionPage,ProviderKind,BillingMode,CredentialInput,CredentialType)),modifiers(&SecurityAddon))]
 pub struct ApiDoc;
 struct SecurityAddon;
 impl utoipa::Modify for SecurityAddon {
@@ -677,6 +722,10 @@ pub fn router(state: AppState, body_limit: usize) -> Router {
         .route("/api/v1/audit", get(audit))
         .route("/api/v1/prices", get(prices).post(create_price))
         .route("/api/v1/connections", get(connections))
+        .route(
+            "/api/v1/connections/{connection_id}/credentials",
+            axum::routing::put(write_credential).delete(revoke_credential),
+        )
         .route(
             "/api/v1/connections/{connection_id}",
             get(read_connection).patch(update_connection),

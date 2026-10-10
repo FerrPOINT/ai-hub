@@ -89,6 +89,44 @@ pub struct ConnectionMutation {
     pub operation_id: Uuid,
     pub value: Connection,
 }
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CredentialInput {
+    #[serde(deserialize_with = "secret_string")]
+    #[schema(value_type=String,write_only=true,min_length=1,max_length=16384)]
+    pub secret: zeroize::Zeroizing<String>,
+    pub credential_type: CredentialType,
+    pub expected_generation: i64,
+}
+#[derive(Debug, Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum CredentialType {
+    ApiKey,
+}
+fn secret_string<'de, D: serde::Deserializer<'de>>(
+    d: D,
+) -> Result<zeroize::Zeroizing<String>, D::Error> {
+    String::deserialize(d).map(zeroize::Zeroizing::new)
+}
+impl CredentialInput {
+    pub fn validate(&self) -> Result<(), HubError> {
+        if self.secret.is_empty()
+            || self.secret.len() > 16384
+            || !self.secret.bytes().all(|b| (33..=126).contains(&b))
+            || self.expected_generation < 1
+            || self.expected_generation == i64::MAX
+        {
+            return Err(HubError::Invalid("credential payload"));
+        }
+        Ok(())
+    }
+}
+/// Internal encrypted material; no Debug/Serialize and no public read path.
+pub struct ProtectedCredential {
+    pub ciphertext: Vec<u8>,
+    pub nonce: [u8; 12],
+    pub key_id: String,
+}
 /// Operator-owned allowlist; never read from public connection body or caller metadata.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

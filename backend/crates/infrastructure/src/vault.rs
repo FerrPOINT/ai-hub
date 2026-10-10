@@ -14,6 +14,22 @@ pub struct Sealed {
     pub nonce: [u8; 12],
     pub ciphertext: Vec<u8>,
 }
+impl aihub_application::CredentialProtection for Vault {
+    fn protect(
+        &self,
+        installation: Uuid,
+        connection: Uuid,
+        generation: i64,
+        secret: &[u8],
+    ) -> Result<aihub_domain::connections::ProtectedCredential, HubError> {
+        let sealed = self.seal(installation, connection, generation, "credential", secret)?;
+        Ok(aihub_domain::connections::ProtectedCredential {
+            ciphertext: sealed.ciphertext,
+            nonce: sealed.nonce,
+            key_id: hex::encode(self.fingerprint()),
+        })
+    }
+}
 
 impl aihub_application::OperationBinding for Vault {
     fn bind(&self, value: &serde_json::Value) -> Result<[u8; 32], HubError> {

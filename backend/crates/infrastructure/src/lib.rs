@@ -4,6 +4,7 @@ mod cancellation;
 pub mod config;
 mod connection_control;
 mod control;
+mod credentials;
 pub mod financial;
 pub mod maintenance;
 pub mod namespace_reader;

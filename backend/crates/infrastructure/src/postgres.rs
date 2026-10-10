@@ -140,6 +140,29 @@ impl PgStore {
 
 #[async_trait]
 impl FoundationStore for PgStore {
+    async fn write_credential(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        connection: Uuid,
+        expected: i64,
+        secret: &aihub_domain::connections::ProtectedCredential,
+    ) -> Result<Operation, HubError> {
+        self.write_credential_control(subject, key, binding, connection, expected, secret)
+            .await
+    }
+    async fn revoke_credential(
+        &self,
+        subject: &str,
+        key: Uuid,
+        binding: [u8; 32],
+        connection: Uuid,
+        version: i64,
+    ) -> Result<Operation, HubError> {
+        self.revoke_credential_control(subject, key, binding, connection, version)
+            .await
+    }
     async fn connection_page(
         &self,
         subject: &str,

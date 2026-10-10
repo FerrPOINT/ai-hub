@@ -30,6 +30,8 @@
   TTL, bounded timer loop и shutdown; provider transport не подключён к worker.
 - Connection list/read/create/update, operator endpoint policy, keyed operation/CAS;
   rename сохраняет authorization, material settings создают непроверенную generation.
+- Write-only credential PUT/revoke, keyed secret binding и own generation AAD;
+  prepared не означает active, original replay не восстанавливает отозванную auth.
 
 ### Повторная проверка 2026-10-10
 

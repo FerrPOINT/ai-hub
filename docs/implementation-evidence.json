@@ -119,7 +119,13 @@
       "tests": ["TC-001", "TC-018", "TC-027"],
       "source": "backend/crates/infrastructure/tests/connection_pg.rs",
       "evidence": "postgresql17_connection_allowlist_identity_cas_generation_rename_and_audit_rollback_pass_20261010",
-      "remaining": "write-only credentials/managed auth; catalog and model context; disable/archive/proof; UI and actual owner/provider qualification"
+      "remaining": "managed auth; catalog and model context; disable/archive/proof; UI and actual owner/provider qualification"
+    },
+    {
+      "tests": ["TC-002", "TC-018", "TC-027"],
+      "source": "backend/crates/infrastructure/tests/credential_pg.rs",
+      "evidence": "postgresql17_foundation_write_only_generation_aad_canary_revoke_original_replay_and_atomic_audit_pass_20261010",
+      "remaining": "whole-app log/UI/export/live secret canary; owned adapter secret context; provider auth qualification; managed login; restore and full TC"
     }
   ],
   "required_acceptance": {

@@ -33,7 +33,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
 | S2a | В реализации: financial SQL/source guard, control API, basic budget UI, protected results и wired maintenance worker | Price/source forms и milestone runtime/provider evidence |
-| S2b | Начат: connection metadata control и operator endpoint allowlist | Credential/catalog/context, draft/CAS/proof/publication UI/API |
+| S2b | В реализации: connection control, endpoint allowlist и write-only credential generations | Catalog/context, disable/archive, draft/CAS/proof/publication и UI |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
 | S5 | Не реализован | Полный operational UI и authorized snapshot/export |
@@ -294,5 +294,28 @@ endpoint ref/provider matching, same-key create, stale/concurrent CAS, two same-
 connections, rename without deauthorization, material generation change, pinned
 original readback, immutable old snapshot и final audit rollback. Six HTTP access
 tests pass; raw URL/secret fields rejected без secret echo. Credentials/quota
-отсутствуют, новый connection status authorization_unknown. Credential write/revoke,
-disable/enable/archive, model catalog и live verification ещё не реализованы.
+отсутствуют в metadata fixture, новый connection status authorization_unknown.
+Disable/enable/archive, model catalog и live verification ещё не реализованы.
+
+## Write-only credentials — текущий срез
+
+Добавлены PUT/DELETE credentials с 202 Operation. PUT требует own expected_generation,
+DELETE — fresh strong If-Match/version. Principal scope и key проверяются до seal.
+Secret DTO — zeroizing, без Debug/Serialize; API schema writeOnly. Keyed canonical
+operation binding включает secret digest, но digest/plaintext не сохраняются.
+Ciphertext AES-GCM связан AAD с installation/connection/new generation/purpose.
+
+Новая generation prepared: наличие ключа не подтверждает account/currency/capability.
+Settings и operator endpoint snapshot копируются, qualified tier/authorization не
+наследуются. Старые credential versions становятся revoked с сохранением ciphertext;
+qualification инвалидируется. Revoke создаёт own revoked generation и сохраняет
+disabled state. Managed provider отвергает API-key body и требует own login.
+
+Fresh PostgreSQL17 после `0013`: 1 scenario pass, 0 ignored, 0.54s. Actual Foundation
+crypto/store boundary проверяет concurrent same-key write, stale generation, changed
+secret conflict, wrong key/generation AAD, отсутствие canary в operations/audit/
+Connection/Operation JSON, final audit rollback, revoke и original replay без
+восстановления authorization. Immutable ciphertext/delete constraints pass.
+Seven API access tests pass, error responses не echo secret. Accounts/secret
+синтетические; live Dev key не перенесён, provider I/O 0. Whole-app log/browser/export
+canary, active adapter secret context и managed login остаются S3/S4/S7 gates.

@@ -11,6 +11,15 @@ use uuid::Uuid;
 pub trait OperationBinding: Send + Sync {
     fn bind(&self, value: &serde_json::Value) -> Result<[u8; 32], HubError>;
 }
+pub trait CredentialProtection: Send + Sync {
+    fn protect(
+        &self,
+        installation: Uuid,
+        connection: Uuid,
+        generation: i64,
+        secret: &[u8],
+    ) -> Result<aihub_domain::connections::ProtectedCredential, HubError>;
+}
 
 #[async_trait]
 pub trait ResultDelivery: Send + Sync {
@@ -64,6 +73,27 @@ pub trait CentralAuthentication: Send + Sync {
 
 #[async_trait]
 pub trait FoundationStore: Send + Sync {
+    async fn write_credential(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+        _connection: Uuid,
+        _expected_generation: i64,
+        _secret: &aihub_domain::connections::ProtectedCredential,
+    ) -> Result<Operation, HubError> {
+        Err(HubError::Unavailable)
+    }
+    async fn revoke_credential(
+        &self,
+        _subject: &str,
+        _key: Uuid,
+        _binding: [u8; 32],
+        _connection: Uuid,
+        _expected_version: i64,
+    ) -> Result<Operation, HubError> {
+        Err(HubError::Unavailable)
+    }
     async fn connection_page(
         &self,
         _subject: &str,
@@ -207,6 +237,7 @@ pub struct Foundation {
     pub auth: Arc<dyn CentralAuthentication>,
     pub store: Arc<dyn FoundationStore>,
     pub bindings: Arc<dyn OperationBinding>,
+    pub secrets: Arc<dyn CredentialProtection>,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -216,6 +247,53 @@ pub struct BudgetFilter {
 }
 
 impl Foundation {
+    pub async fn write_credential(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        id: Uuid,
+        input: &aihub_domain::connections::CredentialInput,
+    ) -> Result<Operation, HubError> {
+        use sha2::{Digest, Sha256};
+        principal.require_config(true)?;
+        input.validate()?;
+        if key.is_nil() || id.is_nil() {
+            return Err(HubError::Invalid("credential operation"));
+        }
+        let binding=self.bindings.bind(&serde_json::json!({"installation":self.installation_id,"principal":principal.subject,"action":"credential.write","connection":id,"generation":input.expected_generation,"type":"api_key","secret_digest":hex::encode(Sha256::digest(input.secret.as_bytes()))}))?;
+        let protected = self.secrets.protect(
+            self.installation_id,
+            id,
+            input.expected_generation + 1,
+            input.secret.as_bytes(),
+        )?;
+        self.store
+            .write_credential(
+                &principal.subject,
+                key,
+                binding,
+                id,
+                input.expected_generation,
+                &protected,
+            )
+            .await
+    }
+    pub async fn revoke_credential(
+        &self,
+        principal: &HumanPrincipal,
+        key: Uuid,
+        id: Uuid,
+        version: i64,
+    ) -> Result<Operation, HubError> {
+        principal.require_config(true)?;
+        if key.is_nil() || id.is_nil() || version < 1 {
+            return Err(HubError::Invalid("credential revoke"));
+        }
+        let binding=self.bindings.bind(&serde_json::json!({"installation":self.installation_id,"principal":principal.subject,"action":"credential.revoke","connection":id,"version":version}))?;
+        self.store
+            .revoke_credential(&principal.subject, key, binding, id, version)
+            .await
+    }
     pub async fn connections(
         &self,
         principal: &HumanPrincipal,
