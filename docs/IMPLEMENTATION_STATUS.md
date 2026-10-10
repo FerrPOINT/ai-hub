@@ -32,7 +32,7 @@ DB-01 не меняет владельцев или public NamespaceRef wire.
 | Этап | Фактический статус | Следующий результат |
 | --- | --- | --- |
 | S1 | В реализации: Cargo/pnpm manifests, DB-01, vault/auth ports, control reads, generated API и Base shell | PostgreSQL/SSO/grants/readers/locked consumer evidence и own runtime |
-| S2a | В реализации: financial SQL, control prices/budgets/sources, basic budget UI, protected result buffer и cancel/recovery ports | Source bindings в admission/dispatch, price/source forms и runtime lifecycle worker |
+| S2a | В реализации: financial SQL и source guard, control prices/budgets/sources, basic budget UI, protected result buffer и cancel/recovery ports | Price/source forms и runtime lifecycle worker |
 | S2b | Не реализован | Connection/catalog/draft/CAS/proof/publication UI/API |
 | S3 | Не реализован | Scoped public/signed inference и общий financial engine |
 | S4 | Не реализован | Own provider accounts с explicit budget и live receipts |
@@ -151,7 +151,7 @@ requests/attempts/usage/replay, immutable ledger и budget/reservation табл�
 effective expense pointer; `0008` — frozen wire mode и encrypted result receipts.
 Application financial port реализован для internal
 verification; provider transport ещё не подключён. Price forms,
-source binding в financial admission/dispatch и runtime lifecycle worker ещё впереди. Public/evaluation admission выключен до
+runtime lifecycle worker ещё впереди. Public/evaluation admission выключен до
 S3/S6. FK profile revision присоединяется S2b до public inference.
 
 ## Protected results — текущий срез
@@ -226,6 +226,28 @@ concurrent operation replay/CAS, exact connection/currency neighbors, expiry no
 fallback, original readback после новых revisions, unique start, immutable rows,
 final audit rollback и auto rejection/qualification/invalidation. Catalog/account
 fixtures синтетические; ledger entries 0, provider calls 0. Five API access tests
-pass (controlled authentication ports). Financial engine ещё использует прежний
-internal quote intent: обязательный source snapshot/version guard добавляется
-следующим integrated slice до первого probe. Поэтому полный TC-038/S2a не закрыт.
+pass (controlled authentication ports). Полный TC-038/S2a остаётся открытым до
+forms, runtime worker и live adapter evidence.
+
+## Financial source binding — текущий срез
+
+`0011` добавляет own source FK и immutable policy version в request. Legacy
+version не угадывается. Admission разрешает quote только по current resolver,
+замораживает ID/version/tier/quote/as_of и source data status в attempt snapshot.
+Unconfigured resolution имеет null source ID и не создаёт placeholder policy.
+Configured, но expired source сохраняет ID и unknown quote; hard budget не
+подменяет missing price нулём.
+
+Dispatch повторно проверяет source/policy/quote/tier перед one-send claim.
+Stable advisory lock покрывает и отсутствие policy row; source writer не может
+вставить новую policy между проверкой и commit claim. Future revision также
+меняет policy version и инвалидирует queued proof. Same-key replay возвращает
+старый request; попытка заменить его source context конфликтует.
+Settlement использует original price snapshot, а не current resolver.
+
+Fresh PostgreSQL17 financial fixture после `0011`: 1 scenario pass, 0 ignored,
+14.85s. Сохранены прежние money/replay/cancel/recovery assertions. Дополнительно
+проверены no-placeholder unconfigured hard-budget denial, future source version
+change при той же effective quote, denied old claim, original request replay,
+immutable source version, fresh proof и late usage по прежним 2/8 rates после
+смены на 20/80. Currency/account/proof синтетические; provider calls 0.

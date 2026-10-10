@@ -123,6 +123,36 @@ impl FinancialAdmission for PgStore {
         sqlx::query("SELECT q.id FROM runtime_qualifications q JOIN connections c ON c.installation_id=q.installation_id AND c.id=q.connection_id JOIN connection_generations g ON g.connection_id=q.connection_id AND g.generation=q.generation JOIN verification_evidence e ON e.installation_id=q.installation_id AND e.id=q.proof_id WHERE q.installation_id=$1 AND q.id=$2 AND q.connection_id=$3 AND q.generation=$4 AND q.provider_model_id=$5 AND q.state='active' AND c.status='enabled' AND c.generation=q.generation AND g.authorization_state='active' AND g.adapter_revision=q.adapter_revision AND g.endpoint_policy_hash=q.endpoint_policy_hash AND q.adapter_revision=$6 AND q.endpoint_policy_hash=$7 AND q.billing_currency=$8 AND e.state='verified' AND e.expires_at>now() FOR SHARE OF q,c,g,e")
             .bind(self.installation_id).bind(attempt.get::<Uuid,_>("qualification_id")).bind(attempt.get::<Uuid,_>("connection_id")).bind(attempt.get::<i64,_>("generation")).bind(target.get("model_id").and_then(|v|v.as_str()).ok_or(HubError::Unavailable)?).bind(snapshot.get("adapter_revision").and_then(|v|v.as_str()).ok_or(HubError::Unavailable)?).bind(snapshot.get("endpoint_policy_hash").and_then(|v|v.as_str()).ok_or(HubError::Unavailable)?).bind(attempt.get::<String,_>("currency")).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::PreconditionFailed)?;
         let fence = Uuid::new_v4();
+        let frozen: aihub_domain::pricing_sources::PricingResolution = serde_json::from_value(
+            snapshot
+                .get("cost_source")
+                .cloned()
+                .ok_or(HubError::PreconditionFailed)?,
+        )
+        .map_err(|_| HubError::PreconditionFailed)?;
+        let as_of: chrono::DateTime<chrono::Utc> = sqlx::query_scalar("SELECT clock_timestamp()")
+            .fetch_one(&mut *tx)
+            .await
+            .map_err(|e| db_failure(e, line!()))?;
+        let current = self
+            .resolve_pricing_locked(
+                &mut tx,
+                attempt.get("connection_id"),
+                target
+                    .get("model_id")
+                    .and_then(|v| v.as_str())
+                    .ok_or(HubError::Unavailable)?,
+                &Currency::parse(&attempt.get::<String, _>("currency"))?,
+                as_of,
+            )
+            .await?;
+        if current.source_revision_id != frozen.source_revision_id
+            || current.policy_version != frozen.policy_version
+            || current.price_revision_id != frozen.price_revision_id
+            || current.tier != frozen.tier
+        {
+            return Err(HubError::PreconditionFailed);
+        }
         sqlx::query("UPDATE attempts SET state='dispatched',accepted='unknown',dispatched_at=now(),dispatch_owner_id=$3,dispatch_fence=$4,dispatch_lease_until=now()+make_interval(secs=>$5),version=version+1 WHERE installation_id=$1 AND id=$2")
             .bind(self.installation_id).bind(attempt_id).bind(owner_id).bind(fence).bind(lease_seconds as f64).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
         sqlx::query("UPDATE requests SET state='dispatching',version=version+1 WHERE installation_id=$1 AND id=$2")
@@ -197,6 +227,10 @@ impl FinancialAdmission for PgStore {
             return Err(HubError::Unavailable);
         }
         if intent.client_id.is_nil()
+            || intent.pricing_policy_version < 0
+            || intent
+                .pricing_source_revision_id
+                .is_some_and(|id| id.is_nil())
             || !(5..=120).contains(&intent.intent_ttl_seconds)
             || intent.grant_id.is_nil()
             || intent.idempotency_key.is_nil()
@@ -242,7 +276,7 @@ impl FinancialAdmission for PgStore {
             .bind(self.installation_id).bind(intent.client_id).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::Forbidden)?;
         let project: String = client.get("project_binding");
         let namespace: Option<Uuid> = client.get("namespace_binding_id");
-        let previous=sqlx::query("SELECT r.id,r.state,r.principal_id,r.payload_hmac,r.grant_id,r.wire_protocol,r.streaming,r.intent_ttl_seconds,a.id AS attempt_id,a.currency,a.upper_provider_cost FROM requests r JOIN attempts a ON a.installation_id=r.installation_id AND a.request_id=r.id AND a.ordinal=1 WHERE r.installation_id=$1 AND r.client_id=$2 AND r.idempotency_key=$3")
+        let previous=sqlx::query("SELECT r.id,r.state,r.principal_id,r.payload_hmac,r.grant_id,r.wire_protocol,r.streaming,r.intent_ttl_seconds,r.pricing_source_revision_id,r.pricing_policy_version,a.deployment_snapshot,a.id AS attempt_id,a.currency,a.upper_provider_cost FROM requests r JOIN attempts a ON a.installation_id=r.installation_id AND a.request_id=r.id AND a.ordinal=1 WHERE r.installation_id=$1 AND r.client_id=$2 AND r.idempotency_key=$3")
             .bind(self.installation_id).bind(intent.client_id).bind(intent.idempotency_key).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
         if let Some(previous) = previous {
             let hash: Vec<u8> = previous.get("payload_hmac");
@@ -256,6 +290,14 @@ impl FinancialAdmission for PgStore {
                 || previous.get::<Option<bool>, _>("streaming") != Some(intent.streaming)
                 || previous.get::<Option<i32>, _>("intent_ttl_seconds")
                     != Some(intent.intent_ttl_seconds)
+                || previous.get::<Option<Uuid>, _>("pricing_source_revision_id")
+                    != intent.pricing_source_revision_id
+                || previous.get::<Option<i64>, _>("pricing_policy_version")
+                    != Some(intent.pricing_policy_version)
+                || previous
+                    .get::<serde_json::Value, _>("deployment_snapshot")
+                    .pointer("/target/price_revision_id")
+                    != Some(&serde_json::json!(intent.price_revision_id))
             {
                 return Err(HubError::IdempotencyConflict);
             }
@@ -311,7 +353,7 @@ impl FinancialAdmission for PgStore {
         let probe=sqlx::query("SELECT configuration,draft_model_id,operation_id FROM probe_snapshots WHERE installation_id=$1 AND id=$2")
             .bind(self.installation_id).bind(intent.probe_snapshot_id).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::NotFound)?;
         let configuration: serde_json::Value = probe.get("configuration");
-        let target = serde_json::json!({"connection_id":intent.connection_id,"generation":intent.generation,"model_id":intent.model_id,"tier":intent.tier,"price_revision_id":intent.price_revision_id,"qualification_id":intent.qualification_id,"upper_usage":intent.upper_usage,"protocol":intent.protocol,"streaming":intent.streaming,"intent_ttl_seconds":intent.intent_ttl_seconds});
+        let target = serde_json::json!({"connection_id":intent.connection_id,"generation":intent.generation,"model_id":intent.model_id,"tier":intent.tier,"price_revision_id":intent.price_revision_id,"qualification_id":intent.qualification_id,"upper_usage":intent.upper_usage,"protocol":intent.protocol,"streaming":intent.streaming,"intent_ttl_seconds":intent.intent_ttl_seconds,"pricing_source_revision_id":intent.pricing_source_revision_id,"pricing_policy_version":intent.pricing_policy_version});
         if !configuration
             .get("targets")
             .and_then(|v| v.as_array())
@@ -320,6 +362,26 @@ impl FinancialAdmission for PgStore {
             return Err(HubError::PreconditionFailed);
         }
         let profile: Option<Uuid> = probe.get("draft_model_id");
+        let as_of: chrono::DateTime<chrono::Utc> = sqlx::query_scalar("SELECT clock_timestamp()")
+            .fetch_one(&mut *tx)
+            .await
+            .map_err(|e| db_failure(e, line!()))?;
+        let cost_source = self
+            .resolve_pricing_locked(
+                &mut tx,
+                intent.connection_id,
+                &intent.model_id,
+                &currency,
+                as_of,
+            )
+            .await?;
+        if cost_source.source_revision_id != intent.pricing_source_revision_id
+            || cost_source.policy_version != intent.pricing_policy_version
+            || cost_source.price_revision_id != intent.price_revision_id
+            || cost_source.tier.as_deref() != Some(intent.tier.as_str())
+        {
+            return Err(HubError::PreconditionFailed);
+        }
         let (price, upper) = if let Some(price_id) = intent.price_revision_id {
             let row=sqlx::query("SELECT * FROM price_revisions WHERE installation_id=$1 AND id=$2 AND connection_id=$3 AND model_id=$4 AND tier=$5 AND currency=$6 AND effective_from<=now() AND (effective_to IS NULL OR effective_to>now())")
                 .bind(self.installation_id).bind(price_id).bind(intent.connection_id).bind(&intent.model_id).bind(&intent.tier).bind(currency.to_string()).fetch_optional(&mut *tx).await.map_err(|err|db_failure(err,line!()))?.ok_or(HubError::PreconditionFailed)?;
@@ -405,9 +467,9 @@ impl FinancialAdmission for PgStore {
                 period_ids.push(row.get::<Uuid, _>("id"));
             }
         }
-        sqlx::query("INSERT INTO requests(id,installation_id,client_id,grant_id,principal_id,project_binding,request_kind,probe_snapshot_id,idempotency_key,payload_hmac,state,namespace_binding_id,operation_id,wire_protocol,streaming,intent_ttl_seconds,intent_deadline) VALUES($1,$2,$3,$4,$5,$6,'verification',$7,$8,$9,'admitted',$10,$11,$12,$13,$14,LEAST(now()+make_interval(secs=>$14::double precision),$15))")
-            .bind(request_id).bind(self.installation_id).bind(intent.client_id).bind(intent.grant_id).bind(&intent.principal_id).bind(&project).bind(intent.probe_snapshot_id).bind(intent.idempotency_key).bind(intent.payload_hmac.as_slice()).bind(namespace).bind(probe.get::<Uuid,_>("operation_id")).bind(intent.protocol.as_str()).bind(intent.streaming).bind(intent.intent_ttl_seconds).bind(grant.get::<chrono::DateTime<chrono::Utc>,_>("expires_at")).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
-        let deployment = serde_json::json!({"target":target,"price":price,"qualified_capabilities":qualification.get::<serde_json::Value,_>("capabilities"),"cost_source_state":if intent.price_revision_id.is_some(){"configured"}else{"unconfigured"},"adapter_revision":qualification.get::<String,_>("adapter_revision"),"endpoint_policy_hash":qualification.get::<String,_>("endpoint_policy_hash")});
+        sqlx::query("INSERT INTO requests(id,installation_id,client_id,grant_id,principal_id,project_binding,request_kind,probe_snapshot_id,idempotency_key,payload_hmac,state,namespace_binding_id,operation_id,wire_protocol,streaming,intent_ttl_seconds,intent_deadline,pricing_source_revision_id,pricing_policy_version) VALUES($1,$2,$3,$4,$5,$6,'verification',$7,$8,$9,'admitted',$10,$11,$12,$13,$14,LEAST(now()+make_interval(secs=>$14::double precision),$15),$16,$17)")
+            .bind(request_id).bind(self.installation_id).bind(intent.client_id).bind(intent.grant_id).bind(&intent.principal_id).bind(&project).bind(intent.probe_snapshot_id).bind(intent.idempotency_key).bind(intent.payload_hmac.as_slice()).bind(namespace).bind(probe.get::<Uuid,_>("operation_id")).bind(intent.protocol.as_str()).bind(intent.streaming).bind(intent.intent_ttl_seconds).bind(grant.get::<chrono::DateTime<chrono::Utc>,_>("expires_at")).bind(cost_source.source_revision_id).bind(cost_source.policy_version).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
+        let deployment = serde_json::json!({"target":target,"price":price,"cost_source":cost_source,"qualified_capabilities":qualification.get::<serde_json::Value,_>("capabilities"),"cost_source_state":if cost_source.source_revision_id.is_some(){"configured"}else{"unconfigured"},"adapter_revision":qualification.get::<String,_>("adapter_revision"),"endpoint_policy_hash":qualification.get::<String,_>("endpoint_policy_hash")});
         sqlx::query("INSERT INTO attempts(id,installation_id,request_id,ordinal,connection_id,generation,deployment_snapshot,state,accepted,qualification_id,upper_provider_cost,currency) VALUES($1,$2,$3,1,$4,$5,$6,'intended','not_accepted',$7,$8,$9)")
             .bind(attempt_id).bind(self.installation_id).bind(request_id).bind(intent.connection_id).bind(intent.generation).bind(deployment).bind(intent.qualification_id).bind(upper.map(decimal).transpose()?).bind(currency.to_string()).execute(&mut *tx).await.map_err(|err|db_failure(err,line!()))?;
         if let Some(upper) = upper {

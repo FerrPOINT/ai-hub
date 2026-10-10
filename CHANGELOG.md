@@ -24,6 +24,8 @@
   запрещают новый send после expiry/restart.
 - Pricing-source GET/POST и immutable CAS timeline; exact quote/tier/currency
   bindings, expired source identity без fallback и qualified catalog provenance.
+- Financial admission/dispatch используют source snapshot/version/tier/quote;
+  future policy инвалидирует queued proof, late settlement сохраняет прежнюю цену.
 
 ### Повторная проверка 2026-10-10
 

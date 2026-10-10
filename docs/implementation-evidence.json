@@ -101,7 +101,13 @@
       "tests": ["TC-010", "TC-018", "TC-027", "TC-038"],
       "source": "backend/crates/infrastructure/tests/pricing_pg.rs",
       "evidence": "postgresql17_source_control_cas_tuple_currency_expiry_no_fallback_auto_provenance_and_atomic_audit_pass_20261010",
-      "remaining": "mandatory source snapshot/version in admission/dispatch; source/price forms; real catalog adapter/currency witness; project tariff charges; full TC and live runtime"
+      "remaining": "source/price forms; real catalog adapter/currency witness; project tariff charges; full TC and live runtime"
+    },
+    {
+      "tests": ["TC-010", "TC-011", "TC-027", "TC-028", "TC-038"],
+      "source": "backend/crates/infrastructure/tests/financial_pg.rs",
+      "evidence": "postgresql17_mandatory_source_snapshot_future_version_claim_guard_and_frozen_late_settlement_pass_20261010",
+      "remaining": "all-provider actual account qualification; public/signed runtime; operational forms; process crash/restore; project tariffs and complete acceptance"
     }
   ],
   "required_acceptance": {

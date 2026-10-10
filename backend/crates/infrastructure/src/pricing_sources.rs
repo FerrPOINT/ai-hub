@@ -100,6 +100,9 @@ impl PgStore {
         let tier: String = conn
             .get::<Option<String>, _>("billing_tier")
             .ok_or(HubError::PreconditionFailed)?;
+        // Covers the absent-policy case without creating an unconfigured placeholder row.
+        sqlx::query("SELECT pg_advisory_xact_lock(hashtextextended(jsonb_build_array($1::text,$2::text,$3::text)::text,310817))")
+            .bind(input.connection_id.to_string()).bind(&input.model_id).bind(input.currency.to_string()).execute(&mut *tx).await.map_err(|e|db_failure(e,line!()))?;
         let as_of: DateTime<Utc> = sqlx::query_scalar("SELECT clock_timestamp()")
             .fetch_one(&mut *tx)
             .await
@@ -207,22 +210,23 @@ impl PgStore {
         currency: &Currency,
         as_of: DateTime<Utc>,
     ) -> Result<PricingResolution, HubError> {
+        let tier:Option<String>=sqlx::query_scalar("SELECT g.billing_tier FROM connections c JOIN connection_generations g ON g.connection_id=c.id AND g.generation=c.generation WHERE c.installation_id=$1 AND c.id=$2 AND c.status='enabled' FOR SHARE OF c,g")
+            .bind(self.installation_id).bind(connection).fetch_optional(&mut **tx).await.map_err(|e|db_failure(e,line!()))?.flatten();
+        sqlx::query("SELECT pg_advisory_xact_lock_shared(hashtextextended(jsonb_build_array($1::text,$2::text,$3::text)::text,310817))")
+            .bind(connection.to_string()).bind(model).bind(currency.to_string()).execute(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;
         let policy=sqlx::query("SELECT id,version FROM pricing_source_policies WHERE installation_id=$1 AND connection_id=$2 AND model_id=$3 AND currency=$4 FOR SHARE")
             .bind(self.installation_id).bind(connection).bind(model).bind(currency.to_string()).fetch_optional(&mut **tx).await.map_err(|e|db_failure(e,line!()))?;
         let mut value = PricingResolution {
             source_revision_id: None,
             policy_version: policy.as_ref().map(|p| p.get("version")).unwrap_or(0),
             price_revision_id: None,
-            tier: None,
+            tier: tier.clone(),
             as_of,
             data_status: PricingDataStatus::Unavailable,
         };
         let Some(policy) = policy else {
             return Ok(value);
         };
-        let tier:Option<String>=sqlx::query_scalar("SELECT g.billing_tier FROM connections c JOIN connection_generations g ON g.connection_id=c.id AND g.generation=c.generation WHERE c.installation_id=$1 AND c.id=$2")
-            .bind(self.installation_id).bind(connection).fetch_optional(&mut **tx).await.map_err(|e|db_failure(e,line!()))?.flatten();
-        value.tier = tier.clone();
         let Some(row)=sqlx::query("SELECT * FROM pricing_source_revisions WHERE installation_id=$1 AND policy_id=$2 AND effective_from<=$3 ORDER BY effective_from DESC LIMIT 1")
             .bind(self.installation_id).bind(policy.get::<Uuid,_>("id")).bind(as_of).fetch_optional(&mut **tx).await.map_err(|e|db_failure(e,line!()))? else {return Ok(value)};
         value.source_revision_id = Some(row.get("id"));

@@ -25,6 +25,56 @@ async fn fixture_intent_ttl(
     qualification: Uuid,
     intent_ttl_seconds: i32,
 ) -> AdmissionIntent {
+    fixture_context(
+        store,
+        connection,
+        Some(price),
+        qualification,
+        intent_ttl_seconds,
+    )
+    .await
+}
+async fn fixture_context(
+    store: &PgStore,
+    connection: Uuid,
+    price: Option<Uuid>,
+    qualification: Uuid,
+    intent_ttl_seconds: i32,
+) -> AdmissionIntent {
+    let usd = Currency::parse("USD").unwrap();
+    let mut source = store
+        .resolve_pricing(connection, "model-a", &usd)
+        .await
+        .unwrap();
+    if let Some(price) = price {
+        if source.price_revision_id != Some(price) {
+            let input = aihub_domain::pricing_sources::PricingSourceInput {
+                connection_id: connection,
+                model_id: "model-a".into(),
+                currency: usd.clone(),
+                mode: aihub_domain::pricing_sources::PricingMode::Manual,
+                manual_price_revision_id: Some(price),
+                expected_version: source.policy_version,
+                effective_from: chrono::Utc::now() - chrono::Duration::milliseconds(1),
+                effective_to: None,
+            };
+            use aihub_application::OperationBinding;
+            let vault = Vault::new(vec![7; 32]).unwrap();
+            store
+                .create_pricing_source(
+                    "fixture-worker",
+                    Uuid::new_v4(),
+                    vault.bind(&serde_json::to_value(&input).unwrap()).unwrap(),
+                    &input,
+                )
+                .await
+                .unwrap();
+            source = store
+                .resolve_pricing(connection, "model-a", &usd)
+                .await
+                .unwrap();
+        }
+    }
     let client = Uuid::new_v4();
     let grant = Uuid::new_v4();
     let probe = Uuid::new_v4();
@@ -47,9 +97,11 @@ async fn fixture_intent_ttl(
         .bind(grant).bind(store.installation_id).bind(client).bind(serde_json::to_value(bounds).unwrap()).execute(&store.pool).await.unwrap();
     sqlx::query("INSERT INTO operations(id,installation_id,principal_kind,principal_id,idempotency_key,binding_hmac,action,state,expires_at) VALUES($1,$2,'internal','fixture-worker',$1,$3,'verify','pending',now()+interval '30 days')").bind(op).bind(store.installation_id).bind(vec![7_u8;32]).execute(&store.pool).await.unwrap();
     let usage = Usage::normalized(100, 0, 50, "qualified-synthetic-fixture".into()).unwrap();
-    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":price,"qualification_id":qualification,"upper_usage":usage,"protocol":"chat_completions","streaming":false,"intent_ttl_seconds":intent_ttl_seconds});
+    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":price,"qualification_id":qualification,"upper_usage":usage,"protocol":"chat_completions","streaming":false,"intent_ttl_seconds":intent_ttl_seconds,"pricing_source_revision_id":source.source_revision_id,"pricing_policy_version":source.policy_version});
     sqlx::query("INSERT INTO probe_snapshots(id,installation_id,operation_id,scope,config_hash,configuration) VALUES($1,$2,$3,'connection_model',$4,$5)").bind(probe).bind(store.installation_id).bind(op).bind("1".repeat(64)).bind(serde_json::json!({"targets":[target]})).execute(&store.pool).await.unwrap();
     AdmissionIntent {
+        pricing_source_revision_id: source.source_revision_id,
+        pricing_policy_version: source.policy_version,
         intent_ttl_seconds,
         protocol: aihub_domain::replay::ReplayProtocol::ChatCompletions,
         streaming: false,
@@ -65,7 +117,7 @@ async fn fixture_intent_ttl(
         generation: 1,
         model_id: "model-a".into(),
         tier: "metered".into(),
-        price_revision_id: Some(price),
+        price_revision_id: price,
         qualification_id: qualification,
         upper_usage: usage,
     }
@@ -94,7 +146,7 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
     .unwrap();
     let connection = Uuid::new_v4();
     sqlx::query("INSERT INTO connections(id,installation_id,provider_id,display_name,endpoint_policy_ref,billing_mode,status) VALUES($1,$2,$3,'synthetic-fixture','controlled-http','metered','enabled')").bind(connection).bind(installation).bind(provider).execute(&store.pool).await.unwrap();
-    sqlx::query("INSERT INTO connection_generations(connection_id,generation,authorization_state,adapter_revision,endpoint_policy_hash) VALUES($1,1,'active','synthetic-v1',$2)").bind(connection).bind("1".repeat(64)).execute(&store.pool).await.unwrap();
+    sqlx::query("INSERT INTO connection_generations(connection_id,generation,authorization_state,adapter_revision,endpoint_policy_hash,billing_tier) VALUES($1,1,'active','synthetic-v1',$2,'metered')").bind(connection).bind("1".repeat(64)).execute(&store.pool).await.unwrap();
     let price = Uuid::new_v4();
     sqlx::query("INSERT INTO price_revisions(id,installation_id,connection_id,model_id,tier,currency,input_uncached,input_cached,output_billable,request_fee,effective_from,source) VALUES($1,$2,$3,'model-a','metered','USD',2,0.5,8,0,now()-interval '1 minute','synthetic-fixture')").bind(price).bind(installation).bind(connection).execute(&store.pool).await.unwrap();
     let account_op = Uuid::new_v4();
@@ -107,6 +159,19 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
     sqlx::query("INSERT INTO runtime_qualifications(id,installation_id,connection_id,generation,provider_model_id,adapter_revision,endpoint_policy_hash,proof_id,capabilities,state,billing_currency,billing_currency_origin) VALUES($1,$2,$3,1,'model-a','synthetic-v1',$4,$5,'{\"trusted_charge_receipts\":true}','active','USD','synthetic-statement')").bind(qualification).bind(installation).bind(connection).bind("1".repeat(64)).bind(evidence).execute(&store.pool).await.unwrap();
     let budget = Uuid::new_v4();
     sqlx::query("INSERT INTO budget_policies(id,installation_id,scope_type,scope_id,currency,period,hard_limit,thresholds,status) VALUES($1,$2,'installation',$3,'USD','utc_day',0.0006,'[80,95]','active')").bind(budget).bind(installation).bind(installation.to_string()).execute(&store.pool).await.unwrap();
+    // Legitimate unconfigured source before a policy exists; a hard cap still rejects unknown cost.
+    let no_price = fixture_context(&store, connection, None, qualification, 120).await;
+    assert!(matches!(
+        store.reserve(&no_price).await,
+        Err(HubError::BudgetExceeded)
+    ));
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM pricing_source_policies")
+            .fetch_one(&store.pool)
+            .await
+            .unwrap(),
+        0
+    );
     let one = fixture_intent(&store, connection, price, qualification).await;
     let two = fixture_intent(&store, connection, price, qualification).await;
     for bad in [
@@ -128,23 +193,6 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
             Err(HubError::Forbidden)
         ));
     }
-    // A missing price is not zero, even for an otherwise authorized exact target.
-    let no_price = AdmissionIntent {
-        price_revision_id: None,
-        ..fixture_intent(&store, connection, price, qualification).await
-    };
-    let target = serde_json::json!({"connection_id":connection,"generation":1,"model_id":"model-a","tier":"metered","price_revision_id":null,"qualification_id":qualification,"upper_usage":no_price.upper_usage,"protocol":no_price.protocol,"streaming":no_price.streaming,"intent_ttl_seconds":no_price.intent_ttl_seconds});
-    let no_price_probe = Uuid::new_v4();
-    sqlx::query("INSERT INTO probe_snapshots(id,installation_id,operation_id,scope,config_hash,configuration) SELECT $1,installation_id,operation_id,scope,config_hash,$2 FROM probe_snapshots WHERE id=$3")
-        .bind(no_price_probe).bind(serde_json::json!({"targets":[target]})).bind(no_price.probe_snapshot_id).execute(&store.pool).await.unwrap();
-    let no_price = AdmissionIntent {
-        probe_snapshot_id: Some(no_price_probe),
-        ..no_price
-    };
-    assert!(matches!(
-        store.reserve(&no_price).await,
-        Err(HubError::BudgetExceeded)
-    ));
     sqlx::raw_sql("CREATE FUNCTION reject_fixture_reserve_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='request.reserve' THEN RAISE EXCEPTION 'fixture audit unavailable'; END IF; RETURN NEW; END; $$; CREATE TRIGGER reject_fixture_reserve_audit BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION reject_fixture_reserve_audit();").execute(&store.pool).await.unwrap();
     assert!(store.reserve(&one).await.is_err());
     for table in [
@@ -895,6 +943,126 @@ async fn durable_budget_admission_concurrency_replay_and_unknown_hold() {
         .await
         .unwrap(),
         0
+    );
+    // A future policy change invalidates a queued proof even while the effective quote stays the same.
+    let queued = fixture_intent(&store, connection, price, qualification).await;
+    let queued_admission = store.reserve(&queued).await.unwrap();
+    let replacement_price = Uuid::new_v4();
+    sqlx::query("INSERT INTO price_revisions(id,installation_id,connection_id,model_id,tier,currency,input_uncached,input_cached,output_billable,request_fee,effective_from,source) VALUES($1,$2,$3,'model-a','metered','USD',20,5,80,0,now()-interval '1 minute','synthetic-new-price')").bind(replacement_price).bind(installation).bind(connection).execute(&store.pool).await.unwrap();
+    let replacement = aihub_domain::pricing_sources::PricingSourceInput {
+        connection_id: connection,
+        model_id: "model-a".into(),
+        currency: Currency::parse("USD").unwrap(),
+        mode: aihub_domain::pricing_sources::PricingMode::Manual,
+        manual_price_revision_id: Some(replacement_price),
+        expected_version: queued.pricing_policy_version,
+        effective_from: chrono::Utc::now() + chrono::Duration::seconds(30),
+        effective_to: None,
+    };
+    use aihub_application::OperationBinding;
+    store
+        .create_pricing_source(
+            "fixture-worker",
+            Uuid::new_v4(),
+            vault
+                .bind(&serde_json::to_value(&replacement).unwrap())
+                .unwrap(),
+            &replacement,
+        )
+        .await
+        .unwrap();
+    let current = store
+        .resolve_pricing(connection, "model-a", &Currency::parse("USD").unwrap())
+        .await
+        .unwrap();
+    assert_eq!(
+        current.source_revision_id,
+        queued.pricing_source_revision_id
+    );
+    assert_eq!(current.price_revision_id, Some(price));
+    assert!(current.policy_version > queued.pricing_policy_version);
+    assert!(matches!(
+        store
+            .claim_dispatch(queued_admission.attempt_id, Uuid::new_v4(), 120)
+            .await,
+        Err(HubError::PreconditionFailed)
+    ));
+    assert_eq!(
+        store.reserve(&queued).await.unwrap().request_id,
+        queued_admission.request_id,
+        "same key returns old request, never re-admits it under the new policy"
+    );
+    assert!(matches!(
+        store
+            .reserve(&AdmissionIntent {
+                pricing_policy_version: current.policy_version,
+                ..queued.clone()
+            })
+            .await,
+        Err(HubError::IdempotencyConflict)
+    ));
+    assert!(
+        sqlx::query(
+            "UPDATE requests SET pricing_policy_version=pricing_policy_version+1 WHERE id=$1"
+        )
+        .bind(queued_admission.request_id)
+        .execute(&store.pool)
+        .await
+        .is_err()
+    );
+    let fresh = fixture_intent(&store, connection, price, qualification).await;
+    let fresh_admission = store.reserve(&fresh).await.unwrap();
+    let fresh_claim = store
+        .claim_dispatch(fresh_admission.attempt_id, Uuid::new_v4(), 120)
+        .await
+        .unwrap();
+    let immediate = aihub_domain::pricing_sources::PricingSourceInput {
+        expected_version: current.policy_version,
+        effective_from: chrono::Utc::now() - chrono::Duration::milliseconds(1),
+        ..replacement
+    };
+    store
+        .create_pricing_source(
+            "fixture-worker",
+            Uuid::new_v4(),
+            vault
+                .bind(&serde_json::to_value(&immediate).unwrap())
+                .unwrap(),
+            &immediate,
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        store
+            .resolve_pricing(connection, "model-a", &Currency::parse("USD").unwrap())
+            .await
+            .unwrap()
+            .price_revision_id,
+        Some(replacement_price)
+    );
+    let late_usage = SettlementFact {
+        attempt_id: fresh_claim.attempt_id,
+        authority: SettlementAuthority::Dispatch {
+            owner_id: fresh_claim.owner_id,
+            fence: fresh_claim.fence,
+        },
+        source: "synthetic-v1".into(),
+        source_event_id: "after-source-change".into(),
+        acceptance: Acceptance::Accepted,
+        terminal: TerminalState::Completed,
+        usage: Some(Usage::normalized(50, 0, 10, "synthetic-old-snapshot".into()).unwrap()),
+        receipt: None,
+    };
+    assert_eq!(
+        store
+            .settle(&late_usage)
+            .await
+            .unwrap()
+            .amount
+            .unwrap()
+            .to_string(),
+        "0.000180000000000000",
+        "late settlement uses frozen 2/8 rates, not replacement 20/80 rates"
     );
     assert!(
         sqlx::query("UPDATE ledger_entries SET amount=0")

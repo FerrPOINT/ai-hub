@@ -31,6 +31,8 @@ impl Purpose {
 /// Internal frozen context, never deserialized from public caller metadata.
 #[derive(Clone)]
 pub struct AdmissionIntent {
+    pub pricing_source_revision_id: Option<Uuid>,
+    pub pricing_policy_version: i64,
     pub intent_ttl_seconds: i32,
     pub protocol: crate::replay::ReplayProtocol,
     pub streaming: bool,
